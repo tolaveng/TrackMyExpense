@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApp.Data;
+using Web.WebApp.Data;
 
-namespace WebApp
+namespace Web.WebApp
 {
     public class Startup
     {
