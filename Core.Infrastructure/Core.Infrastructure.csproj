@@ -7,7 +7,7 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Mapper\" />
-    <Folder Include="Repository\" />
+    <Folder Include="Repository\IRepository\" />
   </ItemGroup>
 
   <ItemGroup>

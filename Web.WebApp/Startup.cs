@@ -1,4 +1,5 @@
 using Core.Infrastructure.Database;
+using Core.Infrastructure.Database.Config;
 using Core.Infrastructure.Database.Schema;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -48,6 +49,8 @@ namespace Web.WebApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                SeedAppUser.SeedDeveloperUser(app);
             }
             else
             {
@@ -77,12 +80,12 @@ namespace Web.WebApp
 
         private void AddAppIdentity(IServiceCollection services, IWebHostEnvironment env)
         {
-            services.AddIdentity<User, Role>(opt => {
+            services.AddIdentity<AppUser, AppRole>(opt => {
 
                 if (env.IsDevelopment())
                 {
                     opt.Password.RequireDigit = false;
-                    opt.Password.RequiredLength = 4;
+                    opt.Password.RequiredLength = 3;
                     opt.Password.RequireLowercase = false;
                     opt.Password.RequireUppercase = false;
                     opt.Password.RequireNonAlphanumeric = false;

@@ -12,7 +12,7 @@ namespace Core.Infrastructure.Database.Schema
     {
         [Key]
         public long ExpenseId { get; set; }
-
+        public Guid UserId { get; set; }
         public int CategoryId { get; set; }
         public virtual Category Category { get; set; }
 

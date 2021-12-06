@@ -1,4 +1,5 @@
-﻿using Core.Infrastructure.Database.Schema;
+﻿using Core.Infrastructure.Database.Config;
+using Core.Infrastructure.Database.Schema;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace Core.Infrastructure.Database
 {
     // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-5.0
 
-    public class AppDbContext : IdentityDbContext<User, Role, Guid>
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
         private readonly IWebHostEnvironment _environment;
         private readonly IAppDbContextConfigurator _configurator;
@@ -40,30 +41,33 @@ namespace Core.Infrastructure.Database
         {
             base.OnModelCreating(modelBuilder);
 
-            // Relationship: https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
-
-            modelBuilder.Entity<Expense>()
-                .HasOne(x => x.Category)
-                .WithMany()                         // Without navigation property: WithMany(x => x.Expenses)
-                .HasForeignKey(x => x.CategoryId)
-                .IsRequired();
-
             // Not use, Table per type (TPT), use the default one to avoid performance issue
             // https://docs.microsoft.com/en-us/ef/core/modeling/inheritance
             // modelBuilder.Entity<RecurrentExpense>().ToTable("RecurrentExpense");
 
             // Change the table names of .Net Core Identity, so that they look nicer.
-            modelBuilder.Entity<User>(entity => { entity.ToTable("Users"); });
-            modelBuilder.Entity<Role>(entity => { entity.ToTable("Roles"); });
+            modelBuilder.Entity<AppUser>(entity => { entity.ToTable("Users"); });
+            modelBuilder.Entity<AppRole>(entity => { entity.ToTable("Roles"); });
             modelBuilder.Entity<IdentityUserRole<Guid>>(entity => { entity.ToTable("UserRoles"); });
             modelBuilder.Entity<IdentityUserClaim<Guid>>(entity => { entity.ToTable("UserClaims"); });
             modelBuilder.Entity<IdentityUserLogin<Guid>>(entity => { entity.ToTable("UserLogins"); });
             modelBuilder.Entity<IdentityUserToken<Guid>>(entity => { entity.ToTable("UserTokens"); });
             modelBuilder.Entity<IdentityRoleClaim<Guid>>(entity => { entity.ToTable("RoleClaims"); });
 
-            // Seed Data
-            //modelBuilder.ApplyConfiguration(new AppRoleConfiguration());
-            //modelBuilder.ApplyConfiguration(new AppUserConfiguration());
+            // Relationship: https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
+            modelBuilder.Entity<Expense>()
+                .HasOne(x => x.Category)
+                .WithMany()                         // Without navigation property: WithMany(x => x.Expenses)
+                .HasForeignKey(x => x.CategoryId)
+                .IsRequired();
+
+            modelBuilder.Entity<AppUser>()
+                .HasMany(x => x.Expenses)
+                .WithOne()
+                .HasForeignKey(x => x.UserId);
+
+            // Seed Default Data
+            modelBuilder.ApplyConfiguration(new AppRoleConfig());
         }
     }
 }

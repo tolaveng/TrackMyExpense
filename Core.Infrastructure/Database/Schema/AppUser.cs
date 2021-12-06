@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Infrastructure.Database.Schema
 {
-    public class User : IdentityUser<Guid>
+    public class AppUser : IdentityUser<Guid>
     {
         public string FullName { get; set; }
         public Subcription Subcription { get; set; }
@@ -16,5 +16,7 @@ namespace Core.Infrastructure.Database.Schema
         public DateTime ExpiryDate { get; set; }
         public bool IsCanceled { get; set; }
         public bool IsDisabled { get; set; }
+
+        public virtual ICollection<Expense> Expenses { get; set; }
     }
 }

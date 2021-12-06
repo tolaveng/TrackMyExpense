@@ -3,6 +3,7 @@ using System;
 using Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211206085423_InitDataTables")]
+    partial class InitDataTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,29 +49,6 @@ namespace Core.Infrastructure.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("Roles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "d1ca48c6-d4d7-42f5-a4ab-1f12db2c0cce",
-                            Name = "Developer",
-                            NormalizedName = "DEVELOPER"
-                        },
-                        new
-                        {
-                            Id = new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"),
-                            ConcurrencyStamp = "5df128f6-38d1-4ba7-b35c-3a94b21c1893",
-                            Name = "Support",
-                            NormalizedName = "SUPPORT"
-                        },
-                        new
-                        {
-                            Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "e5f1b7cb-7171-47dd-992c-992484893e54",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        });
                 });
 
             modelBuilder.Entity("Core.Infrastructure.Database.Schema.AppUser", b =>

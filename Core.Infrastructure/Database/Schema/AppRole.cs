@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Infrastructure.Database.Schema
 {
-    public class Role : IdentityRole<Guid>
+    public class AppRole : IdentityRole<Guid>
     {
     }
 }
