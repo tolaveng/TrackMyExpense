@@ -1,4 +1,5 @@
-﻿using Core.Domain.Enums;
+﻿using Core.Domain.Entities;
+using Core.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,5 @@
-﻿using Core.Infrastructure.Database.Config;
+﻿using Core.Domain.Entities;
+using Core.Infrastructure.Database.Config;
 using Core.Infrastructure.Database.Schema;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -54,12 +55,17 @@ namespace Core.Infrastructure.Database
             modelBuilder.Entity<IdentityUserToken<Guid>>(entity => { entity.ToTable("UserTokens"); });
             modelBuilder.Entity<IdentityRoleClaim<Guid>>(entity => { entity.ToTable("RoleClaims"); });
 
+            modelBuilder.Entity<Expense>().HasKey(x => x.ExpenseId);
+            modelBuilder.Entity<Category>().HasKey(x => x.CategoryId);
+
             // Relationship: https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
             modelBuilder.Entity<Expense>()
                 .HasOne(x => x.Category)
                 .WithMany()                         // Without navigation property: WithMany(x => x.Expenses)
                 .HasForeignKey(x => x.CategoryId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.SetNull);
+
 
             modelBuilder.Entity<AppUser>()
                 .HasMany(x => x.Expenses)

@@ -22,11 +22,11 @@ namespace Core.Infrastructure.Database.Config
                 NormalizedName = UserBaseRole.Developer.ToString().ToUpper()
             };
 
-            var supportRole = new AppRole()
+            var staffRole = new AppRole()
             {
                 Id = Guid.Parse("9F50E6A8-E115-489B-8B4B-DBC70B2FBBFC"),
-                Name = UserBaseRole.Support.ToString(),
-                NormalizedName = UserBaseRole.Support.ToString().ToUpper()
+                Name = UserBaseRole.Staff.ToString(),
+                NormalizedName = UserBaseRole.Staff.ToString().ToUpper()
             };
 
             var userRole = new AppRole()
@@ -38,7 +38,7 @@ namespace Core.Infrastructure.Database.Config
 
             builder.HasData(
                 developerRole,
-                supportRole,
+                staffRole,
                 userRole
             );
         }

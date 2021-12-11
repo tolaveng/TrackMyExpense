@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211206092614_SeedRole")]
-    partial class SeedRole
+    [Migration("20211211085030_InitDataTables")]
+    partial class InitDataTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,99 @@ namespace Core.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Core.Domain.Entities.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("IconName")
+                        .HasColumnType("text");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
+                {
+                    b.Property<long>("ExpenseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ExpenseId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedBy")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string[]>("Images")
+                        .HasColumnType("text[]");
+
+                    b.Property<bool>("IsTaxable")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ModifiedBy")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("PayDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Payee")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Ref")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ExpenseId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Expenses");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Expense");
+                });
 
             modelBuilder.Entity("Core.Infrastructure.Database.Schema.AppRole", b =>
                 {
@@ -54,21 +147,21 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "d1ca48c6-d4d7-42f5-a4ab-1f12db2c0cce",
+                            ConcurrencyStamp = "c57fd750-4af5-406e-a4d6-370de1d1015a",
                             Name = "Developer",
                             NormalizedName = "DEVELOPER"
                         },
                         new
                         {
                             Id = new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"),
-                            ConcurrencyStamp = "5df128f6-38d1-4ba7-b35c-3a94b21c1893",
-                            Name = "Support",
-                            NormalizedName = "SUPPORT"
+                            ConcurrencyStamp = "22fa8d3a-677e-42f8-a24a-287840dee2ca",
+                            Name = "Staff",
+                            NormalizedName = "STAFF"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "e5f1b7cb-7171-47dd-992c-992484893e54",
+                            ConcurrencyStamp = "c4332b59-9114-4bd2-9481-25cc68295339",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -155,95 +248,6 @@ namespace Core.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("Core.Infrastructure.Database.Schema.Category", b =>
-                {
-                    b.Property<int>("CategoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
-
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("ArchivedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("IconName")
-                        .HasColumnType("text");
-
-                    b.HasKey("CategoryId");
-
-                    b.ToTable("Categories");
-                });
-
-            modelBuilder.Entity("Core.Infrastructure.Database.Schema.Expense", b =>
-                {
-                    b.Property<long>("ExpenseId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ExpenseId"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("ArchivedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string[]>("Images")
-                        .HasColumnType("text[]");
-
-                    b.Property<bool>("IsTaxable")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("PayDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Payee")
-                        .HasColumnType("text");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Ref")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("ExpenseId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Expenses");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Expense");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -349,9 +353,9 @@ namespace Core.Infrastructure.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Infrastructure.Database.Schema.RecurrentExpense", b =>
+            modelBuilder.Entity("Core.Domain.Entities.RecurrentExpense", b =>
                 {
-                    b.HasBaseType("Core.Infrastructure.Database.Schema.Expense");
+                    b.HasBaseType("Core.Domain.Entities.Expense");
 
                     b.Property<DateTime>("FinishDate")
                         .HasColumnType("timestamp with time zone");
@@ -368,12 +372,12 @@ namespace Core.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue("RecurrentExpense");
                 });
 
-            modelBuilder.Entity("Core.Infrastructure.Database.Schema.Expense", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
                 {
-                    b.HasOne("Core.Infrastructure.Database.Schema.Category", "Category")
+                    b.HasOne("Core.Domain.Entities.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.HasOne("Core.Infrastructure.Database.Schema.AppUser", null)

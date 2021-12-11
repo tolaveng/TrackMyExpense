@@ -16,10 +16,9 @@ namespace Core.Infrastructure.Migrations
                 {
                     CategoryId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CategoryName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    CategoryName = table.Column<string>(type: "text", nullable: true),
                     IconName = table.Column<string>(type: "text", nullable: true),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false),
-                    ArchivedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -109,13 +108,16 @@ namespace Core.Infrastructure.Migrations
                     IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
                     Images = table.Column<string[]>(type: "text[]", nullable: true),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false),
-                    ArchivedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Discriminator = table.Column<string>(type: "text", nullable: false),
                     IsCompleted = table.Column<bool>(type: "boolean", nullable: true),
                     IsRecurrent = table.Column<bool>(type: "boolean", nullable: true),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    FinishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    FinishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifiedBy = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -125,7 +127,7 @@ namespace Core.Infrastructure.Migrations
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "CategoryId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Expenses_Users_UserId",
                         column: x => x.UserId,
@@ -217,6 +219,16 @@ namespace Core.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "c4332b59-9114-4bd2-9481-25cc68295339", "User", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "c57fd750-4af5-406e-a4d6-370de1d1015a", "Developer", "DEVELOPER" },
+                    { new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"), "22fa8d3a-677e-42f8-a24a-287840dee2ca", "Staff", "STAFF" }
                 });
 
             migrationBuilder.CreateIndex(

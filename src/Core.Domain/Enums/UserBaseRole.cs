@@ -10,6 +10,6 @@ namespace Core.Domain.Enums
     {
         User,
         Developer,
-        Support
+        Staff
     }
 }

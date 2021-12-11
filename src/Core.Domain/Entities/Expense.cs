@@ -1,16 +1,11 @@
 ﻿using Core.Domain.Enums;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Core.Infrastructure.Database.Schema
+
+namespace Core.Domain.Entities
 {
-    public class Expense : IArchivable
+    public class Expense : AuditableEntity
     {
-        [Key]
         public long ExpenseId { get; set; }
         public Guid UserId { get; set; }
         public int CategoryId { get; set; }
@@ -26,8 +21,5 @@ namespace Core.Infrastructure.Database.Schema
         public PaymentMethod PaymentMethod { get; set; }
 
         public string[] Images { get; set; }
-
-        public bool Archived { get; set; }
-        public DateTimeOffset? ArchivedAt { get; set; } = DateTime.UtcNow;
     }
 }
