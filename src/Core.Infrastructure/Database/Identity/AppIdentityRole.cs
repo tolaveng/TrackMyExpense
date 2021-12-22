@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Infrastructure.Database.Schema
+namespace Core.Infrastructure.Database.Identity
 {
-    public class AppRole : IdentityRole<Guid>
+    public class AppIdentityRole : IdentityRole<Guid>
     {
     }
 }

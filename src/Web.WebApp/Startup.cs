@@ -1,6 +1,7 @@
+using Core.Application.IRepositories;
 using Core.Infrastructure.Database;
-using Core.Infrastructure.Database.Config;
-using Core.Infrastructure.Database.Schema;
+using Core.Infrastructure.Database.Identity;
+using Core.Infrastructure.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -31,11 +32,16 @@ namespace Web.WebApp
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(Startup));
+
             // Infrastructure
             AddDatabase(services);
 
             // .Net Identity
             AddAppIdentity(services, Environment);
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddRazorPages();
             services.AddServerSideBlazor();
@@ -78,7 +84,7 @@ namespace Web.WebApp
 
         private void AddAppIdentity(IServiceCollection services, IWebHostEnvironment env)
         {
-            services.AddIdentity<AppUser, AppRole>(opt => {
+            services.AddIdentity<AppIdentityUser, AppIdentityRole>(opt => {
 
                 if (env.IsDevelopment())
                 {

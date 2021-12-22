@@ -1,4 +1,4 @@
-﻿using Core.Domain.IRepositories;
+﻿using Core.Application.IRepositories;
 using Core.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,6 +7,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+
+// The Repository and Unit of Work Patterns
+// https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
 
 namespace Core.Infrastructure.Repository
 {
@@ -28,6 +31,15 @@ namespace Core.Infrastructure.Repository
             {
                 _db.Remove(record);
             }
+        }
+
+        public async Task Delete(T entity)
+        {
+            if (_context.Entry(entity).State == EntityState.Detached)
+            {
+                _db.Attach(entity);
+            }
+            _db.Remove(entity);
         }
 
         public async Task DeleteRange(IEnumerable<T> entities)

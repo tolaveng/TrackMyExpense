@@ -1,5 +1,4 @@
 ﻿using Core.Domain.Enums;
-using Core.Infrastructure.Database.Schema;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Infrastructure.Database.Config
+namespace Core.Infrastructure.Database.Identity
 {
     public static class SeedAppUser
     {
@@ -18,10 +17,10 @@ namespace Core.Infrastructure.Database.Config
             using( var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-                var userManager = serviceScope.ServiceProvider.GetService<UserManager<AppUser>>();
-                var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<AppRole>>();
+                var userManager = serviceScope.ServiceProvider.GetService<UserManager<AppIdentityUser>>();
+                var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<AppIdentityRole>>();
 
-                var devUser = new AppUser
+                var devUser = new AppIdentityUser
                 {
                     UserName = "dev",
                     FullName = "Developer",

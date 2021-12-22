@@ -1,5 +1,6 @@
 # Project Structure
 The project structure and design based on Domain Driven Design and Clean Architecture design pattern.
+## Core.Application
 ## Core.Domain
 The Domain layer contains businese logic, entities and types. It is an independent, other projects will flow inward and depend on this domain project.
 Domain project should consist of POCO and should not depend on external library and frameworks includes .Net Framework.

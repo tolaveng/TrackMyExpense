@@ -1,6 +1,5 @@
 ﻿using Core.Domain.Entities;
-using Core.Infrastructure.Database.Config;
-using Core.Infrastructure.Database.Schema;
+using Core.Infrastructure.Database.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -15,7 +14,7 @@ namespace Core.Infrastructure.Database
 {
     // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/customize-identity-model?view=aspnetcore-5.0
 
-    public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
+    public class AppDbContext : IdentityDbContext<AppIdentityUser, AppIdentityRole, Guid>
     {
         private readonly IWebHostEnvironment _environment;
         private readonly IAppDbContextConfigurator _configurator;
@@ -47,8 +46,8 @@ namespace Core.Infrastructure.Database
             // modelBuilder.Entity<RecurrentExpense>().ToTable("RecurrentExpense");
 
             // Change the table names of .Net Core Identity, so that they look nicer.
-            modelBuilder.Entity<AppUser>(entity => { entity.ToTable("Users"); });
-            modelBuilder.Entity<AppRole>(entity => { entity.ToTable("Roles"); });
+            modelBuilder.Entity<AppIdentityUser>(entity => { entity.ToTable("Users"); });
+            modelBuilder.Entity<AppIdentityRole>(entity => { entity.ToTable("Roles"); });
             modelBuilder.Entity<IdentityUserRole<Guid>>(entity => { entity.ToTable("UserRoles"); });
             modelBuilder.Entity<IdentityUserClaim<Guid>>(entity => { entity.ToTable("UserClaims"); });
             modelBuilder.Entity<IdentityUserLogin<Guid>>(entity => { entity.ToTable("UserLogins"); });
@@ -67,7 +66,7 @@ namespace Core.Infrastructure.Database
                 .OnDelete(DeleteBehavior.SetNull);
 
 
-            modelBuilder.Entity<AppUser>()
+            modelBuilder.Entity<AppIdentityUser>()
                 .HasMany(x => x.Expenses)
                 .WithOne()
                 .HasForeignKey(x => x.UserId);
