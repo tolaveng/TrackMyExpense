@@ -57,13 +57,11 @@ namespace Core.Infrastructure.Database
             modelBuilder.Entity<Expense>().HasKey(x => x.ExpenseId);
             modelBuilder.Entity<Category>().HasKey(x => x.CategoryId);
 
-            // Relationship: https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
+            // Relationship:
+            // https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
             modelBuilder.Entity<Expense>()
-                .HasOne(x => x.Category)
-                .WithMany()                         // Without navigation property: WithMany(x => x.Expenses)
-                .HasForeignKey(x => x.CategoryId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasMany(x => x.Categories)
+                .WithMany(x => x.Expenses);
 
 
             modelBuilder.Entity<AppIdentityUser>()

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20211211085030_InitDataTables")]
-    partial class InitDataTables
+    [Migration("20211222051236_InitTables")]
+    partial class InitTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,21 @@ namespace Core.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CategoryExpense", b =>
+                {
+                    b.Property<int>("CategoriesCategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("ExpensesExpenseId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("CategoriesCategoryId", "ExpensesExpenseId");
+
+                    b.HasIndex("ExpensesExpenseId");
+
+                    b.ToTable("CategoryExpense");
+                });
 
             modelBuilder.Entity("Core.Domain.Entities.Category", b =>
                 {
@@ -59,9 +74,6 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -108,8 +120,6 @@ namespace Core.Infrastructure.Migrations
 
                     b.HasKey("ExpenseId");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("Expenses");
@@ -117,7 +127,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasDiscriminator<string>("Discriminator").HasValue("Expense");
                 });
 
-            modelBuilder.Entity("Core.Infrastructure.Database.Schema.AppRole", b =>
+            modelBuilder.Entity("Core.Infrastructure.Database.Identity.AppIdentityRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -147,27 +157,27 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "c57fd750-4af5-406e-a4d6-370de1d1015a",
+                            ConcurrencyStamp = "c08c5da7-1317-4519-bc7f-86bdf3e05051",
                             Name = "Developer",
                             NormalizedName = "DEVELOPER"
                         },
                         new
                         {
                             Id = new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"),
-                            ConcurrencyStamp = "22fa8d3a-677e-42f8-a24a-287840dee2ca",
+                            ConcurrencyStamp = "878ace04-4c85-41ab-9184-9cbc53236aa2",
                             Name = "Staff",
                             NormalizedName = "STAFF"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "c4332b59-9114-4bd2-9481-25cc68295339",
+                            ConcurrencyStamp = "e2c91588-5b25-4407-9484-7840a6e2e3c6",
                             Name = "User",
                             NormalizedName = "USER"
                         });
                 });
 
-            modelBuilder.Entity("Core.Infrastructure.Database.Schema.AppUser", b =>
+            modelBuilder.Entity("Core.Infrastructure.Database.Identity.AppIdentityUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -372,26 +382,33 @@ namespace Core.Infrastructure.Migrations
                     b.HasDiscriminator().HasValue("RecurrentExpense");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
+            modelBuilder.Entity("CategoryExpense", b =>
                 {
-                    b.HasOne("Core.Domain.Entities.Category", "Category")
+                    b.HasOne("Core.Domain.Entities.Category", null)
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasForeignKey("CategoriesCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Infrastructure.Database.Schema.AppUser", null)
+                    b.HasOne("Core.Domain.Entities.Expense", null)
+                        .WithMany()
+                        .HasForeignKey("ExpensesExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
+                {
+                    b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityUser", null)
                         .WithMany("Expenses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Core.Infrastructure.Database.Schema.AppRole", null)
+                    b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -400,7 +417,7 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Core.Infrastructure.Database.Schema.AppUser", null)
+                    b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -409,7 +426,7 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Core.Infrastructure.Database.Schema.AppUser", null)
+                    b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -418,13 +435,13 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Core.Infrastructure.Database.Schema.AppRole", null)
+                    b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Core.Infrastructure.Database.Schema.AppUser", null)
+                    b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -433,14 +450,14 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("Core.Infrastructure.Database.Schema.AppUser", null)
+                    b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.Infrastructure.Database.Schema.AppUser", b =>
+            modelBuilder.Entity("Core.Infrastructure.Database.Identity.AppIdentityUser", b =>
                 {
                     b.Navigation("Expenses");
                 });

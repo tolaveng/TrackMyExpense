@@ -1,6 +1,6 @@
 ﻿using Core.Domain.Enums;
 using System;
-
+using System.Collections.Generic;
 
 namespace Core.Domain.Entities
 {
@@ -8,9 +8,6 @@ namespace Core.Domain.Entities
     {
         public long ExpenseId { get; set; }
         public Guid UserId { get; set; }
-        public int CategoryId { get; set; }
-        public virtual Category Category { get; set; }
-
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public string Currency { get; set; }
@@ -19,7 +16,8 @@ namespace Core.Domain.Entities
         public string Payee { get; set; }
         public bool IsTaxable { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
-
         public string[] Images { get; set; }
+
+        public virtual ICollection<Category> Categories { get; set; }
     }
 }

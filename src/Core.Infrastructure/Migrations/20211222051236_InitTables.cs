@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Core.Infrastructure.Migrations
 {
-    public partial class InitDataTables : Migration
+    public partial class InitTables : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -98,7 +98,6 @@ namespace Core.Infrastructure.Migrations
                     ExpenseId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CategoryId = table.Column<int>(type: "integer", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     Currency = table.Column<string>(type: "text", nullable: true),
@@ -122,12 +121,6 @@ namespace Core.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Expenses", x => x.ExpenseId);
-                    table.ForeignKey(
-                        name: "FK_Expenses_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "CategoryId",
-                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Expenses_Users_UserId",
                         column: x => x.UserId,
@@ -221,20 +214,44 @@ namespace Core.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CategoryExpense",
+                columns: table => new
+                {
+                    CategoriesCategoryId = table.Column<int>(type: "integer", nullable: false),
+                    ExpensesExpenseId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryExpense", x => new { x.CategoriesCategoryId, x.ExpensesExpenseId });
+                    table.ForeignKey(
+                        name: "FK_CategoryExpense_Categories_CategoriesCategoryId",
+                        column: x => x.CategoriesCategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryExpense_Expenses_ExpensesExpenseId",
+                        column: x => x.ExpensesExpenseId,
+                        principalTable: "Expenses",
+                        principalColumn: "ExpenseId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "c4332b59-9114-4bd2-9481-25cc68295339", "User", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "c57fd750-4af5-406e-a4d6-370de1d1015a", "Developer", "DEVELOPER" },
-                    { new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"), "22fa8d3a-677e-42f8-a24a-287840dee2ca", "Staff", "STAFF" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "e2c91588-5b25-4407-9484-7840a6e2e3c6", "User", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "c08c5da7-1317-4519-bc7f-86bdf3e05051", "Developer", "DEVELOPER" },
+                    { new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"), "878ace04-4c85-41ab-9184-9cbc53236aa2", "Staff", "STAFF" }
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Expenses_CategoryId",
-                table: "Expenses",
-                column: "CategoryId");
+                name: "IX_CategoryExpense_ExpensesExpenseId",
+                table: "CategoryExpense",
+                column: "ExpensesExpenseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_UserId",
@@ -282,7 +299,7 @@ namespace Core.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Expenses");
+                name: "CategoryExpense");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
@@ -301,6 +318,9 @@ namespace Core.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Expenses");
 
             migrationBuilder.DropTable(
                 name: "Roles");
