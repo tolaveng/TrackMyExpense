@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Core.Infrastructure.Migrations
 {
-    public partial class InitTables : Migration
+    public partial class InitDataTables : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -243,9 +243,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "e2c91588-5b25-4407-9484-7840a6e2e3c6", "User", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "c08c5da7-1317-4519-bc7f-86bdf3e05051", "Developer", "DEVELOPER" },
-                    { new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"), "878ace04-4c85-41ab-9184-9cbc53236aa2", "Staff", "STAFF" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "33323c67-3580-4fef-aa03-2a17b8fc8380", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "64a61921-1f76-4dd9-9b2a-42bc7f5c309f", "admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

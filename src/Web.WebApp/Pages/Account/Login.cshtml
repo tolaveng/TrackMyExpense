@@ -1,0 +1,41 @@
+﻿@page "/account/login"
+@model Web.WebApp.Pages.Account.LoginModel
+
+@{
+    ViewData["Title"] = "Account Log In";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" id="account">
+            <div>
+                <span class="text-danger">@Model.ErrorMessage</span>
+            </div>
+            <div class="form-floating">
+                <input type="text" class="form-control" placeholder="Email" asp-for="Input.Email" aria-required="true"/>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" placeholder="Password" asp-for="Input.Password"/>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div>
+                <div class="checkbox">
+                    <label asp-for="Input.RememberMe" class="form-label">
+                        <input type="checkbox" class="form-check-input" asp-for="Input.RememberMe"/>
+                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                    </label>
+                </div>
+            </div>
+            <div>
+                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+            </div>
+            @Html.AntiForgeryToken()
+        </form>
+    </div>
+</div>
+@*
+@section scripts{
+   <partial name="_ValidationScriptsPartial" />
+}
+*@

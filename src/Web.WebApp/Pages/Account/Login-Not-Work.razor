@@ -1,0 +1,72 @@
+﻿@page "/account/login-not-working"
+@using Microsoft.AspNetCore.Components
+@using Core.Application.Models
+@using Core.Application.Services.IServices
+@inject NavigationManager NavigationManager
+@inject IUserService _userService;
+@inject AuthenticationStateProvider appAuthenticationStateProvider;
+<h3>Login</h3>
+<section>
+    <EditForm Model="@user" OnValidSubmit="@UserLogin">
+        <DataAnnotationsValidator/>
+        <div class="col-12 row">
+            <InputText class="form-control col-12" @bind-Value="user.Email" placeholder="Email" />
+            <ValidationMessage For="@(() => user.Email)" />
+        </div>
+        <br />
+        <div class="col-12 row">
+            <InputText type="password" class="form-control col-12" @bind-Value="user.Password" placeholder="Password" />
+            <ValidationMessage For="@(() => user.Password)" />
+        </div>
+        <br />
+        <div>
+            <InputCheckbox class="form-check-input" @bind-Value="RememberMe" id="chkRememberMe" /><label for="chkRememberMe">Remember Me</label>
+        </div>
+        <br />
+        <div class="col-12 row">
+            <span class="col-12"></span>
+            <input type="submit" class="form-control col-6 btn btn-primary" value="Login" />
+            <a href="/account/register" class="col-3">Sign up</a> | <a href="/account/forgotpassword" class="col-3">Forgot Password</a>
+        </div>
+        <br />
+        <div class="col-12 row" style="text-align:left; font-weight:bold">
+            <span class="col-12">@LoginMesssage</span>
+            <ValidationSummary />
+        </div>
+    </EditForm>
+</section>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string ReturnUrl { get; set; }
+
+    public UserDto user { get; set; } = new UserDto();
+
+    public string LoginMesssage { get; set; }
+
+    public bool RememberMe { get; set; } = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        //var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        //if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("redirectUrl", out var _redirectUrl))
+        //{
+        //    RedirectUrl = _redirectUrl;
+        //}
+        // Clear the existing external cookie to ensure a clean login process
+    }
+
+    private async Task<bool> UserLogin()
+    {
+        var returnUrl = ReturnUrl ?? "/";
+        if (string.IsNullOrWhiteSpace(user.Email) || string.IsNullOrWhiteSpace(user.Password))
+        {
+            LoginMesssage = "Email and Password are required";
+            return await Task.FromResult(false);
+        }
+
+        NavigationManager.NavigateTo(returnUrl);
+        return await Task.FromResult(true);
+    }
+}

@@ -9,11 +9,11 @@ namespace Core.Application.Common
     public class Result<T> where T : class
     {
         public bool Succeeded { get; set; }
-        public T Data { get; set; }
+        public T? Data { get; set; }
         public string Message { get; set; }
         public string[] Errors { get; set; }
 
-        public Result(bool succeeded, T data, string message, string[] errors)
+        public Result(bool succeeded, T? data, string message, string[] errors)
         {
             Succeeded = succeeded;
             Data = data;

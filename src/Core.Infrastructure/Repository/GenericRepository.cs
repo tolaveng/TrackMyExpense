@@ -24,27 +24,31 @@ namespace Core.Infrastructure.Repository
             _db = context.Set<T>();
         }
 
-        public async Task Delete(int id)
+        public async Task<bool> Delete(int id)
         {
             var record = await _db.FindAsync(id);
             if (record != null)
             {
                 _db.Remove(record);
+                return true;
             }
+            return false;
         }
 
-        public async Task Delete(T entity)
+        public bool Delete(T entity)
         {
             if (_context.Entry(entity).State == EntityState.Detached)
             {
                 _db.Attach(entity);
             }
             _db.Remove(entity);
+            return true;
         }
 
-        public async Task DeleteRange(IEnumerable<T> entities)
+        public bool DeleteRange(IEnumerable<T> entities)
         {
             _db.RemoveRange(entities);
+            return true;
         }
 
         public async Task<T> Get(Expression<Func<T, bool>> expression, List<string> includes = null)
@@ -101,10 +105,11 @@ namespace Core.Infrastructure.Repository
             await _db.AddRangeAsync(entities);
         }
 
-        public async Task Update(T entity)
+        public bool Update(T entity)
         {
             _db.Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
+            return true;
         }
     }
 }

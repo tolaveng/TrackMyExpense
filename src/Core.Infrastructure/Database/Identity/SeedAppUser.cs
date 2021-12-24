@@ -1,18 +1,15 @@
-﻿using Core.Domain.Enums;
+﻿using Core.Domain.Constants;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Infrastructure.Database.Identity
 {
     public static class SeedAppUser
     {
-        public static async void SeedDeveloperUser(IApplicationBuilder app)
+        public static async void SeedAdminUser(IApplicationBuilder app)
         {
             using( var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
@@ -20,13 +17,13 @@ namespace Core.Infrastructure.Database.Identity
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<AppIdentityUser>>();
                 var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<AppIdentityRole>>();
 
-                var devUser = new AppIdentityUser
+                var adminUser = new AppIdentityUser
                 {
-                    UserName = "dev",
-                    FullName = "Developer",
-                    NormalizedUserName = "DEV",
-                    Email = "dev@dev.local",
-                    NormalizedEmail = "DEV@DEV.LOCAL",
+                    UserName = "admin@local.dev",
+                    FullName = "Administrator User",
+                    NormalizedUserName = "ADMIN@LOCAL.DEV",
+                    Email = "admin@local.dev",
+                    NormalizedEmail = "ADMIN@LOCAL.DEV",
                     PhoneNumber = "1",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
@@ -34,14 +31,14 @@ namespace Core.Infrastructure.Database.Identity
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                if (!context.Users.Any(u => u.UserName == devUser.UserName))
+                if (!context.Users.Any(u => u.UserName == adminUser.UserName))
                 {
                     //var password = new PasswordHasher<AppUser>();
-                    //var hashed = password.HashPassword(devUser, "dev");
+                    //var hashed = password.HashPassword(adminUser, "admin");
                     //devUser.PasswordHash = hashed;
 
-                    await userManager.CreateAsync(devUser, "dev");
-                    await userManager.AddToRoleAsync(devUser, UserBaseRole.Developer.ToString());
+                    await userManager.CreateAsync(adminUser, "admin");
+                    await userManager.AddToRoleAsync(adminUser, UserBaseRole.Admin);
                 }
             }
         }

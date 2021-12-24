@@ -2,6 +2,7 @@ using Core.Application.IRepositories;
 using Core.Infrastructure.Database;
 using Core.Infrastructure.Database.Identity;
 using Core.Infrastructure.Repository;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -13,7 +14,15 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Core.Application.Services;
+using Core.Application.Services.IServices;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Web.WebApp.Pages.Account;
 
 namespace Web.WebApp
 {
@@ -32,7 +41,19 @@ namespace Web.WebApp
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(opt =>
+            {
+                opt.LoginPath = "/account/login";
+            });
+            services.Configure<CookiePolicyOptions>(opt =>
+            {
+                opt.CheckConsentNeeded = context => true;
+                //opt.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddMediatR(Assembly.GetExecutingAssembly());
 
             // Infrastructure
             AddDatabase(services);
@@ -42,7 +63,15 @@ namespace Web.WebApp
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-
+            services.AddScoped<IUserService, UserService>();
+            
+            // Config route option
+            services.Configure<RouteOptions>(opt =>
+            {
+                opt.LowercaseUrls = true;
+                opt.LowercaseQueryStrings = true;
+            });
+            
             services.AddRazorPages();
             services.AddServerSideBlazor();
         }
@@ -54,7 +83,7 @@ namespace Web.WebApp
             {
                 app.UseDeveloperExceptionPage();
 
-                SeedAppUser.SeedDeveloperUser(app);
+                SeedAppUser.SeedAdminUser(app);
             }
             else
             {
@@ -67,6 +96,9 @@ namespace Web.WebApp
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseCookiePolicy();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -84,31 +116,30 @@ namespace Web.WebApp
 
         private void AddAppIdentity(IServiceCollection services, IWebHostEnvironment env)
         {
-            services.AddIdentity<AppIdentityUser, AppIdentityRole>(opt => {
-
-                if (env.IsDevelopment())
-                {
-                    opt.Password.RequireDigit = false;
-                    opt.Password.RequiredLength = 3;
-                    opt.Password.RequireLowercase = false;
-                    opt.Password.RequireUppercase = false;
-                    opt.Password.RequireNonAlphanumeric = false;
-
-                }
-                else
-                {
-                    opt.SignIn.RequireConfirmedEmail = true;
-                    opt.SignIn.RequireConfirmedPhoneNumber = true;
-                    opt.Password.RequireDigit = false;
-                    opt.Password.RequiredLength = 8;
-                    opt.Password.RequireLowercase = false;
-                    opt.Password.RequireUppercase = false;
-                    opt.Password.RequireNonAlphanumeric = false;
-                }
-            })
-                .AddEntityFrameworkStores<AppDbContext>()
-                .AddDefaultTokenProviders();
-            ;
+            services.AddIdentity<AppIdentityUser, AppIdentityRole>(opt => { 
+                    if (env.IsDevelopment()) 
+                    {
+                        opt.Password.RequireDigit = false;
+                        opt.Password.RequiredLength = 3;
+                        opt.Password.RequireLowercase = false;
+                        opt.Password.RequireUppercase = false;
+                        opt.Password.RequireNonAlphanumeric = false;
+                        opt.User.RequireUniqueEmail = true;
+                    }
+                    else
+                    {
+                        opt.SignIn.RequireConfirmedEmail = true;
+                        opt.SignIn.RequireConfirmedPhoneNumber = true;
+                        opt.Password.RequireDigit = false;
+                        opt.Password.RequiredLength = 8;
+                        opt.Password.RequireLowercase = false;
+                        opt.Password.RequireUppercase = false;
+                        opt.Password.RequireNonAlphanumeric = false;
+                        opt.User.RequireUniqueEmail = true;
+                    }
+                })
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
         }
     }
 }

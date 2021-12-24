@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Application.Common;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using SignInResult = Core.Application.Common.SignInResult;
 
 namespace Core.Infrastructure.Repository
 {
@@ -15,15 +17,21 @@ namespace Core.Infrastructure.Repository
     {
         private readonly AppDbContext _context;
         private readonly UserManager<AppIdentityUser> _userManager;
+        private readonly SignInManager<AppIdentityUser> _signInManager;
         private readonly IMapper _mapper;
+        private readonly ILogger<UserRepository> _logger;
 
         public UserRepository(AppDbContext context,
             UserManager<AppIdentityUser> userManager,
-            IMapper mapper)
+            SignInManager<AppIdentityUser> signInManager,
+            IMapper mapper,
+            ILogger<UserRepository> logger)
         {
             _context = context;
             _userManager = userManager;
+            _signInManager = signInManager;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<Result<AppUser>> CreateUser(AppUser appUser)
@@ -50,6 +58,26 @@ namespace Core.Infrastructure.Repository
             return false;
         }
 
+        public async Task<SignInResult> SignInAsync(string email, string password, bool remember)
+        {
+            try
+            {
+                var result = await _signInManager.PasswordSignInAsync(email, password, remember, false);
+                //var result = await _signInManager.CheckPasswordSignInAsync(email, password, false);
+                return new SignInResult(result.Succeeded, result.RequiresTwoFactor, result.IsLockedOut);
+            }
+            catch (Exception ex)
+            {
+               _logger.LogError(ex.StackTrace);
+            }
+            return SignInResult.Failure();
+        }
+
+        public async Task SignOutAsync()
+        {
+            await _signInManager.SignOutAsync();
+        }
+
         public async Task<Result<AppUser>> GetByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -60,8 +88,19 @@ namespace Core.Infrastructure.Repository
             }
             return Result<AppUser>.Failure("User not found");
         }
+        
+        public async Task<Result<AppUser>> GetByUsername(string email)
+        {
+            var user = await _userManager.FindByNameAsync(email);
+            if (user == null)
+            {
+                var appUser = _mapper.Map<AppUser>(user);
+                return Result<AppUser>.Success(appUser);
+            }
+            return Result<AppUser>.Failure("User not found");
+        }
 
-        public async Task<Result<AppUser>> GetById(Guid userId)
+        public Result<AppUser> GetById(Guid userId)
         {
             var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
             if (user == null)

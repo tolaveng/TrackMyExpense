@@ -1,0 +1,35 @@
+﻿@page "/admin"
+@using Core.Domain.Constants
+@inject NavigationManager Navigation
+@*@attribute [Authorize(Roles = UserBaseRole.Admin)] *@
+
+
+<h3>Admin Index</h3>
+
+<AuthorizeView Roles=@UserBaseRole.Admin>
+    <Authorized>
+        I'm logged in
+    </Authorized>
+    <NotAuthorized>
+        I'm not log in
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthStat).User;
+        if(user.Identity != null && !user.Identity.IsAuthenticated)
+        {
+            Navigation.NavigateTo($"/account/login?returnUrl={Uri.EscapeDataString(Navigation.Uri)}");
+        }
+
+        if (!user.IsInRole(UserBaseRole.Admin))
+        {
+            Navigation.NavigateTo("/");
+        }
+    }
+}

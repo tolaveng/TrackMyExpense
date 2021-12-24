@@ -155,22 +155,15 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "c08c5da7-1317-4519-bc7f-86bdf3e05051",
-                            Name = "Developer",
-                            NormalizedName = "DEVELOPER"
-                        },
-                        new
-                        {
-                            Id = new Guid("9f50e6a8-e115-489b-8b4b-dbc70b2fbbfc"),
-                            ConcurrencyStamp = "878ace04-4c85-41ab-9184-9cbc53236aa2",
-                            Name = "Staff",
-                            NormalizedName = "STAFF"
+                            ConcurrencyStamp = "64a61921-1f76-4dd9-9b2a-42bc7f5c309f",
+                            Name = "admin",
+                            NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "e2c91588-5b25-4407-9484-7840a6e2e3c6",
-                            Name = "User",
+                            ConcurrencyStamp = "33323c67-3580-4fef-aa03-2a17b8fc8380",
+                            Name = "user",
                             NormalizedName = "USER"
                         });
                 });
