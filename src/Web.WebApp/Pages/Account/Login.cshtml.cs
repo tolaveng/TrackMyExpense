@@ -75,9 +75,11 @@ namespace Web.WebApp.Pages.Account
         {
             [Required]
             [EmailAddress]
+            [StringLength(32, ErrorMessage = "Email too long (32 character limit)")]
             public string Email { get; set; }
 
             [Required]
+            [StringLength(32, ErrorMessage = "Password too long (32 character limit)")]
             [DataType(DataType.Password)]
             public string Password { get; set; }
 

@@ -19,6 +19,32 @@ namespace Core.Application.Services
             _mapper = mapper;
         }
 
+        public async Task<bool> ConfirmEmailTokenAsync(Guid userId, string token)
+        {
+            return await _userRepository.ConfirmEmailTokenAsync(userId, token);
+        }
+
+        public async Task<Result<Guid>> CreateUserAsync(UserDto userDto)
+        {
+            var user = _mapper.Map<AppUser>(userDto);
+            return await _userRepository.CreateUserAsync(user);
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(Guid userId)
+        {
+            return await _userRepository.GenerateEmailConfirmationTokenAsync(userId);
+        }
+
+        public async Task<UserDto> GetUserByEmailAsync(string email)
+        {
+            var user = await _userRepository.GetByEmailAsync(email);
+            if (user != null)
+            {
+                return _mapper.Map<UserDto>(user);
+            }
+            return null;
+        }
+
         public async Task<SignInResult> SignInAsync(string email, string password, bool remember)
         {
             return await _userRepository.SignInAsync(email, password, remember);

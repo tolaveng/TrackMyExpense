@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Common
 {
-    public class Result<T> where T : class
+    public class Result<T>// where T : class
     {
         public bool Succeeded { get; set; }
-        public T? Data { get; set; }
+        public T Data { get; set; }
         public string Message { get; set; }
         public string[] Errors { get; set; }
 
@@ -23,12 +23,12 @@ namespace Core.Application.Common
 
         public static Result<T> Success()
         {
-            return new Result<T>(true, null, "", Array.Empty<string>());
+            return new Result<T>(true, default, "", Array.Empty<string>());
         }
 
         public static Result<T> Success(string message)
         {
-            return new Result<T>(true, null, message, Array.Empty<string>());
+            return new Result<T>(true, default, message, Array.Empty<string>());
         }
 
         public static Result<T> Success(T data, string message)
@@ -43,8 +43,8 @@ namespace Core.Application.Common
 
         public static Result<T> Failure(string message, string[]? errors = null)
         {
-            if (errors == null) return new Result<T>(true, null, message, Array.Empty<string>());
-            return new Result<T>(true, null, message, errors);
+            if (errors == null) return new Result<T>(true, default, message, Array.Empty<string>());
+            return new Result<T>(true, default, message, errors);
         }
     }
 }

@@ -1,0 +1,31 @@
+﻿@page "/account/registerverify/{userid}"
+
+@using Core.Application.Services.IServices
+@using Microsoft.AspNetCore.Hosting
+
+@inject IUserService UserService;
+@inject NavigationManager Navigation;
+@inject IWebHostEnvironment HostEnvironment;
+@inject IEmailService EmailService;
+
+<h3>Email Confirmation</h3>
+<hr />
+<section>
+    <div>
+        <p>
+            Your account has been created. Now let's verify your email address.<br />
+            Please check your inbox or spam folder, and click on the link in the email sent to <b>@Email</b>.
+        </p>
+        <p>
+            Haven't received it? <a>Click here</a> to resend the email.
+        </p>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "email")]
+    public string Email { get; set; }
+    [Parameter]
+    public string UserId { get; set; }
+}

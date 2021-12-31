@@ -1,0 +1,174 @@
+﻿@page "/account/register"
+@using Core.Application.Services.IServices
+@using Microsoft.AspNetCore.Components
+@using Core.Application.Models
+@using System.ComponentModel.DataAnnotations
+@using System.Web
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
+
+@inject IUserService UserService;
+@inject NavigationManager Navigation;
+@inject IWebHostEnvironment HostEnvironment;
+@inject IEmailService EmailService;
+
+<h3>Create an account and start tracking your expenses.</h3>
+<hr />
+<div class="col-md-6">
+    <div class="row">
+        <EditForm Model="@Input" OnValidSubmit="@RegisterUser" class="form-floating">
+            <DataAnnotationsValidator/>
+            <div class="form-floating md-3">
+                <InputText id="inputFullName" class="form-control" @bind-Value="@Input.FullName" placeholder="Full Name" autocomplete="off" spellcheck="false"/>
+                <label for="inputFullName">Full Name</label>
+                <ValidationMessage For="@(() => Input.FullName)"/>
+                <br/>
+            </div>
+
+            <div class="form-floating md-3">
+                <InputText id="inputEmail" class="form-control" @bind-Value="@Input.Email" placeholder="Email" autocomplete="off" spellcheck="false"/>
+                <label for="inputEmail">Email</label>
+                <ValidationMessage For="@(() => Input.Email)"/>
+                <br/>
+            </div>
+
+            <div class="form-floating md-3">
+                <InputText id="inputPassword" type="password" class="form-control" @bind-Value="@Input.Password" placeholder="Password" autocomplete="off" spellcheck="false"/>
+                <label for="inputPassword">Password</label>
+                <ValidationMessage For="@(() => Input.Password)"/>
+                <br/>
+            </div>
+
+            <div class="form-floating md-3">
+                <InputText id="inputConfirmPassword" type="password" class="form-control" @bind-Value="@Input.ConfirmPassword" placeholder="Confirm Password" autocomplete="off" spellcheck="false"/>
+                <label for="inputConfirmPassword">Confirm Password</label>
+                <ValidationMessage For="@(() => Input.ConfirmPassword)"/>
+                <br/>
+            </div>
+
+            <div class="md-3">
+                By creating a new account, you agree to our Terms of Use and Privacy Policy.
+            </div>
+
+            <div class="md-3">
+                @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                {
+                 <div class="alert alert-danger">
+                    <span class="oi oi-warning"></span>
+                    @((MarkupString)ErrorMessage)
+                    </div>
+                } else
+                {
+                    <div><br /></div>
+                }
+            </div>
+            <div class="md-3 row g-3">
+                <div class="col-auto">
+                    <button type="submit" disabled="@IsSubmitting" class="form-control btn btn-primary">
+                        <span class="spinner-border spinner-border-sm" hidden="@(!IsSubmitting)" role="status" aria-hidden="true"></span>
+                        <span>Create an account</span>
+                    </button>
+                </div>
+                <div class="col-auto col-form-label">
+                    Already have an account? <a href="/account/login">Log In</a>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+    <hr class="m-3"/>
+
+    Sign up with Google
+    
+    
+    @* Debug only: print email confirmation link *@
+    @if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
+    {
+        <textarea>@EmailConfirmLink</textarea>
+    }
+
+</div>
+
+@code {
+    public bool IsSubmitting { get; set; }
+    public RegisterInput Input { get; set; } = new RegisterInput();
+    public string ErrorMessage { get; set; }
+
+    public string EmailConfirmLink { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Input = new RegisterInput();
+    }
+
+    public async Task RegisterUser() {
+        ErrorMessage = "";
+        IsSubmitting = true;
+        StateHasChanged();
+
+        // Password match
+        if (!Input.Password.Equals(Input.ConfirmPassword)) {
+            ErrorMessage = "Confirm Password doesn't match the Password";
+            IsSubmitting = false;
+            StateHasChanged();
+            return;
+        }
+        // Check email
+        var existUser = await UserService.GetUserByEmailAsync(Input.Email);
+        if (existUser != null)
+        {
+            ErrorMessage = "Email is already registered. Pleas enter a new email or <a href='/account/forgot-password' class='alert-link'>Reset the password </a>.";
+            IsSubmitting = false;
+            StateHasChanged();
+            return;
+        }
+
+        // create
+        var user = new UserDto()
+        {
+            Username = Input.Email,
+            FullName = Input.FullName,
+            Email = Input.Email,
+            Password = Input.Password
+        };
+
+        var result = await UserService.CreateUserAsync(user);
+        if (!result.Succeeded)
+        {
+            ErrorMessage = "Unexpected Error. Sorry, something went wrong please try again later";
+            IsSubmitting = false;
+            StateHasChanged();
+            return;
+        }
+
+        // Confirm email
+        var token = await UserService.GenerateEmailConfirmationTokenAsync(result.Data);
+        EmailConfirmLink = $"{Navigation.BaseUri}account/confirmemail?uid={result.Data}&token={HttpUtility.UrlEncode(token)}";
+
+        // Send email and redirect
+        await EmailService.SendEmailConfirmationAsync(Input.Email, Input.FullName, EmailConfirmLink);
+        Navigation.NavigateTo($"/account/registerverify/{result.Data}?email={HttpUtility.UrlEncode(Input.Email)}");
+    }
+
+    public class RegisterInput
+    {
+        [Required]
+        [MinLength(6, ErrorMessage = "Full Name must be at least 6 characters")]
+        public string FullName { get; set; }
+
+        [Required]
+        [EmailAddress]
+        [MinLength(6, ErrorMessage = "Email must be at least 6 characters")]
+        [StringLength(32, ErrorMessage = "Email too long (32 character limit)")]
+        public string Email { get; set; }
+        
+        [Required]
+        [MinLength(6, ErrorMessage = "Password must be at least 8 characters")]
+        [StringLength(32, ErrorMessage = "Password too long (32 character limit)")]
+        public string Password { get; set; }
+
+        [Required]
+        [CompareProperty("Password", ErrorMessage = "Confirm Password doesn't match the Password")]
+        public string ConfirmPassword { get; set; }
+    }
+}

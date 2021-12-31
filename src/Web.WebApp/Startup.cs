@@ -1,28 +1,24 @@
 using Core.Application.IRepositories;
-using Core.Infrastructure.Database;
+using Core.Infrastructure.Configurations;
 using Core.Infrastructure.Database.Identity;
 using Core.Infrastructure.Repository;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Core.Application.Services;
 using Core.Application.Services.IServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Web.WebApp.Pages.Account;
+using Core.Application.Mapper;
+using Core.Infrastructure.Mapper;
+using Core.Infrastructure.Database;
+using Core.Application.Settings;
 
 namespace Web.WebApp
 {
@@ -52,7 +48,9 @@ namespace Web.WebApp
             });
 
 
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            //services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddAutoMapper(Assembly.GetAssembly(typeof(DataMapperProfile)));
+            services.AddAutoMapper(Assembly.GetAssembly(typeof(AppMapperProfile)));
             services.AddMediatR(Assembly.GetExecutingAssembly());
 
             // Infrastructure
@@ -61,10 +59,14 @@ namespace Web.WebApp
             // .Net Identity
             AddAppIdentity(services, Environment);
 
+            services.AddSingleton<IEmailService, EmailService>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserService, UserService>();
-            
+
+            // Config Settings
+            services.Configure<EmailSetting>(Configuration.GetSection("EmailSetting"));
+
             // Config route option
             services.Configure<RouteOptions>(opt =>
             {
@@ -117,29 +119,40 @@ namespace Web.WebApp
         private void AddAppIdentity(IServiceCollection services, IWebHostEnvironment env)
         {
             services.AddIdentity<AppIdentityUser, AppIdentityRole>(opt => { 
-                    if (env.IsDevelopment()) 
-                    {
-                        opt.Password.RequireDigit = false;
-                        opt.Password.RequiredLength = 3;
-                        opt.Password.RequireLowercase = false;
-                        opt.Password.RequireUppercase = false;
-                        opt.Password.RequireNonAlphanumeric = false;
-                        opt.User.RequireUniqueEmail = true;
-                    }
-                    else
-                    {
-                        opt.SignIn.RequireConfirmedEmail = true;
-                        opt.SignIn.RequireConfirmedPhoneNumber = true;
-                        opt.Password.RequireDigit = false;
-                        opt.Password.RequiredLength = 8;
-                        opt.Password.RequireLowercase = false;
-                        opt.Password.RequireUppercase = false;
-                        opt.Password.RequireNonAlphanumeric = false;
-                        opt.User.RequireUniqueEmail = true;
-                    }
+                if (env.IsDevelopment()) 
+                {
+                    opt.Password.RequireDigit = false;
+                    opt.Password.RequiredLength = 3;
+                    opt.Password.RequireLowercase = false;
+                    opt.Password.RequireUppercase = false;
+                    opt.Password.RequireNonAlphanumeric = false;
+                    opt.User.RequireUniqueEmail = true;
+                }
+                else
+                {
+                    opt.SignIn.RequireConfirmedEmail = true;
+                    opt.SignIn.RequireConfirmedPhoneNumber = true;
+                    opt.Password.RequireDigit = false;
+                    opt.Password.RequiredLength = 8;
+                    opt.Password.RequireLowercase = false;
+                    opt.Password.RequireUppercase = false;
+                    opt.Password.RequireNonAlphanumeric = false;
+                    opt.User.RequireUniqueEmail = true;
+                }
+                // custom reset password token
+                opt.Tokens.PasswordResetTokenProvider = "CustomPasswordResetProvider";
                 })
             .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<PasswordResetTokenProvider<AppIdentityUser>>("CustomPasswordResetProvider");
+
+            // Set all identity token expiry to 2 days
+            services.Configure<DataProtectionTokenProviderOptions>(opt =>
+                opt.TokenLifespan = TimeSpan.FromDays(2));
+
+            //// Set password reset token expiry to 3 hours
+            //services.Configure<PasswordResetTokenProviderOptions>(opt =>
+            //    opt.TokenLifespan = TimeSpan.FromHours(3));
         }
     }
 }

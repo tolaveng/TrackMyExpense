@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Infrastructure.Database
+namespace Core.Infrastructure.Configurations
 {
     public class AppDbContextConfigurator : IAppDbContextConfigurator
     {
@@ -32,7 +32,7 @@ namespace Core.Infrastructure.Database
             if (!string.IsNullOrWhiteSpace(_postgresOptions.POSTGRES_AUTO_PREPARE_MIN_USAGES)) stringBuilder.Append($"Auto Prepare Min Usages={_postgresOptions.POSTGRES_AUTO_PREPARE_MIN_USAGES};");
             if (!string.IsNullOrWhiteSpace(_postgresOptions.POSTGRES_KEEPALIVE)) stringBuilder.Append($"Keepalive={_postgresOptions.POSTGRES_KEEPALIVE}");
 
-            Console.WriteLine("DB connection string: " + stringBuilder.ToString());
+            //Console.WriteLine("DB connection string: " + stringBuilder.ToString());
             return optionsBuilder.UseNpgsql(stringBuilder.ToString());
         }
     }

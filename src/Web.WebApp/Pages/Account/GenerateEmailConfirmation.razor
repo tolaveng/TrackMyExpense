@@ -1,0 +1,80 @@
+﻿@page "/account/generateemailconfirmation"
+
+@using System.ComponentModel.DataAnnotations
+@using Core.Application.Services.IServices
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
+@using System.Web
+
+@inject IUserService UserService;
+@inject NavigationManager Navigation;
+@inject IWebHostEnvironment HostEnvironment;
+
+<h3>Email Confirmation</h3>
+<hr />
+
+<section>
+    <div class="mb-3">Enter the email to receive a new verification link.</div>
+        <EditForm Model="@Input" OnValidSubmit="@GenerateConfirmationEmail">
+            <DataAnnotationsValidator/>
+            <div class="row">
+                <div class="col-auto col-md-3">
+                    <InputText id="inputEmail" class="form-control" @bind-Value="@Input.Email" placeholder="Email" autocomplete="off" spellcheck="false"/>
+                    <ValidationMessage For="@(() => Input.Email)"/>
+                    <br/>
+                </div>
+                <div class="col-auto mb-3">
+                    <button type="submit" disabled="@IsSubmitting" class="btn btn-primary">Send Verification Link</button>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(InfoMessage))
+            {
+                <div class="alert alert-info">
+                <span class="oi oi-info"></span>
+                @((MarkupString)InfoMessage)
+                </div>
+            } else
+            {
+                <div><br /></div>
+            }
+        </EditForm>
+
+        @* Debug only: print email confirmation link *@
+        @if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
+        {
+            <textarea>@EmailConfirmLink</textarea>
+        }
+</section>
+
+@code {
+    public ConfirmEmailInput Input { get; set; } = new ConfirmEmailInput();
+    public bool IsSubmitting { get; set; }
+    public string InfoMessage { get; set; }
+    public string EmailConfirmLink { get; set; }
+
+    public async Task GenerateConfirmationEmail()
+    {
+        InfoMessage = "If the email is matched, we will send a new verification link. Please check your email inbox or spam folder.";
+        IsSubmitting = true;
+        var existUser = await UserService.GetUserByEmailAsync(Input.Email);
+        if (existUser == null)
+        {   
+            IsSubmitting = false;
+            return;
+        }
+
+        var token = await UserService.GenerateEmailConfirmationTokenAsync(existUser.Id);
+        EmailConfirmLink = $"{Navigation.BaseUri}account/confirmemail?uid={existUser.Id}&token={HttpUtility.UrlEncode(token)}";
+
+    }
+
+    public class ConfirmEmailInput
+    {
+        [Required]
+        [EmailAddress]
+        [MinLength(6, ErrorMessage = "Email must be at least 6 characters")]
+        [StringLength(32, ErrorMessage = "Email too long (32 character limit)")]
+        public string Email { get; set; }
+    }
+}

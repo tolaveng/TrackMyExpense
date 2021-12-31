@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Infrastructure.Database
+namespace Core.Infrastructure.Configurations
 {
     public interface IAppDbContextConfigurator
     {

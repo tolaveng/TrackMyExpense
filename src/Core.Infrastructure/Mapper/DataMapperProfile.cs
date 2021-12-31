@@ -1,17 +1,12 @@
 ﻿using AutoMapper;
 using Core.Domain.Entities;
 using Core.Infrastructure.Database.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Infrastructure.Mapper
 {
-    public class MapperProfile : Profile
+    public class DataMapperProfile : Profile
     {
-        public MapperProfile()
+        public DataMapperProfile()
         {
             CreateMap<AppUser, AppIdentityUser>()
                 .ForMember(x => x.UserName, x => x.MapFrom(z => z.Username))

@@ -1,0 +1,48 @@
+﻿@page "/account/confirmemail"
+@using Core.Application.Services.IServices
+
+@inject IUserService UserService;
+
+<h3>Email Confirmation</h3>
+<hr />
+
+@if (IsLoading)
+{
+    <div>We are checking your email ...</div>
+} else
+{
+    if (IsConfirmed)
+    {
+        <div>Thank you. Your email has been successfully verified. <a href="/account/login">Click here to log in</a>.</div>
+    } else
+    {
+        <div>Sorry, we cannot verify your email or the verification link is expired.</div>
+        <div><a href="/account/generateemailconfirmation">Click here</a> to generate a new verification link.</div>
+    }
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "uid")]
+    public string Uid { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "token")]
+    public string Token { get; set; }
+
+    public bool IsLoading { get; set; }
+    public bool IsConfirmed { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        if (string.IsNullOrWhiteSpace(Uid) || string.IsNullOrWhiteSpace(Token)) return;
+
+        if (Guid.TryParse(Uid, out var userId))
+        {
+            IsConfirmed = await UserService.ConfirmEmailTokenAsync(userId, Token);
+        }
+        IsLoading = false;
+    }
+}

@@ -11,15 +11,23 @@ namespace Web.WebApp.Pages.Account
     {
         private readonly IUserService _userService;
         
-        public string ReturnUrl { get; set; }
-        
         public LogoutModel(IUserService userService)
         {
             _userService = userService;
         }
-        public void OnGet(string returnUrl = null)
+        
+        public async Task<IActionResult> OnGet(string returnUrl = null)
         {
-            ReturnUrl = returnUrl ?? Url.Content("~/");
+            await _userService.SignOutAsync();
+            
+            if (returnUrl != null)
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return LocalRedirect("/");
+            }
         }
         
         public async Task<IActionResult> OnPost(string returnUrl = null)

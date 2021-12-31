@@ -1,23 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Core.Domain.Entities;
+using Core.Domain.Enums;
 
 namespace Core.Application.Models
 {
     public class UserDto
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress]
-        [StringLength(32, ErrorMessage = "Email too long (32 character limit)")]
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string FullName { get; set; } 
         public string Email { get; set; }
-
-        [EmailAddress]
-        [StringLength(32, ErrorMessage = "Email too long (32 character limit)")]
-        public string ConfirmEmail { get; set; }
-
-        [Required(ErrorMessage = "Password is required")]
-        [DataType(DataType.Password)]
-        [StringLength(32, ErrorMessage = "Password too long (32 character limit)")]
         public string Password { get; set; }
+        public string PhoneNumber { get; set; }
+        public Subcription Subcription { get; set; }
+        public decimal Wallet { get; set; }
+        public DateTime ExpiryDate { get; set; }
+        public bool IsCanceled { get; set; }
+        public bool IsDisabled { get; set; }
+        public bool TwoFactorEnabled { get; set; }
         
-        public bool RememberMe { get; set; }
+        public ICollection<Expense> Expenses { get; set; }
     }
 }

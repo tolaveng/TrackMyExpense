@@ -10,15 +10,17 @@ namespace Core.Application.IRepositories
 {
     public interface IUserRepository
     {
-        Result<AppUser> GetById(Guid userId);
-        Task<Result<AppUser>> GetByEmail(string email);
+        AppUser GetById(Guid userId);
+        Task<AppUser> GetByEmailAsync(string email);
 
-        Task<Result<AppUser>> CreateUser(AppUser appUser);
-        Task<Result<AppUser>> UpdateUser(AppUser appUser);
+        Task<Result<Guid>> CreateUserAsync(AppUser appUser);
+        Task<Result<bool>> UpdateUserAsync(AppUser appUser);
 
         Task<bool> Disabled(Guid userId);
         
         Task<SignInResult> SignInAsync(string email, string password, bool remember);
         Task SignOutAsync();
+        Task<string> GenerateEmailConfirmationTokenAsync(Guid userId);
+        Task<bool> ConfirmEmailTokenAsync(Guid userId, string token);
     }
 }

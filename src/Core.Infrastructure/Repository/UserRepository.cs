@@ -34,16 +34,25 @@ namespace Core.Infrastructure.Repository
             _logger = logger;
         }
 
-        public async Task<Result<AppUser>> CreateUser(AppUser appUser)
+        public async Task<Result<Guid>> CreateUserAsync(AppUser appUser)
         {
-            var user = _mapper.Map<AppIdentityUser>(appUser);
-            var result = await _userManager.CreateAsync(user);
-            if (result.Succeeded)
+            try
             {
-                return Result<AppUser>.Success(appUser);
+                var user = _mapper.Map<AppIdentityUser>(appUser);
+                var result = await _userManager.CreateAsync(user, appUser.Password);
+                if (result.Succeeded)
+                {
+                    return Result<Guid>.Success(user.Id);
+                }
+
+                return Result<Guid>.Failure("Cannot create a new user",
+                    result.Errors.Select(x => x.Description).ToArray());
             }
-            return Result<AppUser>.Failure("Cannot create a new user",
-                result.Errors.Select(x => x.Description).ToArray());
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+            }
+            return Result<Guid>.Failure("Cannot create a new user");
         }
 
         public async Task<bool> Disabled(Guid userId)
@@ -78,21 +87,20 @@ namespace Core.Infrastructure.Repository
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<Result<AppUser>> GetByEmail(string email)
+        public async Task<AppUser> GetByEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            if (user != null)
             {
-                var appUser = _mapper.Map<AppUser>(user);
-                return Result<AppUser>.Success(appUser);
+                return _mapper.Map<AppUser>(user);
             }
-            return Result<AppUser>.Failure("User not found");
+            return null;
         }
         
         public async Task<Result<AppUser>> GetByUsername(string email)
         {
             var user = await _userManager.FindByNameAsync(email);
-            if (user == null)
+            if (user != null)
             {
                 var appUser = _mapper.Map<AppUser>(user);
                 return Result<AppUser>.Success(appUser);
@@ -100,33 +108,55 @@ namespace Core.Infrastructure.Repository
             return Result<AppUser>.Failure("User not found");
         }
 
-        public Result<AppUser> GetById(Guid userId)
+        public AppUser GetById(Guid userId)
         {
             var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
-            if (user == null)
+            if (user != null)
             {
-                var appUser = _mapper.Map<AppUser>(user);
-                return Result<AppUser>.Success(appUser);
+                return _mapper.Map<AppUser>(user);
             }
-            return Result<AppUser>.Failure("User not found");
+            return null;
         }
 
 
-        public async Task<Result<AppUser>> UpdateUser(AppUser appUser)
+        public async Task<Result<bool>> UpdateUserAsync(AppUser appUser)
         {
             var user = _userManager.Users.SingleOrDefault(x => x.Id == appUser.Id);
-            if (user == null)
+            if (user != null)
             {
                 user.PhoneNumber = appUser.PhoneNumber;
                 user.FullName = appUser.FullName;
                 user.Subcription = appUser.Subcription;
                 user.Wallet = appUser.Wallet;
-                user.Email = appUser.Email;
+                //user.Email = appUser.Email;
 
                 await _userManager.UpdateAsync(user);
-                return Result<AppUser>.Success(appUser);
+                return Result<bool>.Success();
             }
-            return Result<AppUser>.Failure("User not found");
+            return Result<bool>.Failure("User not found");
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(Guid userId)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
+            if (user != null)
+            {
+                return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            }
+            return null;
+        }
+
+        public async Task<bool> ConfirmEmailTokenAsync(Guid userId, string token)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
+            if (user != null)
+            {
+                if (await _userManager.IsEmailConfirmedAsync(user)) return true;
+
+                var result = await _userManager.ConfirmEmailAsync(user, token);
+                return result.Succeeded;
+            }
+            return false;
         }
     }
 }
