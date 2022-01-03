@@ -1,4 +1,7 @@
 ﻿@page "/account/register"
+@attribute [AllowAnonymous]
+@layout BlankLayout
+
 @using Core.Application.Services.IServices
 @using Microsoft.AspNetCore.Components
 @using Core.Application.Models
@@ -12,82 +15,96 @@
 @inject IWebHostEnvironment HostEnvironment;
 @inject IEmailService EmailService;
 
-<h3>Create an account and start tracking your expenses.</h3>
-<hr />
-<div class="col-md-6">
-    <div class="row">
-        <EditForm Model="@Input" OnValidSubmit="@RegisterUser" class="form-floating">
-            <DataAnnotationsValidator/>
-            <div class="form-floating md-3">
-                <InputText id="inputFullName" class="form-control" @bind-Value="@Input.FullName" placeholder="Full Name" autocomplete="off" spellcheck="false"/>
-                <label for="inputFullName">Full Name</label>
-                <ValidationMessage For="@(() => Input.FullName)"/>
-                <br/>
-            </div>
+<section class="d-flex justify-content-center">
+    <div class="col-md-5 mb-5">
+        <h3>Start tracking your expenses</h3>
+        <hr />
+        <div class="row">
+            <EditForm Model="@Input" OnValidSubmit="@RegisterUser" class="form-floating">
+                <DataAnnotationsValidator/>
+                <div class="has-float-label mb-3">
+                    <InputText id="inputFullName" class="form-control" @bind-Value="@Input.FullName" placeholder="Full name" autocomplete="off" spellcheck="false"/>
+                    <label for="inputFullName">Full name</label>
+                    <ValidationMessage For="@(() => Input.FullName)"/>
+                </div>
 
-            <div class="form-floating md-3">
-                <InputText id="inputEmail" class="form-control" @bind-Value="@Input.Email" placeholder="Email" autocomplete="off" spellcheck="false"/>
-                <label for="inputEmail">Email</label>
-                <ValidationMessage For="@(() => Input.Email)"/>
-                <br/>
-            </div>
+                <div class="has-float-label mb-3">
+                    <InputText id="inputEmail" class="form-control" @bind-Value="@Input.Email" placeholder="Email address" autocomplete="off" spellcheck="false"/>
+                    <label for="inputEmail">Email</label>
+                    <ValidationMessage For="@(() => Input.Email)"/>
+                </div>
 
-            <div class="form-floating md-3">
-                <InputText id="inputPassword" type="password" class="form-control" @bind-Value="@Input.Password" placeholder="Password" autocomplete="off" spellcheck="false"/>
-                <label for="inputPassword">Password</label>
-                <ValidationMessage For="@(() => Input.Password)"/>
-                <br/>
-            </div>
+                <div class="has-float-label mb-3">
+                    <InputText id="inputPassword" type="password" class="form-control" @bind-Value="@Input.Password" placeholder="Password" autocomplete="off" spellcheck="false"/>
+                    <label for="inputPassword">Password</label>
+                    <ValidationMessage For="@(() => Input.Password)"/>
+                </div>
 
-            <div class="form-floating md-3">
-                <InputText id="inputConfirmPassword" type="password" class="form-control" @bind-Value="@Input.ConfirmPassword" placeholder="Confirm Password" autocomplete="off" spellcheck="false"/>
-                <label for="inputConfirmPassword">Confirm Password</label>
-                <ValidationMessage For="@(() => Input.ConfirmPassword)"/>
-                <br/>
-            </div>
+                <div class="has-float-label mb-3">
+                    <InputText id="inputConfirmPassword" type="password" class="form-control" @bind-Value="@Input.ConfirmPassword" placeholder="Confirm Password" autocomplete="off" spellcheck="false"/>
+                    <label for="inputConfirmPassword">Confirm Password</label>
+                    <ValidationMessage For="@(() => Input.ConfirmPassword)"/>
+                </div>
 
-            <div class="md-3">
-                By creating a new account, you agree to our Terms of Use and Privacy Policy.
-            </div>
+                <div class="mb-3">
+                    By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+                </div>
 
-            <div class="md-3">
-                @if (!string.IsNullOrWhiteSpace(ErrorMessage))
-                {
-                 <div class="alert alert-danger">
-                    <span class="oi oi-warning"></span>
-                    @((MarkupString)ErrorMessage)
+                <div class="md-3">
+                    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                    {
+                     <div class="alert alert-danger">
+                        <span class="oi oi-warning"></span>
+                        @((MarkupString)ErrorMessage)
+                        </div>
+                    }
+                </div>
+                <div class="md-3 row g-3">
+                    <div class="col-auto">
+                        <button type="submit" disabled="@IsSubmitting" class="form-control btn btn-primary">
+                            <span class="spinner-border spinner-border-sm" hidden="@(!IsSubmitting)" role="status" aria-hidden="true"></span>
+                            <span>Create Account</span>
+                        </button>
                     </div>
-                } else
-                {
-                    <div><br /></div>
-                }
-            </div>
-            <div class="md-3 row g-3">
-                <div class="col-auto">
-                    <button type="submit" disabled="@IsSubmitting" class="form-control btn btn-primary">
-                        <span class="spinner-border spinner-border-sm" hidden="@(!IsSubmitting)" role="status" aria-hidden="true"></span>
-                        <span>Create an account</span>
-                    </button>
+                    <div class="col-auto col-form-label">
+                        Already have an account? <a href="/account/login">Log In</a>
+                    </div>
                 </div>
-                <div class="col-auto col-form-label">
-                    Already have an account? <a href="/account/login">Log In</a>
-                </div>
-            </div>
-        </EditForm>
+            </EditForm>
+        </div>
+        <div class="mb-3 mt-5">
+            <div class="hr-center"><span>OR</span></div>
+        </div>
+        <div class="d-grid gap-2">
+            <button type="button" class="btn btn-light" style="width: 100%">
+                <span>
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20.64 12.2c0-.63-.06-1.25-.16-1.84H12v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.92a8.78 8.78 0 0 0 2.68-6.62z" fill="#4285F4"></path>
+                    <path d="M12 21a8.6 8.6 0 0 0 5.96-2.18l-2.91-2.26a5.4 5.4 0 0 1-8.09-2.85h-3v2.33A9 9 0 0 0 12 21z" fill="#34A853"></path>
+                    <path d="M6.96 13.71a5.41 5.41 0 0 1 0-3.42V7.96h-3a9 9 0 0 0 0 8.08l3-2.33z" fill="#FBBC05"></path>
+                    <path d="M12 6.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59A9 9 0 0 0 3.96 7.95l3 2.34A5.36 5.36 0 0 1 12 6.58z" fill="#EA4335"></path>
+                    </svg>
+                </span>
+                <span style="vertical-align: middle;">Sign up with Google</span>
+            </button>
+            <button type="button" class="btn btn-light" style="width: 100%;">
+                <span style="color: #1877f2">
+                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.5 12.058c0-5.28-4.253-9.558-9.5-9.558s-9.5 4.279-9.5 9.558c0 4.771 3.473 8.725 8.016 9.442v-6.68H8.104v-2.762h2.412V9.952c0-2.395 1.417-3.718 3.588-3.718 1.04 0 2.126.186 2.126.186v2.352h-1.198c-1.18 0-1.548.738-1.548 1.494v1.792h2.635l-.421 2.763h-2.214V21.5c4.543-.717 8.016-4.67 8.016-9.442z" fill="currentColor"></path>
+                    </svg>
+                </span>
+                <span style="vertical-align: middle;">Sign up with Facebook</span>
+            </button>
+        </div>
     </div>
+</section>
 
-    <hr class="m-3"/>
+@* Debug only: print email confirmation link *@
+@if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
+{
+    <textarea>@EmailConfirmLink</textarea>
+}
 
-    Sign up with Google
-    
-    
-    @* Debug only: print email confirmation link *@
-    @if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
-    {
-        <textarea>@EmailConfirmLink</textarea>
-    }
-
-</div>
 
 @code {
     public bool IsSubmitting { get; set; }
@@ -102,6 +119,15 @@
     }
 
     public async Task RegisterUser() {
+
+        if (Input == null
+            || string.IsNullOrWhiteSpace(Input.Email)
+            || string.IsNullOrWhiteSpace(Input.FullName)
+            || string.IsNullOrWhiteSpace(Input.Password))
+        {
+            return;
+        }
+
         ErrorMessage = "";
         IsSubmitting = true;
         StateHasChanged();
@@ -152,22 +178,22 @@
 
     public class RegisterInput
     {
-        [Required]
+        [Required(ErrorMessage = "Full Name is required")]
         [MinLength(6, ErrorMessage = "Full Name must be at least 6 characters")]
         public string FullName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Email is required")]
         [EmailAddress]
         [MinLength(6, ErrorMessage = "Email must be at least 6 characters")]
         [StringLength(32, ErrorMessage = "Email too long (32 character limit)")]
         public string Email { get; set; }
         
-        [Required]
+        [Required(ErrorMessage = "Password is required")]
         [MinLength(6, ErrorMessage = "Password must be at least 8 characters")]
         [StringLength(32, ErrorMessage = "Password too long (32 character limit)")]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Confirm Password is required")]
         [CompareProperty("Password", ErrorMessage = "Confirm Password doesn't match the Password")]
         public string ConfirmPassword { get; set; }
     }

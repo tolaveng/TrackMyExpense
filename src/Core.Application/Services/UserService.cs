@@ -5,6 +5,8 @@ using Core.Application.IRepositories;
 using Core.Application.Models;
 using Core.Application.Services.IServices;
 using Core.Domain.Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 
 namespace Core.Application.Services
 {
@@ -24,7 +26,7 @@ namespace Core.Application.Services
             return await _userRepository.ConfirmEmailTokenAsync(userId, token);
         }
 
-        public async Task<Result<Guid>> CreateUserAsync(UserDto userDto)
+        public async Task<GenericResponse<Guid>> CreateUserAsync(UserDto userDto)
         {
             var user = _mapper.Map<AppUser>(userDto);
             return await _userRepository.CreateUserAsync(user);
@@ -33,6 +35,16 @@ namespace Core.Application.Services
         public async Task<string> GenerateEmailConfirmationTokenAsync(Guid userId)
         {
             return await _userRepository.GenerateEmailConfirmationTokenAsync(userId);
+        }
+
+        public async Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync()
+        {
+            return await _userRepository.GetExternalAuthenticationSchemesAsync();
+        }
+
+        public AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl)
+        {
+            return _userRepository.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
         }
 
         public async Task<UserDto> GetUserByEmailAsync(string email)
@@ -45,7 +57,12 @@ namespace Core.Application.Services
             return null;
         }
 
-        public async Task<SignInResult> SignInAsync(string email, string password, bool remember)
+        public bool IsEmailConfirmed(Guid userId)
+        {
+            return _userRepository.IsEmailConfirmed(userId);
+        }
+
+        public async Task<SignInResponse> SignInAsync(string email, string password, bool remember)
         {
             return await _userRepository.SignInAsync(email, password, remember);
         }
@@ -53,6 +70,16 @@ namespace Core.Application.Services
         public async Task SignOutAsync()
         {
             await _userRepository.SignOutAsync();
+        }
+
+        public async Task<ExternalLoginInfo> GetExternalLoginInfoAsync()
+        {
+            return await _userRepository.GetExternalLoginInfoAsync();
+        }
+
+        public async Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo)
+        {
+            return await _userRepository.ExternalLoginSignInAsync(loginInfo);
         }
     }
 }

@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using Core.Application.Common;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
-using SignInResult = Core.Application.Common.SignInResult;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace Core.Infrastructure.Repository
 {
@@ -34,7 +36,7 @@ namespace Core.Infrastructure.Repository
             _logger = logger;
         }
 
-        public async Task<Result<Guid>> CreateUserAsync(AppUser appUser)
+        public async Task<GenericResponse<Guid>> CreateUserAsync(AppUser appUser)
         {
             try
             {
@@ -42,17 +44,17 @@ namespace Core.Infrastructure.Repository
                 var result = await _userManager.CreateAsync(user, appUser.Password);
                 if (result.Succeeded)
                 {
-                    return Result<Guid>.Success(user.Id);
+                    return GenericResponse<Guid>.Success(user.Id);
                 }
 
-                return Result<Guid>.Failure("Cannot create a new user",
+                return GenericResponse<Guid>.Failure("Cannot create a new user",
                     result.Errors.Select(x => x.Description).ToArray());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.StackTrace);
             }
-            return Result<Guid>.Failure("Cannot create a new user");
+            return GenericResponse<Guid>.Failure("Cannot create a new user");
         }
 
         public async Task<bool> Disabled(Guid userId)
@@ -67,19 +69,19 @@ namespace Core.Infrastructure.Repository
             return false;
         }
 
-        public async Task<SignInResult> SignInAsync(string email, string password, bool remember)
+        public async Task<SignInResponse> SignInAsync(string email, string password, bool remember)
         {
             try
             {
                 var result = await _signInManager.PasswordSignInAsync(email, password, remember, false);
                 //var result = await _signInManager.CheckPasswordSignInAsync(email, password, false);
-                return new SignInResult(result.Succeeded, result.RequiresTwoFactor, result.IsLockedOut);
+                return new SignInResponse(result.Succeeded, result.RequiresTwoFactor, result.IsLockedOut);
             }
             catch (Exception ex)
             {
                _logger.LogError(ex.StackTrace);
             }
-            return SignInResult.Failure();
+            return SignInResponse.Failure();
         }
 
         public async Task SignOutAsync()
@@ -97,15 +99,15 @@ namespace Core.Infrastructure.Repository
             return null;
         }
         
-        public async Task<Result<AppUser>> GetByUsername(string email)
+        public async Task<GenericResponse<AppUser>> GetByUsername(string email)
         {
             var user = await _userManager.FindByNameAsync(email);
             if (user != null)
             {
                 var appUser = _mapper.Map<AppUser>(user);
-                return Result<AppUser>.Success(appUser);
+                return GenericResponse<AppUser>.Success(appUser);
             }
-            return Result<AppUser>.Failure("User not found");
+            return GenericResponse<AppUser>.Failure("User not found");
         }
 
         public AppUser GetById(Guid userId)
@@ -119,7 +121,7 @@ namespace Core.Infrastructure.Repository
         }
 
 
-        public async Task<Result<bool>> UpdateUserAsync(AppUser appUser)
+        public async Task<GenericResponse<bool>> UpdateUserAsync(AppUser appUser)
         {
             var user = _userManager.Users.SingleOrDefault(x => x.Id == appUser.Id);
             if (user != null)
@@ -131,9 +133,9 @@ namespace Core.Infrastructure.Repository
                 //user.Email = appUser.Email;
 
                 await _userManager.UpdateAsync(user);
-                return Result<bool>.Success();
+                return GenericResponse<bool>.Success();
             }
-            return Result<bool>.Failure("User not found");
+            return GenericResponse<bool>.Failure("User not found");
         }
 
         public async Task<string> GenerateEmailConfirmationTokenAsync(Guid userId)
@@ -158,5 +160,74 @@ namespace Core.Infrastructure.Repository
             }
             return false;
         }
+
+        public bool IsEmailConfirmed(Guid userId)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
+            if (user != null)
+            {
+                return _userManager.IsEmailConfirmedAsync(user).Result;
+            }
+            return false;
+        }
+
+        public async Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync()
+        {
+            return await _signInManager.GetExternalAuthenticationSchemesAsync();
+        }
+
+        public AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl)
+        {
+            return _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+        }
+
+        public async Task<ExternalLoginInfo> GetExternalLoginInfoAsync()
+        {
+            return await _signInManager.GetExternalLoginInfoAsync();
+        }
+
+        public async Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo)
+        {
+            var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, false, true);
+            if (result.Succeeded)
+            {
+                return GenericResponse<string>.Success(string.Empty);
+            }
+            
+            var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+            var fullName = loginInfo.Principal.FindFirstValue(ClaimTypes.Name);
+            if (email == null)
+            {
+                return GenericResponse<string>.Failure("Log in fail. Cannot get an email from your account.");
+            }
+
+            // check if user exist
+            var appUser = await _userManager.FindByEmailAsync(email);
+            if (appUser == null)
+            {
+                appUser = new AppIdentityUser()
+                {
+                    Email = email,
+                    UserName = email,
+                    FullName = fullName
+                };
+                var createResult = await _userManager.CreateAsync(appUser);
+                if (!createResult.Succeeded)
+                {
+                    return GenericResponse<string>.Failure("Unexpected error occured. Please try again later");
+                }
+            }
+
+            // add to login and sign in
+            var addResult = await _userManager.AddLoginAsync(appUser, loginInfo);
+            if (addResult.Succeeded)
+            {
+                await _signInManager.SignInAsync(appUser, isPersistent: false);
+                return GenericResponse<string>.Success(string.Empty);
+            }
+
+            return GenericResponse<string>.Failure("Unexpected error occured. Please try again later");
+        }
+
     }
 }

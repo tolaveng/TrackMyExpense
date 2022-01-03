@@ -19,6 +19,8 @@ using Core.Application.Mapper;
 using Core.Infrastructure.Mapper;
 using Core.Infrastructure.Database;
 using Core.Application.Settings;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Web.WebApp
 {
@@ -37,16 +39,42 @@ namespace Web.WebApp
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(opt =>
-            {
-                opt.LoginPath = "/account/login";
-            });
+            var oAuthFacebook = Configuration.GetSection("OAuthFacebook").Get<OAuthSetting>();
+            var oAuthGoogle = Configuration.GetSection("OAuthGoogle").Get<OAuthSetting>();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(opt =>
+                {
+                    opt.LoginPath = "/account/login";
+                    opt.LogoutPath = "/account/logout";
+                    opt.Cookie.SameSite = SameSiteMode.None;
+                })
+                .AddFacebook(opt =>
+                {
+                    opt.AppId = oAuthFacebook.ClientId;
+                    opt.AppSecret = oAuthFacebook.ClientSecret;
+                    opt.AccessDeniedPath = "/account/login";
+                })
+                .AddGoogle(opt => {
+                    opt.ClientId = oAuthGoogle.ClientId;
+                    opt.ClientSecret = oAuthGoogle.ClientSecret;
+                })
+                ;
+
             services.Configure<CookiePolicyOptions>(opt =>
             {
                 opt.CheckConsentNeeded = context => true;
                 //opt.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            // Requires all users to be authenticated - NOT WORK with Blazor razor component
+            // Solution: add [Authorize] attribute to _Import.razor
+            //services.AddAuthorization(opt =>
+            //{
+            //    opt.FallbackPolicy = new AuthorizationPolicyBuilder()
+            //        .RequireAuthenticatedUser()
+            //        .Build();
+            //});
 
             //services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddAutoMapper(Assembly.GetAssembly(typeof(DataMapperProfile)));
@@ -55,6 +83,7 @@ namespace Web.WebApp
 
             // Infrastructure
             AddDatabase(services);
+            services.AddTransient<IReCaptchaService, ReCaptchaService>();
 
             // .Net Identity
             AddAppIdentity(services, Environment);
@@ -66,6 +95,7 @@ namespace Web.WebApp
 
             // Config Settings
             services.Configure<EmailSetting>(Configuration.GetSection("EmailSetting"));
+            services.Configure<ReCaptchaSetting>(Configuration.GetSection("ReCaptcha"));
 
             // Config route option
             services.Configure<RouteOptions>(opt =>
@@ -73,8 +103,17 @@ namespace Web.WebApp
                 opt.LowercaseUrls = true;
                 opt.LowercaseQueryStrings = true;
             });
-            
+
+            services.AddDistributedMemoryCache();
+            services.AddSession(opt => {
+                opt.IdleTimeout = TimeSpan.FromMinutes(30);
+                opt.Cookie.HttpOnly = true;
+                opt.Cookie.IsEssential = true;
+            });
+            //services.AddMemoryCache();
+
             services.AddRazorPages();
+            services.AddControllers();
             services.AddServerSideBlazor();
         }
 
@@ -102,9 +141,12 @@ namespace Web.WebApp
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseSession();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

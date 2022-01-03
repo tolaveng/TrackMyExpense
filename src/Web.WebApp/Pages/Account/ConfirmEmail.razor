@@ -1,25 +1,31 @@
 ﻿@page "/account/confirmemail"
+@attribute [AllowAnonymous]
+@layout BlankLayout
 @using Core.Application.Services.IServices
 
 @inject IUserService UserService;
 
-<h3>Email Confirmation</h3>
-<hr />
+<section class="d-flex justify-content-center">
+    <div class="col-md-5 mb-5">
+        <h3>Email Confirmation</h3>
+        <hr />
+        @if (IsLoading)
+        {
+            <div>We are checking your email ...</div>
+        } else
+        {
+            if (IsConfirmed)
+            {
+                <div>Thank you. Your email has been successfully verified. <a href="/account/login">Click here to log in</a>.</div>
+            } else
+            {
+                <div>Sorry, we cannot verify your email or the verification link is expired.</div>
+                <div><a href="/account/generateemailconfirmation">Click here</a> to generate a new verification link.</div>
+            }
+        }
+    </div>
+</section>
 
-@if (IsLoading)
-{
-    <div>We are checking your email ...</div>
-} else
-{
-    if (IsConfirmed)
-    {
-        <div>Thank you. Your email has been successfully verified. <a href="/account/login">Click here to log in</a>.</div>
-    } else
-    {
-        <div>Sorry, we cannot verify your email or the verification link is expired.</div>
-        <div><a href="/account/generateemailconfirmation">Click here</a> to generate a new verification link.</div>
-    }
-}
 
 @code {
     [Parameter]

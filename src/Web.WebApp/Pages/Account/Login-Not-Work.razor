@@ -1,10 +1,13 @@
 ﻿@page "/account/login-not-working"
+@attribute [AllowAnonymous]
+@layout BlankLayout
 @using Microsoft.AspNetCore.Components
 @using Core.Application.Models
 @using Core.Application.Services.IServices
 @inject NavigationManager NavigationManager
 @inject IUserService _userService;
 @inject AuthenticationStateProvider appAuthenticationStateProvider;
+
 <h3>Login</h3>
 <section>
     <EditForm Model="@user" OnValidSubmit="@UserLogin">

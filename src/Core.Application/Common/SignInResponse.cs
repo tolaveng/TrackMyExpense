@@ -1,24 +1,24 @@
 ﻿namespace Core.Application.Common
 {
-    public class SignInResult
+    public class SignInResponse
     {
         public bool Succeeded { get; set; }
         public bool RequiresTwoFactor { get; set; }
         public bool IsLockedOut { get; set; }
 
-        public SignInResult(bool succeeded, bool requiresTwoFactor, bool isLockedOut)
+        public SignInResponse(bool succeeded, bool requiresTwoFactor, bool isLockedOut)
         {
             Succeeded = succeeded;
             RequiresTwoFactor = requiresTwoFactor;
             IsLockedOut = isLockedOut;
         }
-        public static SignInResult Failure()
+        public static SignInResponse Failure()
         {
-            return new SignInResult(false, false, false);
+            return new SignInResponse(false, false, false);
         }
-        public static SignInResult Success()
+        public static SignInResponse Success()
         {
-            return new SignInResult(true, false, false);
+            return new SignInResponse(true, false, false);
         }
     }
 }

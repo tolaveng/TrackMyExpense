@@ -1,5 +1,6 @@
 ﻿@page "/account/generateemailconfirmation"
-
+@attribute [AllowAnonymous]
+@layout BlankLayout
 @using System.ComponentModel.DataAnnotations
 @using Core.Application.Services.IServices
 @using Microsoft.AspNetCore.Hosting
@@ -9,22 +10,26 @@
 @inject IUserService UserService;
 @inject NavigationManager Navigation;
 @inject IWebHostEnvironment HostEnvironment;
+@inject IEmailService EmailService;
 
-<h3>Email Confirmation</h3>
-<hr />
-
-<section>
-    <div class="mb-3">Enter the email to receive a new verification link.</div>
+<section class="d-flex justify-content-center">
+    <div class="col-md-5 mb-5">
+        <h3>Email Confirmation</h3>
+        <hr />
+        <div class="mb-3">Enter the email to receive a new verification link.</div>
         <EditForm Model="@Input" OnValidSubmit="@GenerateConfirmationEmail">
             <DataAnnotationsValidator/>
             <div class="row">
-                <div class="col-auto col-md-3">
+                <div class="col-md-6">
                     <InputText id="inputEmail" class="form-control" @bind-Value="@Input.Email" placeholder="Email" autocomplete="off" spellcheck="false"/>
                     <ValidationMessage For="@(() => Input.Email)"/>
                     <br/>
                 </div>
-                <div class="col-auto mb-3">
-                    <button type="submit" disabled="@IsSubmitting" class="btn btn-primary">Send Verification Link</button>
+                <div class="col-md-6">
+                    <button type="submit" disabled="@IsSubmitting" class="btn btn-primary">
+                        <span class="spinner-border spinner-border-sm" hidden="@(!IsSubmitting)" role="status" aria-hidden="true"></span>
+                        <span>Send a new link</span>
+                    </button>
                 </div>
             </div>
 
@@ -39,13 +44,13 @@
                 <div><br /></div>
             }
         </EditForm>
-
-        @* Debug only: print email confirmation link *@
-        @if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
-        {
-            <textarea>@EmailConfirmLink</textarea>
-        }
+    </div>
 </section>
+@* Debug only: print email confirmation link *@
+@if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
+{
+    <textarea>@EmailConfirmLink</textarea>
+}
 
 @code {
     public ConfirmEmailInput Input { get; set; } = new ConfirmEmailInput();
@@ -53,9 +58,25 @@
     public string InfoMessage { get; set; }
     public string EmailConfirmLink { get; set; }
 
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "email")]
+    public string Email { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(Email))
+        {
+            Input = new ConfirmEmailInput()
+            {
+                Email = Email
+            };
+        }
+    }
+
+
     public async Task GenerateConfirmationEmail()
     {
-        InfoMessage = "If the email is matched, we will send a new verification link. Please check your email inbox or spam folder.";
+        InfoMessage = "Please check your email inbox or spam folder, and click on the verification link in the email.";
         IsSubmitting = true;
         var existUser = await UserService.GetUserByEmailAsync(Input.Email);
         if (existUser == null)
@@ -64,9 +85,21 @@
             return;
         }
 
+        if (UserService.IsEmailConfirmed(existUser.Id))
+        {
+            InfoMessage = "This email is already verified. <a href='/account/login'>Click here to log in</a>";
+            IsSubmitting = false;
+            return;
+        }
+
         var token = await UserService.GenerateEmailConfirmationTokenAsync(existUser.Id);
         EmailConfirmLink = $"{Navigation.BaseUri}account/confirmemail?uid={existUser.Id}&token={HttpUtility.UrlEncode(token)}";
-
+        var result = await EmailService.SendEmailConfirmationAsync(Input.Email, existUser.FullName, EmailConfirmLink);
+        if (!result)
+        {
+            InfoMessage = "Sorry, there was an unexpected error occured. Please try again later.";
+        }
+        IsSubmitting = false;
     }
 
     public class ConfirmEmailInput

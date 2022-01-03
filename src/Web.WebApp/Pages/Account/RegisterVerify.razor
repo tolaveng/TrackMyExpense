@@ -1,5 +1,6 @@
 ﻿@page "/account/registerverify/{userid}"
-
+@attribute [AllowAnonymous]
+@layout BlankLayout
 @using Core.Application.Services.IServices
 @using Microsoft.AspNetCore.Hosting
 
@@ -8,16 +9,16 @@
 @inject IWebHostEnvironment HostEnvironment;
 @inject IEmailService EmailService;
 
-<h3>Email Confirmation</h3>
-<hr />
-<section>
-    <div>
+<section class="d-flex justify-content-center">
+    <div class="col-md-5 mb-5">
+        <h3>Email Confirmation</h3>
+        <hr />
         <p>
             Your account has been created. Now let's verify your email address.<br />
-            Please check your inbox or spam folder, and click on the link in the email sent to <b>@Email</b>.
+            Please check your inbox or spam folder, and click on the verification link in the email sent to <b>@Email</b>.
         </p>
         <p>
-            Haven't received it? <a>Click here</a> to resend the email.
+            Haven't received it? <a href="/account/generateemailconfirmation?email=@Email">Click here</a> to resend the email.
         </p>
     </div>
 </section>
@@ -26,6 +27,7 @@
     [Parameter]
     [SupplyParameterFromQuery(Name = "email")]
     public string Email { get; set; }
+
     [Parameter]
     public string UserId { get; set; }
 }

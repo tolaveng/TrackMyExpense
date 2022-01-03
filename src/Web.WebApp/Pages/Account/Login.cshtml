@@ -1,39 +1,107 @@
 ﻿@page "/account/login"
+@attribute [AllowAnonymous]
+@using Core.Application.Settings
+@using Microsoft.AspNetCore.Components
+@using Microsoft.Extensions.Options
+
+@inject IOptions<ReCaptchaSetting> ReCaptchaSetting
+
 @model Web.WebApp.Pages.Account.LoginModel
 
 @{
     ViewData["Title"] = "Account Log In";
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" id="account">
-            <div>
-                <span class="text-danger">@Model.ErrorMessage</span>
-            </div>
-            <div class="form-floating">
-                <input type="text" class="form-control" placeholder="Email" asp-for="Input.Email" aria-required="true"/>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input type="password" class="form-control" placeholder="Password" asp-for="Input.Password"/>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div>
-                <div class="checkbox">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input type="checkbox" class="form-check-input" asp-for="Input.RememberMe"/>
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
+<section class="d-flex justify-content-center">
+    <div class="col-md-4 mb-5">
+        <h3>Log in to track your expenses</h3>
+        <hr />
+        <div class="row">
+            <form method="post" id="account" class="form-floating">
+                <div class="has-float-label mb-3">
+                    <input type="text" id="inputEmail" class="form-control" placeholder="Email" asp-for="Input.Email" aria-required="true" autocomplete="off" spellcheck="false" autofocus/>
+                    <label for="inputEmail">Email</label>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-            </div>
-            <div>
-                <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-            </div>
-            @Html.AntiForgeryToken()
+
+                <div class="has-float-label mb-3">
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" asp-for="Input.Password" autocomplete="off" spellcheck="false"/>
+                    <label for="inputPassword">Password</label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="checkbox mb-3">
+                            <label asp-for="Input.RememberMe" class="form-label">
+                                <input type="checkbox" class="form-check-input" asp-for="Input.RememberMe"/>
+                                &nbsp; Stay signed in
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="/account/forgotpassword">Forgot password</a>
+                    </div>
+                </div>
+                
+                @if (@Model.LoginAttempt >= 3)
+                {
+                    <div class="mb-3">
+                        <div class="g-recaptcha" data-sitekey=@ReCaptchaSetting.Value.SiteKey></div>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    @if (!string.IsNullOrWhiteSpace(@Model.ErrorMessage))
+                    {
+                     <div class="text-danger">
+                        <span class="oi oi-warning"></span>
+                        @((MarkupString)Model.ErrorMessage)
+                        </div>
+                    }
+                </div>
+                <div>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                </div>
+                @Html.AntiForgeryToken()
+            </form>
+        </div>
+
+        <div class="mb-3 mt-5">
+            <div class="hr-center"><span>OR</span></div>
+        </div>
+        
+        <form method="post">
+            <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-light" style="width: 100%" asp-page-handler="ExternalLogin" name="provider" value="Google">
+                <span>
+                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20.64 12.2c0-.63-.06-1.25-.16-1.84H12v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.92a8.78 8.78 0 0 0 2.68-6.62z" fill="#4285F4"></path>
+                    <path d="M12 21a8.6 8.6 0 0 0 5.96-2.18l-2.91-2.26a5.4 5.4 0 0 1-8.09-2.85h-3v2.33A9 9 0 0 0 12 21z" fill="#34A853"></path>
+                    <path d="M6.96 13.71a5.41 5.41 0 0 1 0-3.42V7.96h-3a9 9 0 0 0 0 8.08l3-2.33z" fill="#FBBC05"></path>
+                    <path d="M12 6.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59A9 9 0 0 0 3.96 7.95l3 2.34A5.36 5.36 0 0 1 12 6.58z" fill="#EA4335"></path>
+                    </svg>
+                </span>
+                <span style="vertical-align: middle;">Log in with Google</span>
+                </button>
+
+                <button type="submit" class="btn btn-light" style="width: 100%" asp-page-handler="ExternalLogin" name="provider" value="Facebook">
+                <span style="color: #1877f2">
+                    <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21.5 12.058c0-5.28-4.253-9.558-9.5-9.558s-9.5 4.279-9.5 9.558c0 4.771 3.473 8.725 8.016 9.442v-6.68H8.104v-2.762h2.412V9.952c0-2.395 1.417-3.718 3.588-3.718 1.04 0 2.126.186 2.126.186v2.352h-1.198c-1.18 0-1.548.738-1.548 1.494v1.792h2.635l-.421 2.763h-2.214V21.5c4.543-.717 8.016-4.67 8.016-9.442z" fill="currentColor"></path>
+                    </svg>
+                </span>
+                <span style="vertical-align: middle;">Log in with Facebook</span>
+                </button>
+           </div>
         </form>
     </div>
-</div>
+</section>
+@section scripts {
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+}
+
 @*
 @section scripts{
    <partial name="_ValidationScriptsPartial" />
