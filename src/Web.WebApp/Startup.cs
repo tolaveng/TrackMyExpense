@@ -21,6 +21,7 @@ using Core.Infrastructure.Database;
 using Core.Application.Settings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using MudBlazor.Services;
 
 namespace Web.WebApp
 {
@@ -110,8 +111,9 @@ namespace Web.WebApp
                 opt.Cookie.HttpOnly = true;
                 opt.Cookie.IsEssential = true;
             });
-            //services.AddMemoryCache();
+            
 
+            services.AddMudServices();
             services.AddRazorPages();
             services.AddControllers();
             services.AddServerSideBlazor();
