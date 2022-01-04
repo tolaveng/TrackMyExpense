@@ -23,7 +23,9 @@ namespace Core.Application.IRepositories
         Task<SignInResponse> SignInAsync(string email, string password, bool remember);
         Task SignOutAsync();
         Task<string> GenerateEmailConfirmationTokenAsync(Guid userId);
+        Task<string> GeneratePasswordResetTokenAsync(Guid userId);
         Task<bool> ConfirmEmailTokenAsync(Guid userId, string token);
+        Task<bool> ResetPasswordAsync(Guid userId, string token, string password);
         bool IsEmailConfirmed(Guid userId);
 
         // External Login

@@ -1,0 +1,80 @@
+﻿@using Newtonsoft.Json
+@inject IJSRuntime JSRuntime;
+
+<div id="googleRecaptcha"></div>
+
+
+@code {
+    [Parameter]
+    public string SiteKey { get; set; }
+
+    [Parameter]
+    public string SecretKey { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnCaptchaChanged { get; set; }
+
+    private static string RecaptchaResponse;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (string.IsNullOrWhiteSpace(SiteKey)) {
+            throw new ArgumentNullException("Site key is required");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("loadJSScript", @"https://www.google.com/recaptcha/api.js", true, true);
+        await JSRuntime.InvokeVoidAsync("loadJSScript", @"/js/google-recaptcha.js");
+
+        if (firstRender && !string.IsNullOrWhiteSpace(SiteKey))
+        {
+            await JSRuntime.InvokeVoidAsync("recaptcha_render",
+                DotNetObjectReference.Create(this),
+                "googleRecaptcha",
+                SiteKey);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    // callback from script
+    [JSInvokable("GoogleRecaptchaCallback")]
+    public async Task GoogleRecaptchaCallback(string response)
+    {
+        RecaptchaResponse = response;
+        await OnCaptchaChanged.InvokeAsync(!string.IsNullOrWhiteSpace(response));
+    }
+
+    public async Task<bool> ValidateCaptchaAsync()
+    {
+        if (string.IsNullOrWhiteSpace(RecaptchaResponse)) return false;
+
+        var googleVerificationUrl = "https://www.google.com/recaptcha/api/siteverify";
+        try
+        {
+            using var client = new HttpClient();
+            var response = await client.PostAsync($"{googleVerificationUrl}?secret={SecretKey}&response={RecaptchaResponse}", null);
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var captchaVerfication = JsonConvert.DeserializeObject<CaptchaResponse>(jsonString);
+            if (captchaVerfication != null)
+            {
+                return captchaVerfication.success;
+            }
+        }
+        catch (Exception)
+        {
+            //ignored
+        }
+        return false;
+    }
+
+    private class CaptchaResponse
+    {
+        public bool success { get; set; }
+        public string challenge_ts { get; set; }
+        public string hostname { get; set; }
+    }
+}

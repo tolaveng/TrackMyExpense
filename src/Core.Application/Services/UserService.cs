@@ -81,5 +81,15 @@ namespace Core.Application.Services
         {
             return await _userRepository.ExternalLoginSignInAsync(loginInfo);
         }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(Guid userId)
+        {
+            return await _userRepository.GeneratePasswordResetTokenAsync(userId);
+        }
+
+        public async Task<bool> ResetPasswordAsync(Guid userId, string token, string password)
+        {
+            return await _userRepository.ResetPasswordAsync(userId, token, password);
+        }
     }
 }

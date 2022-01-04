@@ -12,7 +12,9 @@ namespace Core.Application.Services.IServices
         Task<UserDto> GetUserByEmailAsync(string email);
         Task<GenericResponse<Guid>> CreateUserAsync(UserDto userDto);
         Task<string> GenerateEmailConfirmationTokenAsync(Guid userId);
+        Task<string> GeneratePasswordResetTokenAsync(Guid userId);
         Task<bool> ConfirmEmailTokenAsync(Guid userId, string token);
+        Task<bool> ResetPasswordAsync(Guid userId, string token, string password);
         bool IsEmailConfirmed(Guid userId);
 
         // External Login

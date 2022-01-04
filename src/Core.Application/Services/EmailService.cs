@@ -37,22 +37,47 @@ namespace Core.Application.Services
             emailSetting = options.Value;
             _logger = logger;
         }
-        public async Task<bool> SendEmailConfirmationAsync(string email, string name, string confirmEmailLink)
+        public bool SendNoReplyEmailAsync(string receiverEmail, string receiverName,
+            string subject, string textBody, string htmlBody)
         {
             //TODO: Move to worker
             var message = new MimeMessage();
+            message.Subject = subject;
             message.From.Add(new MailboxAddress(emailSetting.SenderEmail, emailSetting.SenderEmail));
-            message.To.Add(new MailboxAddress(name, email));
-
-            message.Subject = "Track My Expense Verify your email";
+            message.To.Add(new MailboxAddress(receiverName, receiverEmail));
 
             var builder = new BodyBuilder();
+            builder.TextBody = textBody;
+            builder.HtmlBody = htmlBody;
+            message.Body = builder.ToMessageBody();
+
+            try
+            {
+                using (var client = new SmtpClient())
+                {
+                    client.Connect(emailSetting.Host, emailSetting.Port, emailSetting.SSL);
+                    client.Authenticate(emailSetting.User, emailSetting.Password);
+                    client.Send(message);
+                    client.Disconnect(true);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                _logger.LogError(ex.StackTrace);
+                return false;
+            }
+        }
+
+        public bool SendEmailConfirmation(string receiverEmail, string receiverName, string confirmEmailLink)
+        {
+            var subject = "Track My Expense - Verify your email";
             var textBody = new StringBuilder("Hey there,");
             textBody.AppendLine("Thank you for register your email with TrackMyExpense. To activate your account, please copy and paste the URL below into a web browser.");
             textBody.AppendLine(confirmEmailLink);
             textBody.AppendLine("Please ignore this message if you did not associate this email address.");
-            
-            builder.TextBody = textBody.ToString();
+            textBody.AppendLine("\nKind regards,\nTrack My Expense Teams");
 
             var htmlBody = new StringBuilder($"{logoHtml}<br/><br/>");
             htmlBody.AppendLine("Hey there,<br/>");
@@ -61,27 +86,30 @@ namespace Core.Application.Services
             htmlBody.AppendLine("If you experience any issues with the link above, copy and paste the URL below into a web browser.<br/><br/>");
             htmlBody.AppendLine($"{confirmEmailLink}<br/><br/>");
             htmlBody.AppendLine("Please ignore this message if you did not associate this email address.<br/>");
-            builder.HtmlBody = htmlBody.ToString();
+            htmlBody.AppendLine("<br/>Kind regards,<br/>Track My Expense Teams");
 
-            message.Body = builder.ToMessageBody();
-            using (var client = new SmtpClient())
-            {
-                try
-                {
-                    client.Connect(emailSetting.Host, emailSetting.Port, emailSetting.SSL);
-                    client.Authenticate(emailSetting.User, emailSetting.Password);
-                    client.Send(message);
-                    client.Disconnect(true);
+            return SendNoReplyEmailAsync(receiverEmail, receiverName, subject, textBody.ToString(), htmlBody.ToString());
+        }
 
-                } catch (Exception ex)
-                {
-                    _logger.LogError(ex.Message);
-                    _logger.LogError(ex.StackTrace);
-                    return false;
-                }
-            }
+        public bool SendPasswordReset(string receiverEmail, string receiverName, string confirmEmailLink)
+        {
+            var subject = "Track My Expense - Reset Password";
+            var textBody = new StringBuilder("Hey there,");
+            textBody.AppendLine("To reset your password, please click on the link below within 24 hours.");
+            textBody.AppendLine(confirmEmailLink);
+            textBody.AppendLine("Please ignore this message if you did not request to reset your password.");
+            textBody.AppendLine("\nKind regards,\nTrack My Expense Teams");
 
-            return true;
+            var htmlBody = new StringBuilder($"{logoHtml}<br/><br/>");
+            htmlBody.AppendLine("Hey there,<br/>");
+            htmlBody.AppendLine("To reset your password, please click on the link below within 24 hours.<br/>");
+            htmlBody.AppendLine($"<a href=\"{confirmEmailLink}\" target=\"_blank\">Reset my password</a><br/><br/>");
+            htmlBody.AppendLine("If you experience any issues with the link above, copy and paste the URL below into a web browser.<br/><br/>");
+            htmlBody.AppendLine($"{confirmEmailLink}<br/><br/>");
+            htmlBody.AppendLine("Please ignore this message if you did not request to reset your password.<br/>");
+            htmlBody.AppendLine("<br/>Kind regards,<br/>Track My Expense Teams");
+
+            return SendNoReplyEmailAsync(receiverEmail, receiverName, subject, textBody.ToString(), htmlBody.ToString());
         }
     }
 }

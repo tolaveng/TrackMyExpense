@@ -109,5 +109,5 @@ a, .btn-link {
 }
 .has-float-label .form-control:placeholder-shown:not(:focus) + label {
     font-size: 100% !important;
-    top: 0.6em !important;
+    top: 0.7em !important;
 }

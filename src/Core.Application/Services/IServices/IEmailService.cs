@@ -8,6 +8,7 @@ namespace Core.Application.Services.IServices
 {
     public interface IEmailService
     {
-        Task<bool> SendEmailConfirmationAsync(string email, string name, string confirmEmailLink);
+        bool SendEmailConfirmation(string receiverEmail, string receiverName, string confirmEmailLink);
+        bool SendPasswordReset(string receiverEmail, string receiverName, string confirmEmailLink);
     }
 }

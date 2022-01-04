@@ -198,7 +198,7 @@ namespace Core.Infrastructure.Repository
             var fullName = loginInfo.Principal.FindFirstValue(ClaimTypes.Name);
             if (email == null)
             {
-                return GenericResponse<string>.Failure("Log in fail. Cannot get an email from your account.");
+                return GenericResponse<string>.Failure("Log in failed. Cannot get an email from your account.");
             }
 
             // check if user exist
@@ -209,7 +209,8 @@ namespace Core.Infrastructure.Repository
                 {
                     Email = email,
                     UserName = email,
-                    FullName = fullName
+                    FullName = fullName,
+                    EmailConfirmed = true
                 };
                 var createResult = await _userManager.CreateAsync(appUser);
                 if (!createResult.Succeeded)
@@ -229,5 +230,25 @@ namespace Core.Infrastructure.Repository
             return GenericResponse<string>.Failure("Unexpected error occured. Please try again later");
         }
 
+        public async Task<string> GeneratePasswordResetTokenAsync(Guid userId)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
+            if (user != null)
+            {
+                return await _userManager.GeneratePasswordResetTokenAsync(user);
+            }
+            return null;
+        }
+
+        public async Task<bool> ResetPasswordAsync(Guid userId, string token, string password)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
+            if (user != null)
+            {   
+                var result = await _userManager.ResetPasswordAsync(user, token, password);
+                return result.Succeeded;
+            }
+            return false;
+        }
     }
 }
