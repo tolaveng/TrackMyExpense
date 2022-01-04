@@ -192,9 +192,9 @@ namespace Web.WebApp
             services.Configure<DataProtectionTokenProviderOptions>(opt =>
                 opt.TokenLifespan = TimeSpan.FromDays(2));
 
-            // Set password reset token expiry to 3 hours
+            // Set password reset token expiry to 24 hours
             services.Configure<PasswordResetTokenProviderOptions>(opt =>
-                opt.TokenLifespan = TimeSpan.FromMinutes(3));
+                opt.TokenLifespan = TimeSpan.FromHours(24));
         }
     }
 }
