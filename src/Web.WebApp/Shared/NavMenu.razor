@@ -1,9 +1,11 @@
 ﻿@using Core.Domain.Constants
-<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">WebApp</a>
+<div class="top-row">
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
+    <a class="navbar-brand" href="" title="Home">
+        <img src="/img/TrackMyExpense.svg" style="width: auto; height: 24px;"/>
+    </a>
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
@@ -15,10 +17,13 @@
         </li>
         <AuthorizeView Roles=@UserBaseRole.Admin>
             <Authorized>
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
-                        <span class="oi oi-person" aria-hidden="true"></span> Admin
+                <li class="nav-item dropdown px-3">
+                    <NavLink class="nav-link dropdown-toggle" href="/admin" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="oi oi-person" aria-hidden="true"></span> Administrator
                     </NavLink>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><NavLink class="nav-link" href="/admin/users">Users</NavLink></li>
+                    </ul>
                 </li>
             </Authorized>
         </AuthorizeView>

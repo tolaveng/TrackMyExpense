@@ -15,20 +15,20 @@ namespace Core.Application.Services
 
         private const string logoHtml = @"
             <span style=""font-family:'Times New Roman','Times-Roman',serif; font-size:32px"">
-            <span style='color:#00796B'>T</span>
-            <span style='color:#00e8ea'>r</span>
-            <span style='color:#02befd'>a</span>
-            <span style='color:#059afa'>c</span>
-            <span style='color:#056afa'>k</span>
-            <span style='color:#0538fa'>M</span>
-            <span style='color:#5303fc'>y</span>
-            <span style='color:#7a04fb'>E</span>
-            <span style='color:#a302fd'>x</span>
-            <span style='color:#ca05fa'>p</span>
-            <span style='color:#eb04fb'>e</span>
-            <span style='color:#fb04d7'>n</span>
-            <span style='color:#fa0596'>s</span>
-            <span style='color:#fc0351'>e</span>
+            <span style='color:#127777'>T</span>
+            <span style='color:#445E5E'>r</span>
+            <span style='color:#624F4F'>a</span>
+            <span style='color:#833E3E'>c</span>
+            <span style='color:#953535'>k</span>
+            <span style='color:#BE2121'>M</span>
+            <span style='color:#E40D0D'>y</span>
+            <span style='color:#EF0011'>E</span>
+            <span style='color:#D3002C'>x</span>
+            <span style='color:#C1003F'>p</span>
+            <span style='color:#B0004F'>e</span>
+            <span style='color:#A00060'>n</span>
+            <span style='color:#91006F'>s</span>
+            <span style='color:#83007D'>e</span>
             </span>
         ";
 

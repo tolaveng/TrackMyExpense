@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="1136.8334"
+   height="117.05699"
+   viewBox="0 0 1136.8334 117.05699"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="TrackMyExpense.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:zoom="0.92898975"
+     inkscape:cx="515.07565"
+     inkscape:cy="308.39953"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient20643">
+      <stop
+         style="stop-color:#008080;stop-opacity:1"
+         offset="0"
+         id="stop20639" />
+      <stop
+         style="stop-color:#ff0000;stop-opacity:1"
+         offset="0.48812914"
+         id="stop23283" />
+      <stop
+         style="stop-color:#800080;stop-opacity:1"
+         offset="1"
+         id="stop20641" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient20643"
+       id="linearGradient20645"
+       x1="149.62491"
+       y1="135.63121"
+       x2="1283.1143"
+       y2="135.63121"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-147.98397,-75.337582)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:133.333px;line-height:1.25;font-family:sans-serif;letter-spacing:10px;fill:url(#linearGradient20645);fill-opacity:1;stroke:none"
+       x="143.16628"
+       y="163.61861"
+       id="text1551"><tspan
+         sodipodi:role="line"
+         id="tspan1549"
+         x="143.16628"
+         y="163.61861"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:133.333px;font-family:serif;-inkscape-font-specification:'serif Bold';fill:url(#linearGradient20645);fill-opacity:1"><tspan
+   style="fill:url(#linearGradient20645);fill-opacity:1"
+   id="tspan11693">T</tspan>rackMyExpense</tspan></text>
+  </g>
+</svg>
