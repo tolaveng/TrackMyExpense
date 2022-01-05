@@ -3,7 +3,8 @@
     {
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
     }
-    <a href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
+    <a class="page-logo @(DrawerOpen ? "page-logo-hidden" : "page-logo-show")" href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
+    
     <MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex justify-end pr-5">
         <AuthorizeView>
             <Authorized>

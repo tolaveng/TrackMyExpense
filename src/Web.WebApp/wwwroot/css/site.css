@@ -136,3 +136,17 @@ a, .btn-link {
     font-size: 100% !important;
     top: 0.7em !important;
 }
+
+.page-logo {
+    transition: visibility 0s, opacity 0.5s linear;
+}
+
+.page-logo.page-logo-show {
+    visibility: visible;
+    opacity: 1;
+}
+
+.page-logo.page-logo-hidden {
+    visibility: hidden;
+    opacity: 0;
+}
