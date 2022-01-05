@@ -6,13 +6,9 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <a href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
-        <MudSpacer />
-        <MudLink Href="/account/login" Class="mr-3">Log In</MudLink>
-        <MudLink Href="/account/register">Create Account</MudLink>
-    </MudAppBar>
+    <AppBar ShowToggleIcon="@false" />
     <MudMainContent>
         @Body
     </MudMainContent>
+    <PageFooter />
 </MudLayout>
