@@ -1,12 +1,12 @@
 ﻿@page "/account/confirmemail"
 @attribute [AllowAnonymous]
-@layout BlankLayout
+@layout EmptyLayout
 @using Core.Application.Services.IServices
 
 @inject IUserService UserService;
 
-<section class="d-flex justify-content-center">
-    <div class="col-md-5 mb-5">
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
+    <MudPaper Outlined="true" Elevation="1" Class="p-3">
         <h5>Email Confirmation</h5>
         <hr />
         @if (IsLoading)
@@ -23,8 +23,8 @@
                 <div><a href="/account/generateemailconfirmation">Click here</a> to generate a new verification link.</div>
             }
         }
-    </div>
-</section>
+    </MudPaper>
+</MudContainer>
 
 
 @code {

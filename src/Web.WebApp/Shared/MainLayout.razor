@@ -1,13 +1,29 @@
-﻿@inherits LayoutComponentBase
+﻿@using Web.WebApp.Themes
+@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
+<MudThemeProvider Theme="@PrimaryTheme.Default"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <AppBar OnDrawerToggle="@DrawerToggle" DrawerOpen="@_drawerOpen"/>
+    <MudDrawer @bind-Open="@_drawerOpen" Elevation="2">
+        <MudDrawerHeader Style="padding: 12px;">
+            <a href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
+        </MudDrawerHeader>
         <NavMenu />
-    </div>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+        <PageFooter />
+    </MudMainContent>
+</MudLayout>
 
-    <div class="main">
-        <div class="content px-4">
-            @Body
-        </div>
-    </div>
-</div>
+@code {
+    bool _drawerOpen = false;
+
+    void DrawerToggle(bool drawerOpen)
+    {
+        _drawerOpen = drawerOpen;
+    }
+}

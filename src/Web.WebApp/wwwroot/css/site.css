@@ -36,6 +36,31 @@
 
 html, body {
     font-family: 'Lato', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+}
+
+.mud-main-content > .mud-container {
+    min-height: 420px;
+}
+
+.page-footer {
+    box-sizing: border-box;
+    box-shadow: inset 0px 3px 3px -2px #B2DFDB;
+    border-top: 1px solid #009688;
+    margin-top: 32px;
+    padding: 32px;
+    display: flex;
+}
+
+.page-footer > .page-footer-left {
+    flex: 1;
+    justify-content: space-between;
+    width: 50%;
+}
+.page-footer > .page-footer-right {
+    flex: 1;
+    text-align: right;
+    width: 50%;
 }
 
 a, .btn-link {

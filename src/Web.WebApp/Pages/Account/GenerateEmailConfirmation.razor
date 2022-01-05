@@ -1,6 +1,6 @@
 ﻿@page "/account/generateemailconfirmation"
 @attribute [AllowAnonymous]
-@layout BlankLayout
+@layout EmptyLayout
 @using System.ComponentModel.DataAnnotations
 @using Core.Application.Services.IServices
 @using Core.Application.Settings
@@ -17,45 +17,41 @@
 @inject IJSRuntime JsRuntime;
 @inject IOptions<ReCaptchaSetting> ReCaptchaSetting
 
-<section class="d-flex justify-content-center">
-    <div class="col-md-5 mb-5 card">
-        <div class="card-header">
-            <h5>Email Confirmation</h5>
-        </div>
-        <div class="card-body">
-            <div class="mb-3">Enter your email address to get a new verification link.</div>
-            <EditForm Model="@Input" OnValidSubmit="@GenerateConfirmationEmail">
-                <DataAnnotationsValidator/>
-                <div>
-                    <div class="mb-2">
-                        <InputText id="inputEmail" class="form-control" @bind-Value="@Input.Email" placeholder="Email" autocomplete="off" spellcheck="false"/>
-                        <ValidationMessage For="@(() => Input.Email)"/>
-                    </div>
-                    <div class="mb-2">
-                        <GoogleRecaptcha @ref="googleRecaptcha" SiteKey=@ReCaptchaSetting.Value.SiteKey SecretKey=@ReCaptchaSetting.Value.SecretKey OnCaptchaChanged="@OnCaptchaChanged" />
-                    </div>
-                    <div class="mb-2">
-                        <button type="submit" disabled="@SubmitDisabled" class="btn btn-primary">
-                            <span class="spinner-border spinner-border-sm" hidden="@(!IsSubmitting)" role="status" aria-hidden="true"></span>
-                            <span>Get email verification link</span>
-                        </button>
-                    </div>
-                </div>
-
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
+    <MudCard Outlined="true" Elevation="1" Class="rounded-lg p-3">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">Email Confirmation</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+       <MudCardContent>
+           @if (IsSubmitted) {
                 @if (!string.IsNullOrWhiteSpace(InfoMessage))
                 {
-                    <div class="alert alert-info">
-                    <span class="oi oi-info"></span> &nbsp;
-                    @((MarkupString)InfoMessage)
-                    </div>
-                } else
-                {
-                    <div><br /></div>
+                    <MudAlert Severity="Severity.Info">@((MarkupString)InfoMessage)</MudAlert>
                 }
-            </EditForm>
-        </div>
-    </div>
-</section>
+            } else {
+                <div class="mb-3">Enter your email address to get a new verification link.</div>
+                <EditForm Model="@Input" OnValidSubmit="@GenerateConfirmationEmail">
+                    <DataAnnotationsValidator/>
+                    <MudTextField Label="Email" @bind-Value="@Input.Email" For="@(() => Input.Email)" />
+                    <div class="my-3">
+                        <GoogleRecaptcha @ref="googleRecaptcha" SiteKey=@ReCaptchaSetting.Value.SiteKey SecretKey=@ReCaptchaSetting.Value.SecretKey OnCaptchaChanged="@OnCaptchaChanged" />
+                    </div>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@SubmitDisabled">
+                        <span class="spinner-border spinner-border-sm" hidden="@(!IsSubmitting)" role="status" aria-hidden="true"></span>
+                        <span>Get email verification link</span>
+                    </MudButton>
+
+                    @if (!string.IsNullOrWhiteSpace(InfoMessage))
+                    {
+                        <MudAlert Severity="Severity.Info">@((MarkupString)InfoMessage)</MudAlert>
+                    }
+                </EditForm>
+            }
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
 @* Debug only: print email confirmation link *@
 @if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
 {
@@ -66,6 +62,7 @@
 @code {
     public ConfirmEmailInput Input { get; set; } = new ConfirmEmailInput();
     public bool IsSubmitting { get; set; }
+    public bool IsSubmitted { get; set; }
     public bool SubmitDisabled { get; set; } = true;
     public string InfoMessage { get; set; }
     public string EmailConfirmLink { get; set; }
@@ -107,12 +104,13 @@
         }
 
         InfoMessage = "If your email is registered. Please check your inbox or spam folder, and click on the verification link.";
-        
+
         var existUser = await UserService.GetUserByEmailAsync(Input.Email);
         if (existUser == null)
         {   // DOT NOT TELL the email is invalid
             IsSubmitting = false;
             SubmitDisabled = false;
+            IsSubmitted = true;
             return;
         }
 
@@ -120,6 +118,7 @@
         {
             InfoMessage = "This email is already verified. <a href='/account/login'>Click here to log in</a>";
             IsSubmitting = false;
+            IsSubmitted = true;
             return;
         }
 
@@ -128,10 +127,11 @@
         var result = EmailService.SendEmailConfirmation(Input.Email, existUser.FullName, EmailConfirmLink);
         if (!result)
         {
-            InfoMessage = "Sorry, there was an unexpected error occured. Please try again later.";
+            InfoMessage = "Sorry, something went wrong. Please try again later.";
         }
         IsSubmitting = false;
         SubmitDisabled = true;
+        IsSubmitted = true;
     }
 
     public class ConfirmEmailInput

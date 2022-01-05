@@ -1,0 +1,14 @@
+﻿@using Web.WebApp.Themes
+@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="@PrimaryTheme.Default"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <AppBar ShowToggleIcon="@false" />
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+    <PageFooter />
+</MudLayout>

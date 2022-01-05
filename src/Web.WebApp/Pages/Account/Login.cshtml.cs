@@ -61,22 +61,22 @@ namespace Web.WebApp.Pages.Account
             if (!ModelState.IsValid) return Page();
 
             // Login attempt and reCaptcha
-            LoginAttempt = (HttpContext.Session.GetInt32("LoginAttempt")?? 0) + 1;
-            HttpContext.Session.SetInt32("LoginAttempt", LoginAttempt);
+            LoginAttempt = HttpContext.Session.GetInt32("LoginAttempt")?? 0;
             if (LoginAttempt >= 3)
             {
                 if (string.IsNullOrWhiteSpace(RecaptchaResponse))
                 {
-                    ErrorMessage = "Please check (reCAPTCHA) security";
+                    ErrorMessage = "Security check (reCAPTCHA) is invalid";
                     return Page();
                 }
                 var isReCaptchaValid = await _reCaptchaService.ValidateCaptcha(RecaptchaResponse);
                 if (!isReCaptchaValid)
                 {
-                    ErrorMessage = "Please check (reCAPTCHA) security";
+                    ErrorMessage = "Security check (reCAPTCHA) is not correct";
                     return Page();
                 }
             }
+            HttpContext.Session.SetInt32("LoginAttempt", ++LoginAttempt);
 
             // Return Url
             var baseUrl = $"{Request.Scheme}://{Request.Host}/";
@@ -105,7 +105,10 @@ namespace Web.WebApp.Pages.Account
                 return RedirectToPage("./LoginWith2FA", new {ReturnUrl = returnUrl, RememberMe = Input.RememberMe});    
             }
 
-            ErrorMessage = "Invalid Email and/or Password.";
+            ErrorMessage = "Please check your email and password are valid!";
+            //Input.Email = String.Empty;
+            Input.Password = String.Empty;
+            //ModelState.Clear();
             return Page();
         }
 

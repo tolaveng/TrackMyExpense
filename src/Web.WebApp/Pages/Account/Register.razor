@@ -1,6 +1,6 @@
 ﻿@page "/account/register"
 @attribute [AllowAnonymous]
-@layout BlankLayout
+@layout EmptyLayout
 
 @using Core.Application.Services.IServices
 @using Microsoft.AspNetCore.Components
@@ -15,41 +15,26 @@
 @inject IWebHostEnvironment HostEnvironment;
 @inject IEmailService EmailService;
 
-<section class="d-flex justify-content-center">
-    <div class="col-md-5 mb-5 card">
-        <div class="card-header"> <h5>Sign up to start tracking your expenses</h5> </div>
-        <div class="card-body">
-            <EditForm Model="@Input" OnValidSubmit="@RegisterUser" class="form-floating">
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
+    <MudCard Outlined="true" Elevation="1" Class="rounded-lg p-3">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h5">Create a new account</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <EditForm Model="@Input" OnValidSubmit="@RegisterUser">
                 <DataAnnotationsValidator/>
-                <div class="has-float-label mb-3">
-                    <InputText id="inputFullName" class="form-control" @bind-Value="@Input.FullName" placeholder="Full name" autocomplete="off" spellcheck="false"/>
-                    <label for="inputFullName">Full name</label>
-                    <ValidationMessage For="@(() => Input.FullName)"/>
-                </div>
-
-                <div class="has-float-label mb-3">
-                    <InputText id="inputEmail" class="form-control" @bind-Value="@Input.Email" placeholder="Email address" autocomplete="off" spellcheck="false"/>
-                    <label for="inputEmail">Email</label>
-                    <ValidationMessage For="@(() => Input.Email)"/>
-                </div>
-
-                <div class="has-float-label mb-3">
-                    <InputText id="inputPassword" type="password" class="form-control" @bind-Value="@Input.Password" placeholder="Password" autocomplete="off" spellcheck="false"/>
-                    <label for="inputPassword">Password</label>
-                    <ValidationMessage For="@(() => Input.Password)"/>
-                </div>
-
-                <div class="has-float-label mb-3">
-                    <InputText id="inputConfirmPassword" type="password" class="form-control" @bind-Value="@Input.ConfirmPassword" placeholder="Confirm Password" autocomplete="off" spellcheck="false"/>
-                    <label for="inputConfirmPassword">Confirm Password</label>
-                    <ValidationMessage For="@(() => Input.ConfirmPassword)"/>
-                </div>
-
+                <MudTextField Label="Full Name" @bind-Value="@Input.FullName" For="@(() => Input.FullName)" Class="mb-3" />
+                <MudTextField Label="Email" @bind-Value="@Input.Email" For="@(() => Input.Email)" Class="mb-3" />
+                <MudTextField Label="Password" @bind-Value="@Input.Password" For="@(() => Input.Password)" InputType="InputType.Password" Class="mb-3"/>
+                <MudTextField Label="Confirm Password" @bind-Value="@Input.ConfirmPassword" For="@(() => Input.ConfirmPassword)" InputType="InputType.Password"  Class="mb-3"/>
+                
                 <div class="mb-3">
                     By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
                 </div>
 
-                <div class="md-3">
+                <div class="mb-3">
                     @if (!string.IsNullOrWhiteSpace(ErrorMessage))
                     {
                      <div class="alert alert-danger">
@@ -58,21 +43,21 @@
                         </div>
                     }
                 </div>
-                <div class="md-3 row g-3">
+                <div class="mb-3 row g-3">
                     <div class="col-auto">
-                        <button type="submit" disabled="@IsSubmitting" class="form-control btn btn-primary">
+                        <MudButton ButtonType="ButtonType.Submit" Disabled="@IsSubmitting" Variant="Variant.Filled" Color="Color.Primary" >
                             <span class="spinner-border spinner-border-sm" hidden="@(!IsSubmitting)" role="status" aria-hidden="true"></span>
-                            <span>Create Account</span>
-                        </button>
+                            <span> Create Account</span>
+                        </MudButton>
                     </div>
                     <div class="col-auto col-form-label">
                         Already have an account? <a href="/account/login">Log In</a>
                     </div>
                 </div>
             </EditForm>
-        </div>
-    </div>
-</section>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
 
 @* Debug only: print email confirmation link *@
 @if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())

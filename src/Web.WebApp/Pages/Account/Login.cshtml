@@ -12,70 +12,83 @@
     ViewData["Title"] = "Account Log In";
 }
 
-<section class="d-flex justify-content-center">
-    <div class="col-md-4 mb-5 card">
-        <div class="card-header"> <h5>Log in to track your expenses</h5></div>
-        <div class="card-body">
-            <form method="post" id="account" class="form-floating">
-                    <div class="has-float-label mb-3">
-                        <input type="text" id="inputEmail" class="form-control" placeholder="Email" asp-for="Input.Email" aria-required="true" autocomplete="off" spellcheck="false" autofocus/>
-                        <label for="inputEmail">Email</label>
-                        <span asp-validation-for="Input.Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="has-float-label mb-3">
-                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" asp-for="Input.Password" autocomplete="off" spellcheck="false"/>
-                        <label for="inputPassword">Password</label>
-                        <span asp-validation-for="Input.Password" class="text-danger"></span>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="checkbox mb-3">
-                                <label asp-for="Input.RememberMe" class="form-label" style="white-space: nowrap">
-                                    <input type="checkbox" checked class="form-check-input" asp-for="Input.RememberMe"/>
-                                    Stay signed in
-                                </label>
-                            </div>
+<div class="mud-container mud-container-maxwidth-sm mt-16">
+    <div class="mud-paper mud-paper-outlined mud-card rounded-lg p-3">
+        <div class="mud-card-header">
+            <div class="mud-card-header-content">
+                <h5 class="mud-typography mud-typography-h5 mud-inherit-text">Log in to track your expenses</h5>
+            </div>
+        </div>
+        <div class="mud-card-content">
+            <form method="post" id="account">
+                <div class="mud-input-control mud-input-input-control mb-3">
+                    <div class="mud-input-control-input-container">
+                        <div class="mud-input mud-input-text mud-input-underline">
+                            <input class="mud-input-slot mud-input-root mud-input-root-text" type="text" asp-for="Input.Email" onchange="shrinkLabel(this)" onfocus="shrinkLabel(this)" autofocus/>
                         </div>
-                        <div class="col-lg-6 text-md-end">
-                            <a href="/account/forgotpassword">Forgotten password?</a>
-                        </div>
+                        <label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol">Email</label>
                     </div>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="mud-input-control mud-input-input-control mb-3">
+                    <div class="mud-input-control-input-container">
+                        <div class="mud-input mud-input-text mud-input-underline">
+                            <input class="mud-input-slot mud-input-root mud-input-root-text" type="password" asp-for="Input.Password"  onchange="shrinkLabel(this)"/>
+                        </div>
+                        <label class="mud-input-label mud-input-label-animated mud-input-label-text mud-input-label-inputcontrol">Password</label>
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
                 
-                    @if (@Model.LoginAttempt >= 3)
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" checked  id="InputRememberMe" type="checkbox" asp-for="Input.RememberMe">
+                            <label class="form-check-label" for="InputRememberMe">Keep signed in</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="/account/forgotpassword">Forgotten password?</a>
+                    </div>
+                </div>
+                
+                @if (@Model.LoginAttempt >= 3)
+                {
+                    <div class="mb-3">
+                        <div class="g-recaptcha" data-sitekey=@ReCaptchaSetting.Value.SiteKey></div>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    @if (!string.IsNullOrWhiteSpace(@Model.ErrorMessage))
                     {
-                        <div class="mb-3">
-                            <div class="g-recaptcha" data-sitekey=@ReCaptchaSetting.Value.SiteKey></div>
+                        <div class="mud-alert mud-alert-text-error mud-elevation-0">
+                            <div class="mud-alert-position justify-sm-start">
+	                            <div class="mud-alert-icon mud-alert-icon-left">
+		                            <svg class="mud-icon-root mud-svg-icon mud-inherit-text mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></svg>
+	                            </div>
+	                            <div class="mud-alert-message">@((MarkupString)Model.ErrorMessage)</div>
+                            </div>
                         </div>
                     }
-
-                    <div class="mb-3">
-                        @if (!string.IsNullOrWhiteSpace(@Model.ErrorMessage))
-                        {
-                         <div class="text-danger">
-                            <span class="oi oi-warning"></span>
-                            @((MarkupString)Model.ErrorMessage)
-                            </div>
-                        }
-                    </div>
-                    <div>
-                        <button id="login-submit" type="submit" class="w-100 btn btn btn-primary">Log in</button>
-                    </div>
-                    @Html.AntiForgeryToken()
+                </div>
+                <div>
+                    <button id="login-submit" type="submit" class="w-100 mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium mud-ripple">Log in</button>
+                </div>
+                @Html.AntiForgeryToken()
             </form>
 
             <div class="mt-3 mb-2">
                 <div class="hr-center"><span>or</span></div>
             </div>
 
-            <div class="mb-2">
-                <a type="button" class="w-100 btn btn btn-success" href="/account/register">Create New Account</a>
+            <div class="my-2">
+                <a type="button" class="w-100 mud-button-root mud-button mud-button-outlined mud-button-outlined-primary mud-button-filled-size-medium mud-ripple" href="/account/register">Create New Account</a>
             </div>
             <form method="post">
                 <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-light" style="width: 100%" asp-page-handler="ExternalLogin" name="provider" value="Google">
+                    <button type="submit" class="w-100 my-2 mud-button-root mud-button mud-button-filled mud-button-filled-size-medium" asp-page-handler="ExternalLogin" name="provider" value="Google">
                     <span>
                         <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M20.64 12.2c0-.63-.06-1.25-.16-1.84H12v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.92a8.78 8.78 0 0 0 2.68-6.62z" fill="#4285F4"></path>
@@ -87,7 +100,7 @@
                     <span style="vertical-align: middle;">Log in with Google</span>
                     </button>
 
-                    <button type="submit" class="btn btn-light" style="width: 100%" asp-page-handler="ExternalLogin" name="provider" value="Facebook">
+                    <button type="submit" class="w-100 my-2 mud-button-root mud-button mud-button-filled mud-button-filled-size-medium" asp-page-handler="ExternalLogin" name="provider" value="Facebook">
                     <span style="color: #1877f2">
                         <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21.5 12.058c0-5.28-4.253-9.558-9.5-9.558s-9.5 4.279-9.5 9.558c0 4.771 3.473 8.725 8.016 9.442v-6.68H8.104v-2.762h2.412V9.952c0-2.395 1.417-3.718 3.588-3.718 1.04 0 2.126.186 2.126.186v2.352h-1.198c-1.18 0-1.548.738-1.548 1.494v1.792h2.635l-.421 2.763h-2.214V21.5c4.543-.717 8.016-4.67 8.016-9.442z" fill="currentColor"></path>
@@ -99,7 +112,7 @@
             </form>
         </div>
     </div>
-</section>
+</div>
 @section scripts {
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 }
