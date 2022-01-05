@@ -105,7 +105,10 @@ namespace Web.WebApp.Pages.Account
                 return RedirectToPage("./LoginWith2FA", new {ReturnUrl = returnUrl, RememberMe = Input.RememberMe});    
             }
 
-            ErrorMessage = "Invalid Email and/or Password.";
+            ErrorMessage = "Please check your email and password are valid!";
+            //Input.Email = String.Empty;
+            Input.Password = String.Empty;
+            //ModelState.Clear();
             return Page();
         }
 

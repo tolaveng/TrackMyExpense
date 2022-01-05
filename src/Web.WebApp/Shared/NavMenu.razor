@@ -1,64 +1,28 @@
 ﻿@using Core.Domain.Constants
-<div class="top-row">
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <a class="navbar-brand" href="" title="Home">
-        <img src="/img/TrackMyExpense.svg" style="width: auto; height: 24px;"/>
-    </a>
-</div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <AuthorizeView Roles=@UserBaseRole.Admin>
-            <Authorized>
-                <li class="nav-item dropdown px-3">
-                    <NavLink class="nav-link dropdown-toggle" href="/admin" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <span class="oi oi-person" aria-hidden="true"></span> Administrator
-                    </NavLink>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><NavLink class="nav-link" href="/admin/users">Users</NavLink></li>
-                    </ul>
-                </li>
-            </Authorized>
-        </AuthorizeView>
-        <AuthorizeView>
-            <Authorized>
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="/account/logout" Match="NavLinkMatch.All">
-                        <span class="oi oi-power-standby" aria-hidden="true"></span> Log Out
-                    </NavLink>
-                </li>
-            </Authorized>
-            <NotAuthorized>
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="/account/login" Match="NavLinkMatch.All">
-                        <span class="oi oi-lock-locked" aria-hidden="true"></span> Log In
-                    </NavLink>
-                </li>
-                <li class="nav-item px-3">
-                    <NavLink class="nav-link" href="/account/register" Match="NavLinkMatch.All">
-                        <span class="oi oi-person" aria-hidden="true"></span> Register
-                    </NavLink>
-                </li>
-            </NotAuthorized>
-        </AuthorizeView>
-    </ul>
-</div>
+<MudNavMenu>
+    <AuthorizeView Roles=@UserBaseRole.Admin>
+        <Authorized>
+            <MudNavGroup Title="Administrator" Expanded="true">
+                <MudNavLink Href="/admin/users"><span class="oi oi-person" aria-hidden="true"></span> Users</MudNavLink>
+                <MudNavLink Href="/admin/categories">Categories</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="/account/logout"><span class="oi oi-power-standby" aria-hidden="true"></span> Log Out</MudNavLink>
+        </Authorized>
+        <NotAuthorized>
+            <MudNavLink Href="/account/login"><span class="oi oi-lock-locked" aria-hidden="true"></span> Log In</MudNavLink>
+            <MudNavLink Href="/account/register"><span class="oi oi-person" aria-hidden="true"></span> Register</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudNavMenu>
 
 
 @code {
-    private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
 }
+
+

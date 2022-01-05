@@ -1,0 +1,31 @@
+﻿<MudAppBar Elevation="1">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+    <a href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
+    <MudSpacer />
+    <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+    <AuthorizeView>
+        <Authorized>
+            <MudAvatar Color="Color.Primary">@context.User.Identity.Name.ToUpper()[0]</MudAvatar>
+            <MudText Color="Color.Primary">@context.User.Identity.Name</MudText>
+            <MudLink Href="/account/logout"><span class="oi oi-power-standby" aria-hidden="true"></span> Log Out</MudLink>
+        </Authorized>
+        <NotAuthorized>
+            <MudLink Href="/account/login"><span class="oi oi-lock-locked" aria-hidden="true"></span> Log In</MudLink>
+            <MudLink Href="/account/register"><span class="oi oi-person" aria-hidden="true"></span> Register</MudLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudAppBar>
+
+@code {
+    [Parameter]
+    public bool DrawerOpen { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<bool> OnDrawerToggle { get; set; }
+
+    public async Task DrawerToggle()
+    {
+        DrawerOpen = !DrawerOpen;
+        await OnDrawerToggle.InvokeAsync(DrawerOpen);
+    }
+}
