@@ -43,6 +43,10 @@ html, body {
     min-height: 420px;
 }
 
+.mud-table-head th {
+    font-weight: bold !important;
+}
+
 .page-footer {
     box-sizing: border-box;
     box-shadow: inset 0px 3px 3px -2px #B2DFDB;

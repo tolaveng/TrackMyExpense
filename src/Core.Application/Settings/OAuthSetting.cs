@@ -8,7 +8,7 @@ namespace Core.Application.Settings
 {
     public class OAuthSetting
     {
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
+        public string ClientId { get; set; } = string.Empty;
+        public string ClientSecret { get; set; } = string.Empty;
     }
 }

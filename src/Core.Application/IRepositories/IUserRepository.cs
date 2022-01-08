@@ -33,5 +33,9 @@ namespace Core.Application.IRepositories
         Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
         Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
         Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
+
+        //RUD
+        int GetCount();
+        PaginationResponse<AppUser> GetUsers(string search, Pagination pagination);
     }
 }

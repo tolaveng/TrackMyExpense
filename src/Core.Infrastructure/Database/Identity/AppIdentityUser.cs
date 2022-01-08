@@ -12,12 +12,7 @@ namespace Core.Infrastructure.Database.Identity
     public class AppIdentityUser : IdentityUser<Guid>
     {
         public string FullName { get; set; }
-        public Subcription Subcription { get; set; }
-        public decimal Wallet { get; set; }
-        public DateTime ExpiryDate { get; set; }
-        public bool IsCanceled { get; set; }
         public bool IsDisabled { get; set; }
-
-        public virtual ICollection<Expense> Expenses { get; set; }
+        public virtual ICollection<Subscription> Subscriptions { get; set; }
     }
 }

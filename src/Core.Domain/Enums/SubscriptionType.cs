@@ -2,9 +2,10 @@
 
 namespace Core.Domain.Enums
 {
-    public enum Subcription
+    public enum SubscriptionType
     {
+        Staff,
         Free,
-        Member
+        Premium
     }
 }

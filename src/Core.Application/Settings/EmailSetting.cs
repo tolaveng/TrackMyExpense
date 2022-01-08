@@ -8,12 +8,12 @@ namespace Core.Application.Settings
 {
     public class EmailSetting
     {
-        public string SenderName { get; set; }
-        public string SenderEmail { get; set; }
-        public string Host { get; set; }
-        public int Port { get; set; }
-        public string User { get; set; }
-        public string Password { get; set; }
-        public bool SSL { get; set; }
+        public string SenderName { get; set; } = string.Empty;
+        public string SenderEmail { get; set; } = string.Empty;
+        public string Host { get; set; } = string.Empty;
+        public int Port { get; set; } = 0;
+        public string User { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public bool SSL { get; set; } = false;
     }
 }

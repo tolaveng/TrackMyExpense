@@ -1,0 +1,25 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText>@Message</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="@Color.Primary" OnClick="OnCancelClicked">OK</MudButton>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string Message { get; set; }
+
+    protected override void OnInitialized()
+    {
+        MudDialog.Options.FullWidth = true;
+        MudDialog.Options.MaxWidth = MaxWidth.ExtraSmall;
+        MudDialog.Options.NoHeader = true;
+        MudDialog.Options.Position = DialogPosition.Center;
+        MudDialog.SetOptions(MudDialog.Options);
+        base.OnInitialized();
+    }
+
+    void OnCancelClicked() =>  MudDialog.Close(DialogResult.Ok(true));
+}

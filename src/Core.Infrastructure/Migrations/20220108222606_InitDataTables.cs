@@ -11,18 +11,19 @@ namespace Core.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Categories",
+                name: "Incomes",
                 columns: table => new
                 {
-                    CategoryId = table.Column<int>(type: "integer", nullable: false)
+                    IncomeId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CategoryName = table.Column<string>(type: "text", nullable: true),
-                    IconName = table.Column<string>(type: "text", nullable: true),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    PeriodFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PeriodTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
+                    table.PrimaryKey("PK_Incomes", x => x.IncomeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -45,10 +46,6 @@ namespace Core.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FullName = table.Column<string>(type: "text", nullable: true),
-                    Subcription = table.Column<int>(type: "integer", nullable: false),
-                    Wallet = table.Column<decimal>(type: "numeric", nullable: false),
-                    ExpiryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsCanceled = table.Column<bool>(type: "boolean", nullable: false),
                     IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -68,6 +65,32 @@ namespace Core.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BudgetJars",
+                columns: table => new
+                {
+                    BudgetJarId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IncomeId = table.Column<long>(type: "bigint", nullable: true),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Percentage = table.Column<int>(type: "integer", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    IconName = table.Column<string>(type: "text", nullable: true),
+                    IsSystem = table.Column<bool>(type: "boolean", nullable: false),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BudgetJars", x => x.BudgetJarId);
+                    table.ForeignKey(
+                        name: "FK_BudgetJars_Incomes_IncomeId",
+                        column: x => x.IncomeId,
+                        principalTable: "Incomes",
+                        principalColumn: "IncomeId",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -92,41 +115,31 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Expenses",
+                name: "Subscriptions",
                 columns: table => new
                 {
-                    ExpenseId = table.Column<long>(type: "bigint", nullable: false)
+                    SubscriptionId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Currency = table.Column<string>(type: "text", nullable: true),
-                    PayDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Ref = table.Column<string>(type: "text", nullable: true),
-                    Payee = table.Column<string>(type: "text", nullable: true),
-                    IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
-                    PaymentMethod = table.Column<int>(type: "integer", nullable: false),
-                    Images = table.Column<string[]>(type: "text[]", nullable: true),
-                    Discriminator = table.Column<string>(type: "text", nullable: false),
-                    IsCompleted = table.Column<bool>(type: "boolean", nullable: true),
-                    IsRecurrent = table.Column<bool>(type: "boolean", nullable: true),
-                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    FinishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedBy = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SubscriptionType = table.Column<int>(type: "integer", nullable: false),
+                    ValidAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsCanceled = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ModifiedBy = table.Column<Guid>(type: "uuid", nullable: true),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Expenses", x => x.ExpenseId);
+                    table.PrimaryKey("PK_Subscriptions", x => x.SubscriptionId);
                     table.ForeignKey(
-                        name: "FK_Expenses_Users_UserId",
+                        name: "FK_Subscriptions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -215,6 +228,112 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Expenses",
+                columns: table => new
+                {
+                    ExpenseId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Currency = table.Column<string>(type: "text", nullable: true),
+                    PaidDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Ref = table.Column<string>(type: "text", nullable: true),
+                    Payee = table.Column<string>(type: "text", nullable: true),
+                    IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "integer", nullable: false),
+                    BudgetJarId = table.Column<int>(type: "integer", nullable: false),
+                    RecurrentExpenseId = table.Column<int>(type: "integer", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ModifiedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Expenses", x => x.ExpenseId);
+                    table.ForeignKey(
+                        name: "FK_Expenses_BudgetJars_BudgetJarId",
+                        column: x => x.BudgetJarId,
+                        principalTable: "BudgetJars",
+                        principalColumn: "BudgetJarId",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RecurrentExpenses",
+                columns: table => new
+                {
+                    RecurrentExpenseId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Ref = table.Column<string>(type: "text", nullable: true),
+                    Payee = table.Column<string>(type: "text", nullable: true),
+                    IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "integer", nullable: false),
+                    BudgetJarId = table.Column<int>(type: "integer", nullable: false),
+                    Repeat = table.Column<int>(type: "integer", nullable: false),
+                    RepeatDay = table.Column<int>(type: "integer", nullable: false),
+                    RepeatDaily = table.Column<string>(type: "text", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FinishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecurrentExpenses", x => x.RecurrentExpenseId);
+                    table.ForeignKey(
+                        name: "FK_RecurrentExpenses_BudgetJars_BudgetJarId",
+                        column: x => x.BudgetJarId,
+                        principalTable: "BudgetJars",
+                        principalColumn: "BudgetJarId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Attachment",
+                columns: table => new
+                {
+                    AttachmentId = table.Column<string>(type: "text", nullable: false),
+                    Url = table.Column<string>(type: "text", nullable: true),
+                    ExpenseId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Attachment", x => x.AttachmentId);
+                    table.ForeignKey(
+                        name: "FK_Attachment_Expenses_ExpenseId",
+                        column: x => x.ExpenseId,
+                        principalTable: "Expenses",
+                        principalColumn: "ExpenseId",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    CategoryId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CategoryName = table.Column<string>(type: "text", nullable: true),
+                    IconName = table.Column<string>(type: "text", nullable: true),
+                    RecurrentExpenseId = table.Column<int>(type: "integer", nullable: true),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
+                    table.ForeignKey(
+                        name: "FK_Categories_RecurrentExpenses_RecurrentExpenseId",
+                        column: x => x.RecurrentExpenseId,
+                        principalTable: "RecurrentExpenses",
+                        principalColumn: "RecurrentExpenseId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CategoryExpense",
                 columns: table => new
                 {
@@ -239,13 +358,41 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "BudgetJars",
+                columns: new[] { "BudgetJarId", "Amount", "Archived", "IconName", "IncomeId", "IsSystem", "Name", "Percentage", "UserId" },
+                values: new object[,]
+                {
+                    { 1, 0m, false, null, null, true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { 2, 0m, false, null, null, true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { 3, 0m, false, null, null, true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { 4, 0m, false, null, null, true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { 5, 0m, false, null, null, true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { 6, 0m, false, null, null, true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "33323c67-3580-4fef-aa03-2a17b8fc8380", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "64a61921-1f76-4dd9-9b2a-42bc7f5c309f", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "0fa7f4f2-ee03-4bc8-86f1-9c5d54a02071", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "c6a82930-9c6c-4aee-bff9-32041286315a", "admin", "ADMIN" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attachment_ExpenseId",
+                table: "Attachment",
+                column: "ExpenseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BudgetJars_IncomeId",
+                table: "BudgetJars",
+                column: "IncomeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Categories_RecurrentExpenseId",
+                table: "Categories",
+                column: "RecurrentExpenseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CategoryExpense_ExpensesExpenseId",
@@ -253,9 +400,14 @@ namespace Core.Infrastructure.Migrations
                 column: "ExpensesExpenseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Expenses_UserId",
+                name: "IX_Expenses_BudgetJarId",
                 table: "Expenses",
-                column: "UserId");
+                column: "BudgetJarId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecurrentExpenses_BudgetJarId",
+                table: "RecurrentExpenses",
+                column: "BudgetJarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
@@ -267,6 +419,11 @@ namespace Core.Infrastructure.Migrations
                 table: "Roles",
                 column: "NormalizedName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_UserId",
+                table: "Subscriptions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
@@ -298,10 +455,16 @@ namespace Core.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Attachment");
+
+            migrationBuilder.DropTable(
                 name: "CategoryExpense");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "Subscriptions");
 
             migrationBuilder.DropTable(
                 name: "UserClaims");
@@ -326,6 +489,15 @@ namespace Core.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "RecurrentExpenses");
+
+            migrationBuilder.DropTable(
+                name: "BudgetJars");
+
+            migrationBuilder.DropTable(
+                name: "Incomes");
         }
     }
 }

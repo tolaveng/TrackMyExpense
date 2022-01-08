@@ -20,8 +20,8 @@ using Core.Infrastructure.Mapper;
 using Core.Infrastructure.Database;
 using Core.Application.Settings;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
 using MudBlazor.Services;
+using Core.Infrastructure.Seeder;
 
 namespace Web.WebApp
 {

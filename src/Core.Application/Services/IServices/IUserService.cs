@@ -10,6 +10,7 @@ namespace Core.Application.Services.IServices
         Task<SignInResponse> SignInAsync(string email, string password, bool remember);
         Task SignOutAsync();
         Task<UserDto> GetUserByEmailAsync(string email);
+        UserDto GetById(Guid guid);
         Task<GenericResponse<Guid>> CreateUserAsync(UserDto userDto);
         Task<string> GenerateEmailConfirmationTokenAsync(Guid userId);
         Task<string> GeneratePasswordResetTokenAsync(Guid userId);
@@ -22,5 +23,8 @@ namespace Core.Application.Services.IServices
         Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
         Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
         Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
+
+        int GetCount();
+        PaginationResponse<UserDto> GetUsers(string search, Pagination pagination);
     }
 }

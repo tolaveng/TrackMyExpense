@@ -2,8 +2,12 @@
 @inherits LayoutComponentBase
 
 <MudThemeProvider Theme="@PrimaryTheme.Default"/>
-<MudDialogProvider/>
 <MudSnackbarProvider/>
+<MudDialogProvider 
+    CloseButton="true"
+    DisableBackdropClick="true"
+    Position="DialogPosition.TopCenter"
+    CloseOnEscapeKey="true" />
 
 <MudLayout>
     <AppBar OnDrawerToggle="@DrawerToggle" DrawerOpen="@_drawerOpen"/>

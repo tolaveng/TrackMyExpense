@@ -12,9 +12,11 @@ namespace Core.Application.Models
         public string Username { get; set; }
         public string FullName { get; set; } 
         public string Email { get; set; }
+        public bool EmailConfirmed { get; set; }
         public string Password { get; set; }
         public string PhoneNumber { get; set; }
-        public Subcription Subcription { get; set; }
+        public bool PhoneNumberConfirmed { get; set; }
+        public IEnumerable<Subscription> Subscriptions { get; set; }
         public decimal Wallet { get; set; }
         public DateTime ExpiryDate { get; set; }
         public bool IsCanceled { get; set; }

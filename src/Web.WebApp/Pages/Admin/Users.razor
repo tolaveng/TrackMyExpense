@@ -1,0 +1,94 @@
+﻿@page "/admin/users"
+@attribute [Authorize(Roles = UserBaseRole.Admin)]
+
+@using Core.Application.Common
+@using Core.Application.Models
+@using Core.Application.Services.IServices
+@using Core.Domain.Constants
+@inject IDialogService Dialog
+
+@inject IUserService UserService;
+
+
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<UserDto>>>(ServerReload))"
+        Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
+        Loading="@loading" LoadingProgressColor="Color.Info"
+        T= "UserDto" OnRowClick="OnRowClicked">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">User Management</MudText>
+            <MudSpacer />
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortLabel="FullName" T="UserDto">Full Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="Email" T="UserDto">Email</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="PhoneNumber" T="UserDto">Phone</MudTableSortLabel></MudTh>
+            <MudTh>Wallet</MudTh>
+            <MudTh>Email Confirmed</MudTh>
+            <MudTh>Phone Confirmed</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="">@context.FullName</MudTd>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+            <MudTd DataLabel="Phone Number">@context.PhoneNumber</MudTd>
+            <MudTd DataLabel="Wallet">@context.Wallet</MudTd>
+            <MudTd DataLabel="Email Confirmed" HideSmall="@true">@context.EmailConfirmed</MudTd>
+            <MudTd DataLabel="Phone Confirmed" HideSmall="@true">@context.PhoneNumberConfirmed</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
+                Title="Edit" OnClick="@(() => EditRow(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No matching records found</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Loading...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager HorizontalAlignment="HorizontalAlignment.Left" HideRowsPerPage="false" HidePageNumber="false"  InfoFormat="@($"All: {totalItems}")"/>
+        </PagerContent>
+</MudTable>
+</MudContainer>
+
+
+@code {
+    private MudTable<UserDto> table;
+    private int totalItems;
+    private string searchString = null;
+    private bool loading = true;
+    private IEnumerable<UserDto> UserList = new List<UserDto>();
+
+
+    private async Task<TableData<UserDto>> ServerReload(TableState state)
+    {
+        loading = true;
+        var sortDirection = state.SortDirection == SortDirection.Ascending ? Pagination.Ascending : Pagination.Descending;
+        var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel, sortDirection);
+        var result = UserService.GetUsers(searchString, pagination);
+        UserList = result.Data;
+        totalItems = result.TotalCount;
+        loading = false;
+        return new TableData<UserDto>() {TotalItems = totalItems, Items = UserList};
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+    }
+
+    private void OnRowClicked(TableRowClickEventArgs<UserDto> tableRowClickEventArgs)
+    {
+    }
+
+    private void EditRow(Guid id)
+    {
+        var parameters = new DialogParameters { ["UserId"] = id };
+        var options = new DialogOptions() { FullWidth = true };
+        Dialog.Show<UserEditDialog>("Edit User Record", parameters, options);
+    }
+}

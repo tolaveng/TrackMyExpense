@@ -1,6 +1,7 @@
 ﻿using Core.Domain.Entities;
 using Core.Infrastructure.Configurations;
 using Core.Infrastructure.Database.Identity;
+using Core.Infrastructure.Seeder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -28,9 +29,11 @@ namespace Core.Infrastructure.Database
             _configurator.Configure(optionsBuilder);
         }
 
-
+        public DbSet<BudgetJar> BudgetJars { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Income> Incomes { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<RecurrentExpense> RecurrentExpenses { get; set; }
 
 
@@ -51,23 +54,20 @@ namespace Core.Infrastructure.Database
             modelBuilder.Entity<IdentityUserToken<Guid>>(entity => { entity.ToTable("UserTokens"); });
             modelBuilder.Entity<IdentityRoleClaim<Guid>>(entity => { entity.ToTable("RoleClaims"); });
 
-            modelBuilder.Entity<Expense>().HasKey(x => x.ExpenseId);
-            modelBuilder.Entity<Category>().HasKey(x => x.CategoryId);
 
             // Relationship:
             // https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
             modelBuilder.Entity<Expense>()
                 .HasMany(x => x.Categories)
                 .WithMany(x => x.Expenses);
-
-
-            modelBuilder.Entity<AppIdentityUser>()
-                .HasMany(x => x.Expenses)
-                .WithOne()
-                .HasForeignKey(x => x.UserId);
+            modelBuilder.Entity<Expense>().HasMany(x => x.Attachments).WithOne().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Income>().HasMany(x => x.BudgetJars).WithOne().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Expense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<AppIdentityUser>().HasMany(x => x.Subscriptions).WithOne().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.SetNull);
 
             // Seed Default Data
             modelBuilder.ApplyConfiguration(new AppRoleConfig());
+            modelBuilder.ApplyConfiguration(new BudgetJarDefaultConfig());
         }
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Core.Infrastructure.Extensions;
 
 namespace Core.Infrastructure.Repository
 {
@@ -128,8 +129,7 @@ namespace Core.Infrastructure.Repository
             {
                 user.PhoneNumber = appUser.PhoneNumber;
                 user.FullName = appUser.FullName;
-                user.Subcription = appUser.Subcription;
-                user.Wallet = appUser.Wallet;
+                user.Subscriptions = appUser.Subscriptions.ToArray();
                 //user.Email = appUser.Email;
 
                 await _userManager.UpdateAsync(user);
@@ -249,6 +249,39 @@ namespace Core.Infrastructure.Repository
                 return result.Succeeded;
             }
             return false;
+        }
+
+        public PaginationResponse<AppUser> GetUsers(string search, Pagination pagination)
+        {
+            var userQuery = _userManager.Users;
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var filter = search.ToLower();
+                userQuery = userQuery.Where(z =>
+                    z.FullName.ToLower().Contains(filter) ||
+                    z.Email.ToLower().Contains(filter) ||
+                    z.PhoneNumber.ToLower().Contains(filter));
+            }
+
+            if (!string.IsNullOrWhiteSpace(pagination.SortBy))
+            {
+                //userQuery = pagination.SortBy == Pagination.Ascending
+                //    ? userQuery.OrderBy(z => z.Email)
+                //    : userQuery.OrderByDescending(z => z.Email);
+                userQuery = userQuery.SortBy(pagination.SortBy, pagination.SortDirection);
+            }
+
+            var count = userQuery.Count();
+            var users = userQuery.Skip(pagination.Page * pagination.PageSize)
+                .Take(pagination.PageSize).ToArray();
+            var appUsers = _mapper.Map<IEnumerable<AppUser>>(users);
+
+            return PaginationResponse<AppUser>.Result(appUsers, count);
+        }
+
+        public int GetCount()
+        {
+            return _userManager.Users.Count();
         }
     }
 }

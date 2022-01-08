@@ -1,11 +1,14 @@
 ﻿using Core.Domain.Constants;
+using Core.Domain.Entities;
+using Core.Infrastructure.Database;
+using Core.Infrastructure.Database.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 
-namespace Core.Infrastructure.Database.Identity
+namespace Core.Infrastructure.Seeder
 {
     public static class SeedAppUser
     {
@@ -17,8 +20,11 @@ namespace Core.Infrastructure.Database.Identity
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<AppIdentityUser>>();
                 var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<AppIdentityRole>>();
 
+                var adminUserId = Guid.NewGuid();
+                
                 var adminUser = new AppIdentityUser
                 {
+                    Id = adminUserId,
                     UserName = "admin@local.dev",
                     FullName = "Administrator User",
                     NormalizedUserName = "ADMIN@LOCAL.DEV",
@@ -39,6 +45,20 @@ namespace Core.Infrastructure.Database.Identity
 
                     await userManager.CreateAsync(adminUser, "admin");
                     await userManager.AddToRoleAsync(adminUser, UserBaseRole.Admin);
+
+                    // Create subscription
+                    var subscription = new Subscription()
+                    {
+                        SubscriptionId = -1, // Auto generate
+                        UserId = adminUserId,
+                        SubscriptionType = Domain.Enums.SubscriptionType.Staff,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedBy = adminUserId,
+                        ModifiedAt = DateTime.UtcNow,
+                        ModifiedBy = adminUserId,
+                    };
+                    context.Subscriptions.Add(subscription);
+                    context.SaveChanges();
                 }
             }
         }
