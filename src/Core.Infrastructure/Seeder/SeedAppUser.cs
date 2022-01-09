@@ -30,7 +30,7 @@ namespace Core.Infrastructure.Seeder
                     NormalizedUserName = "ADMIN@LOCAL.DEV",
                     Email = "admin@local.dev",
                     NormalizedEmail = "ADMIN@LOCAL.DEV",
-                    PhoneNumber = "1",
+                    PhoneNumber = "0400000000",
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     LockoutEnabled = false,
@@ -49,7 +49,7 @@ namespace Core.Infrastructure.Seeder
                     // Create subscription
                     var subscription = new Subscription()
                     {
-                        SubscriptionId = -1, // Auto generate
+                        SubscriptionId = 0, // Auto generate
                         UserId = adminUserId,
                         SubscriptionType = Domain.Enums.SubscriptionType.Staff,
                         CreatedAt = DateTime.UtcNow,

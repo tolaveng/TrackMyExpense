@@ -1,6 +1,7 @@
 ﻿@page "/account/login"
 @attribute [AllowAnonymous]
 @using Core.Application.Settings
+@using Core.Domain.Constants
 @using Microsoft.AspNetCore.Components
 @using Microsoft.Extensions.Options
 
@@ -9,7 +10,7 @@
 @model Web.WebApp.Pages.Account.LoginModel
 
 @{
-    ViewData["Title"] = "Account Log In";
+    ViewData["Title"] = $"{DefaultConstants.PageTitle} - Account Log In";
 }
 
 <div class="mud-container mud-container-maxwidth-sm mt-16">
@@ -30,7 +31,7 @@
                     </div>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="mud-input-control mud-input-input-control mb-3">
+                <div class="mud-input-control mud-input-input-control mb-4">
                     <div class="mud-input-control-input-container">
                         <div class="mud-input mud-input-text mud-input-underline">
                             <input class="mud-input-slot mud-input-root mud-input-root-text" type="password" asp-for="Input.Password"  onchange="shrinkLabel(this)"/>
@@ -40,7 +41,7 @@
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
                 
-                <div class="row">
+                <div class="row mb-3">
                     <div class="col-md-6">
                         <div class="form-check">
                             <input class="form-check-input" checked  id="InputRememberMe" type="checkbox" asp-for="Input.RememberMe">
@@ -67,23 +68,25 @@
 	                            <div class="mud-alert-icon mud-alert-icon-left">
 		                            <svg class="mud-icon-root mud-svg-icon mud-inherit-text mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><!--!--><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></svg>
 	                            </div>
-	                            <div class="mud-alert-message">@((MarkupString)Model.ErrorMessage)</div>
+	                            <div class="mud-alert-message">@Html.Raw((MarkupString)Model.ErrorMessage)</div>
                             </div>
                         </div>
                     }
                 </div>
-                <div>
+                <div class="mb-3">
                     <button id="login-submit" type="submit" class="w-100 mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium mud-ripple">Log in</button>
                 </div>
                 @Html.AntiForgeryToken()
             </form>
 
-            <div class="mt-3 mb-2">
+            <div class="mt-3 my-5">
                 <div class="hr-center"><span>or</span></div>
             </div>
 
             <div class="my-2">
-                <a type="button" class="w-100 mud-button-root mud-button mud-button-outlined mud-button-outlined-primary mud-button-filled-size-medium mud-ripple" href="/account/register">Create New Account</a>
+                <a type="button" class="w-100 mud-button-root mud-button mud-button-outlined mud-button-outlined-primary mud-button-filled-size-medium mud-ripple" href="/account/register">
+                    Create Free Account
+                </a>
             </div>
             <form method="post">
                 <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />

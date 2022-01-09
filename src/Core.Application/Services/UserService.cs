@@ -109,5 +109,11 @@ namespace Core.Application.Services
             var appUser = _userRepository.GetById(userId);
             return _mapper.Map<UserDto>(appUser);
         }
+
+        public async Task<GenericResponse<bool>> UpdateUserAsync(UserDto userDto)
+        {
+            var appUser = _mapper.Map<AppUser>(userDto);
+            return await _userRepository.UpdateUserAsync(appUser);
+        }
     }
 }

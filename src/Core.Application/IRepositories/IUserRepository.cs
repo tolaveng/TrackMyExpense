@@ -16,7 +16,6 @@ namespace Core.Application.IRepositories
         Task<AppUser> GetByEmailAsync(string email);
 
         Task<GenericResponse<Guid>> CreateUserAsync(AppUser appUser);
-        Task<GenericResponse<bool>> UpdateUserAsync(AppUser appUser);
 
         Task<bool> Disabled(Guid userId);
         
@@ -34,8 +33,8 @@ namespace Core.Application.IRepositories
         Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
         Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
 
-        //RUD
         int GetCount();
         PaginationResponse<AppUser> GetUsers(string search, Pagination pagination);
+        Task<GenericResponse<bool>> UpdateUserAsync(AppUser appUser);
     }
 }

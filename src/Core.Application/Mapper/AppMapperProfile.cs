@@ -12,6 +12,8 @@ namespace Core.Application.Mapper
             CreateMap<AppUser, UserDto>()
                 .ForMember(x => x.Password, x => x.MapFrom(z => string.Empty))
                 ;
+
+            CreateMap<Subscription, SubscriptionDto>().ReverseMap();
         }
     }
 }

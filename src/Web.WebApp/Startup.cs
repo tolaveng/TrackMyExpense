@@ -107,7 +107,7 @@ namespace Web.WebApp
 
             services.AddDistributedMemoryCache();
             services.AddSession(opt => {
-                opt.IdleTimeout = TimeSpan.FromMinutes(30);
+                //opt.IdleTimeout = TimeSpan.FromMinutes(30);
                 opt.Cookie.HttpOnly = true;
                 opt.Cookie.IsEssential = true;
             });
@@ -115,7 +115,10 @@ namespace Web.WebApp
 
             services.AddMudServices();
             services.AddRazorPages();
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(opt =>
+                    opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
             services.AddServerSideBlazor();
         }
 
@@ -162,30 +165,22 @@ namespace Web.WebApp
 
         private void AddAppIdentity(IServiceCollection services, IWebHostEnvironment env)
         {
-            services.AddIdentity<AppIdentityUser, AppIdentityRole>(opt => { 
-                if (env.IsDevelopment()) 
+            services.AddIdentity<AppIdentityUser, AppIdentityRole>(opt => {
+                opt.Password.RequireDigit = false;
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireLowercase = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.User.RequireUniqueEmail = true;
+                opt.SignIn.RequireConfirmedEmail = true;
+
+                if (!env.IsDevelopment()) 
                 {
-                    opt.Password.RequireDigit = false;
-                    opt.Password.RequiredLength = 3;
-                    opt.Password.RequireLowercase = false;
-                    opt.Password.RequireUppercase = false;
-                    opt.Password.RequireNonAlphanumeric = false;
-                    opt.User.RequireUniqueEmail = true;
-                }
-                else
-                {
-                    opt.SignIn.RequireConfirmedEmail = true;
-                    opt.SignIn.RequireConfirmedPhoneNumber = true;
-                    opt.Password.RequireDigit = false;
-                    opt.Password.RequiredLength = 8;
-                    opt.Password.RequireLowercase = false;
-                    opt.Password.RequireUppercase = false;
-                    opt.Password.RequireNonAlphanumeric = false;
-                    opt.User.RequireUniqueEmail = true;
+                    
                 }
                 // custom reset password token
                 opt.Tokens.PasswordResetTokenProvider = "CustomPasswordResetProvider";
-                })
+            })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders()
             .AddTokenProvider<PasswordResetTokenProvider<AppIdentityUser>>("CustomPasswordResetProvider");

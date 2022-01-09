@@ -45,6 +45,16 @@ namespace Core.Infrastructure.Repository
                 var result = await _userManager.CreateAsync(user, appUser.Password);
                 if (result.Succeeded)
                 {
+                    // update subscript after saved
+                    foreach (var sub in user.Subscriptions)
+                    {
+                        sub.UserId = user.Id;
+                        sub.CreatedAt = DateTime.UtcNow;
+                        sub.CreatedBy = user.Id;
+                        sub.ModifiedAt = DateTime.UtcNow;
+                        sub.ModifiedBy = user.Id;
+                    }
+                    _context.SaveChanges();
                     return GenericResponse<Guid>.Success(user.Id);
                 }
 
@@ -75,14 +85,37 @@ namespace Core.Infrastructure.Repository
             try
             {
                 var result = await _signInManager.PasswordSignInAsync(email, password, remember, false);
-                //var result = await _signInManager.CheckPasswordSignInAsync(email, password, false);
-                return new SignInResponse(result.Succeeded, result.RequiresTwoFactor, result.IsLockedOut);
+                if (result.Succeeded)
+                {
+                    return SignInResponse.Success();
+                }
+                else if (result.IsLockedOut)
+                {
+                    return SignInResponse.Failure(false, false, true);
+                }
+                else if (result.RequiresTwoFactor)
+                {
+                    return SignInResponse.Failure(false, true, false);
+                }
+                else
+                {
+                    // if email is not confirm yet
+                    var user = await _userManager.FindByEmailAsync(email);
+                    if (user != null && !user.EmailConfirmed)
+                    {
+                        var passwordValid = await _userManager.CheckPasswordAsync(user, password);
+                        if (passwordValid)
+                        {
+                            return SignInResponse.Failure(true, false, false);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-               _logger.LogError(ex.StackTrace);
+               _logger.LogError(ex, ex.Message);
             }
-            return SignInResponse.Failure();
+            return SignInResponse.Failure(false, false, false);
         }
 
         public async Task SignOutAsync()
@@ -127,11 +160,10 @@ namespace Core.Infrastructure.Repository
             var user = _userManager.Users.SingleOrDefault(x => x.Id == appUser.Id);
             if (user != null)
             {
-                user.PhoneNumber = appUser.PhoneNumber;
                 user.FullName = appUser.FullName;
-                user.Subscriptions = appUser.Subscriptions.ToArray();
                 //user.Email = appUser.Email;
-
+                user.PhoneNumber = appUser.PhoneNumber;
+                user.IsDisabled = appUser.IsDisabled;
                 await _userManager.UpdateAsync(user);
                 return GenericResponse<bool>.Success();
             }
@@ -269,6 +301,9 @@ namespace Core.Infrastructure.Repository
                 //    ? userQuery.OrderBy(z => z.Email)
                 //    : userQuery.OrderByDescending(z => z.Email);
                 userQuery = userQuery.SortBy(pagination.SortBy, pagination.SortDirection);
+            } else
+            {
+                userQuery = userQuery.OrderBy(x => x.FullName);
             }
 
             var count = userQuery.Count();

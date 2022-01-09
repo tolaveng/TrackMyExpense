@@ -25,18 +25,33 @@
             <MudTh><MudTableSortLabel SortLabel="FullName" T="UserDto">Full Name</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="Email" T="UserDto">Email</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="PhoneNumber" T="UserDto">Phone</MudTableSortLabel></MudTh>
-            <MudTh>Wallet</MudTh>
             <MudTh>Email Confirmed</MudTh>
             <MudTh>Phone Confirmed</MudTh>
+            <MudTh>Account Disabled</MudTh>
             <MudTh></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="">@context.FullName</MudTd>
+            <MudTd DataLabel="Full Name">@context.FullName</MudTd>
             <MudTd DataLabel="Email">@context.Email</MudTd>
             <MudTd DataLabel="Phone Number">@context.PhoneNumber</MudTd>
-            <MudTd DataLabel="Wallet">@context.Wallet</MudTd>
-            <MudTd DataLabel="Email Confirmed" HideSmall="@true">@context.EmailConfirmed</MudTd>
-            <MudTd DataLabel="Phone Confirmed" HideSmall="@true">@context.PhoneNumberConfirmed</MudTd>
+            <MudTd DataLabel="Email Confirmed" HideSmall="@true">
+                @if(@context.EmailConfirmed)
+                {
+                    <MudIcon Icon="@Icons.Filled.Check" Title="Yes" />
+                }
+            </MudTd>
+            <MudTd DataLabel="Phone Confirmed" HideSmall="@true">
+                @if(@context.PhoneNumberConfirmed)
+                {
+                    <MudIcon Icon="@Icons.Filled.Check" Title="Yes" />
+                }
+            </MudTd>
+            <MudTd DataLabel="Account Disabled" HideSmall="@true">
+                @if(@context.IsDisabled)
+                {
+                    <MudIcon Icon="@Icons.Filled.Check" Color="Color.Warning" Title="Yes" />
+                }
+            </MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
                 Title="Edit" OnClick="@(() => EditRow(context.Id))" />
@@ -49,7 +64,8 @@
             <MudText>Loading...</MudText>
         </LoadingContent>
         <PagerContent>
-            <MudTablePager HorizontalAlignment="HorizontalAlignment.Left" HideRowsPerPage="false" HidePageNumber="false"  InfoFormat="@($"All: {totalItems}")"/>
+            <MudTablePager HorizontalAlignment="HorizontalAlignment.Left" HideRowsPerPage="false" HidePageNumber="false"
+                InfoFormat="@($"{totalItems} records")"/>
         </PagerContent>
 </MudTable>
 </MudContainer>
@@ -66,7 +82,7 @@
     private async Task<TableData<UserDto>> ServerReload(TableState state)
     {
         loading = true;
-        var sortDirection = state.SortDirection == SortDirection.Ascending ? Pagination.Ascending : Pagination.Descending;
+        var sortDirection = state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending;
         var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel, sortDirection);
         var result = UserService.GetUsers(searchString, pagination);
         UserList = result.Data;
@@ -85,10 +101,15 @@
     {
     }
 
-    private void EditRow(Guid id)
+    private async Task EditRow(Guid id)
     {
         var parameters = new DialogParameters { ["UserId"] = id };
-        var options = new DialogOptions() { FullWidth = true };
-        Dialog.Show<UserEditDialog>("Edit User Record", parameters, options);
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = Dialog.Show<UserEditDialog>("Edit User Record", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            await table.ReloadServerData();
+        }
     }
 }

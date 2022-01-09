@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Core.Application.Services.IServices;
-using Core.Application.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -100,7 +98,14 @@ namespace Web.WebApp.Pages.Account
                 return Redirect(returnUrl);    
             }
 
-            if (result.RequiresTwoFactor)
+            if (result.EmailConfirmationRequired)
+            {
+                ErrorMessage = "Your email is not verified yet. Please check your email or get a new verification email <a href='/account/generateemailconfirmation'>here</a>.";
+                Input.Password = String.Empty;
+                return Page();
+            }
+
+            if (result.TwoFactorRequired)
             {
                 return RedirectToPage("./LoginWith2FA", new {ReturnUrl = returnUrl, RememberMe = Input.RememberMe});    
             }

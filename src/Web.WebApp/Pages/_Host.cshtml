@@ -10,7 +10,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebApp</title>
+    <title>Track My Expense</title>
     <base href="~/" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href='https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
@@ -39,5 +39,11 @@
     <script src="_framework/blazor.server.js"></script>
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+
+    <script>
+        function SetPageTitle(title) {
+            document.title = title;
+        }
+    </script>
 </body>
 </html>

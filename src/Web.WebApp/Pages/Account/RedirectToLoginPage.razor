@@ -1,9 +1,22 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using Core.Domain.Constants
+@inject NavigationManager NavigationManager
 
 @code {
-    protected override void OnAfterRender(bool firstRender)
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var returnUrl = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        NavigationManager.NavigateTo($"/account/login?returnUrl={returnUrl}", forceLoad:true);   
+        var user = (await authenticationStateTask).User;
+        if(user.Identity != null && !user.Identity.IsAuthenticated)
+        {
+            var returnUrl = "/" + NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            NavigationManager.NavigateTo($"/account/login?returnUrl={returnUrl}", forceLoad:true);
+        }
+
+        if (!user.IsInRole(UserBaseRole.Admin))
+        {
+            NavigationManager.NavigateTo("/");
+        }
     }
 }

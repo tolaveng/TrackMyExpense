@@ -51,7 +51,7 @@ html, body {
     box-sizing: border-box;
     box-shadow: inset 0px 3px 3px -2px #B2DFDB;
     border-top: 1px solid #009688;
-    margin-top: 32px;
+    margin-top: 64px;
     padding: 32px;
     display: flex;
 }

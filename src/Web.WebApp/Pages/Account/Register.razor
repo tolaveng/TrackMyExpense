@@ -3,17 +3,22 @@
 @layout EmptyLayout
 
 @using Core.Application.Services.IServices
+@using Core.Domain.Constants
 @using Microsoft.AspNetCore.Components
 @using Core.Application.Models
 @using System.ComponentModel.DataAnnotations
 @using System.Web
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Hosting
+@using Microsoft.Extensions.Logging
 
 @inject IUserService UserService;
 @inject NavigationManager Navigation;
 @inject IWebHostEnvironment HostEnvironment;
 @inject IEmailService EmailService;
+@inject ILogger<Register> Logger;
+
+<SetPageTitle Value=@($"{DefaultConstants.PageTitle} - Create new account") />
 
 <MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
     <MudCard Outlined="true" Elevation="1" Class="rounded-lg p-3">
@@ -59,12 +64,6 @@
     </MudCard>
 </MudContainer>
 
-@* Debug only: print email confirmation link *@
-@if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
-{
-    <textarea>@EmailConfirmLink</textarea>
-}
-
 
 @code {
     public bool IsSubmitting { get; set; }
@@ -73,10 +72,6 @@
 
     public string EmailConfirmLink { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        //Input = new RegisterInput();
-    }
 
     public async Task RegisterUser() {
 
@@ -110,12 +105,19 @@
         }
 
         // create
+        var subscription = new SubscriptionDto()
+        {
+            UserId = Guid.Empty,
+            SubscriptionType = Core.Domain.Enums.SubscriptionType.Free,
+            ValidAt = DateTime.UtcNow
+        };
         var user = new UserDto()
         {
             Username = Input.Email,
             FullName = Input.FullName,
             Email = Input.Email,
-            Password = Input.Password
+            Password = Input.Password,
+            Subscriptions = new []{ subscription }
         };
 
         var result = await UserService.CreateUserAsync(user);
@@ -130,6 +132,12 @@
         // Confirm email
         var token = await UserService.GenerateEmailConfirmationTokenAsync(result.Data);
         EmailConfirmLink = $"{Navigation.BaseUri}account/confirmemail?uid={result.Data}&token={HttpUtility.UrlEncode(token)}";
+
+        // Debug only: print email confirmation link
+        if (HostEnvironment.IsDevelopment())
+        {
+            Logger.LogDebug(EmailConfirmLink);
+        }
 
         // Send email and redirect
         EmailService.SendEmailConfirmation(Input.Email, Input.FullName, EmailConfirmLink);

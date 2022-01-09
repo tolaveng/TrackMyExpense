@@ -26,5 +26,6 @@ namespace Core.Application.Services.IServices
 
         int GetCount();
         PaginationResponse<UserDto> GetUsers(string search, Pagination pagination);
+        Task<GenericResponse<bool>> UpdateUserAsync(UserDto userDto);
     }
 }

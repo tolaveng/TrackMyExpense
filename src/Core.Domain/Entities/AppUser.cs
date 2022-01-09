@@ -17,7 +17,6 @@ namespace Core.Domain.Entities
         public bool PhoneNumberConfirmed { get; set; }
         public string Password { get; set; }
         public string FullName { get; set; }
-        public int SubscriptionId { get; set; }
         public IEnumerable<Subscription> Subscriptions { get; set; }
         public bool IsDisabled { get; set; }
         public bool TwoFactorEnabled { get; set; }

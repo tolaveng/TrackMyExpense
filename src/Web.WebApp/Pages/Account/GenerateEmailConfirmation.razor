@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Hosting
 @using Microsoft.Extensions.Hosting
 @using System.Web
+@using Microsoft.Extensions.Logging
 @using Microsoft.Extensions.Options
 @using Web.WebApp.Components
 
@@ -16,6 +17,7 @@
 @inject IEmailService EmailService;
 @inject IJSRuntime JsRuntime;
 @inject IOptions<ReCaptchaSetting> ReCaptchaSetting
+@inject ILogger<GenerateEmailConfirmation> Logger;
 
 <MudContainer Class="mt-16" MaxWidth="MaxWidth.Small">
     <MudCard Outlined="true" Elevation="1" Class="rounded-lg p-3">
@@ -52,11 +54,6 @@
         </MudCardContent>
     </MudCard>
 </MudContainer>
-@* Debug only: print email confirmation link *@
-@if (!string.IsNullOrWhiteSpace(EmailConfirmLink) && HostEnvironment.IsDevelopment())
-{
-    <textarea>@EmailConfirmLink</textarea>
-}
 
 
 @code {
@@ -132,6 +129,12 @@
         IsSubmitting = false;
         SubmitDisabled = true;
         IsSubmitted = true;
+
+        // Debug only: print email confirmation link
+        if (HostEnvironment.IsDevelopment())
+        {
+            Logger.LogDebug(EmailConfirmLink);
+        }
     }
 
     public class ConfirmEmailInput
