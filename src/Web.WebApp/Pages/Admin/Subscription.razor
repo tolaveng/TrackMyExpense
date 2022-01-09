@@ -1,0 +1,12 @@
+﻿@page "/admin/subscription/{userid}"
+
+@using Core.Domain.Constants
+
+@attribute [Authorize(Roles = UserBaseRole.Admin)]
+
+<h3>Subscription</h3>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+}

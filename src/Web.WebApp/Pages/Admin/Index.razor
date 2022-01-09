@@ -3,15 +3,9 @@
 @inject NavigationManager Navigation
 @*@attribute [Authorize(Roles = UserBaseRole.Admin)] *@
 
-
-<h3>Admin Index</h3>
-
 <AuthorizeView Roles=@UserBaseRole.Admin>
-    <Authorized>
-        I'm logged in
-    </Authorized>
     <NotAuthorized>
-        I'm not log in
+        Access Denied
     </NotAuthorized>
 </AuthorizeView>
 

@@ -8,6 +8,7 @@
 @inject IDialogService Dialog
 
 @inject IUserService UserService;
+@inject NavigationManager NavigationManager;
 
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
@@ -54,7 +55,10 @@
             </MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
-                Title="Edit" OnClick="@(() => EditRow(context.Id))" />
+                Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
+                &nbsp;
+                <MudIconButton Icon="@Icons.Material.Filled.CreditCard" Size="Size.Small" aria-label="subscription"
+                Title="Subscription" Color="Color.Primary" OnClick="@(() => NavigationManager.NavigateTo($"/admin/subscription/{context.Id}"))" />
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
