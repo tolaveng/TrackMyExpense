@@ -24,6 +24,15 @@ namespace Core.Infrastructure.Repository
             _db = context.Set<T>();
         }
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>> expression = null)
+        {
+            if (expression == null)
+            {
+                return await _db.CountAsync();
+            }
+            return await _db.CountAsync(expression);
+        }
+
         public async Task<bool> Delete(int id)
         {
             var record = await _db.FindAsync(id);
@@ -93,6 +102,30 @@ namespace Core.Infrastructure.Repository
             }
 
             return await query.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetPagedAsync(int page, int pageSize, Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
+        {
+            IQueryable<T> query = _db;
+            if (expression != null)
+            {
+                query = query.Where(expression);
+            }
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            return await query.AsNoTracking().Skip(page * pageSize).Take(pageSize).ToListAsync();
         }
 
         public async Task Insert(T entity)

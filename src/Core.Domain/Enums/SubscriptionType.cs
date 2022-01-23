@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Core.Domain.Enums
 {
     public enum SubscriptionType
     {
         Free,
-        Premium,
-        Staff
+        Monthly,
+        Unlimited,
+        Yearly,
     }
 }

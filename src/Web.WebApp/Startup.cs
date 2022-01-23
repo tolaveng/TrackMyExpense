@@ -22,6 +22,8 @@ using Core.Application.Settings;
 using Microsoft.AspNetCore.Http;
 using MudBlazor.Services;
 using Core.Infrastructure.Seeder;
+using FluentValidation;
+using Core.Application.Models;
 
 namespace Web.WebApp
 {
@@ -81,6 +83,8 @@ namespace Web.WebApp
             services.AddAutoMapper(Assembly.GetAssembly(typeof(DataMapperProfile)));
             services.AddAutoMapper(Assembly.GetAssembly(typeof(AppMapperProfile)));
             services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddMediatR(Assembly.GetExecutingAssembly(), typeof(IUnitOfWork).Assembly);
+            //services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(UserDto)));
 
             // Infrastructure
             AddDatabase(services);
@@ -88,6 +92,8 @@ namespace Web.WebApp
 
             // .Net Identity
             AddAppIdentity(services, Environment);
+            services.AddHttpContextAccessor();
+            services.AddScoped<IAuthUserService, AuthUserService>();
 
             services.AddSingleton<IEmailService, EmailService>();
             services.AddScoped<IUserRepository, UserRepository>();
@@ -174,9 +180,9 @@ namespace Web.WebApp
                 opt.User.RequireUniqueEmail = true;
                 opt.SignIn.RequireConfirmedEmail = true;
 
-                if (!env.IsDevelopment()) 
+                if (env.IsDevelopment()) 
                 {
-                    
+                    opt.Password.RequiredLength = 4;
                 }
                 // custom reset password token
                 opt.Tokens.PasswordResetTokenProvider = "CustomPasswordResetProvider";

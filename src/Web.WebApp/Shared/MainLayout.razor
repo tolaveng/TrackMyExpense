@@ -1,28 +1,31 @@
 ﻿@using Web.WebApp.Themes
 @inherits LayoutComponentBase
 
-<MudThemeProvider Theme="@PrimaryTheme.Default"/>
-<MudSnackbarProvider/>
-<MudDialogProvider
-    MaxWidth = "MaxWidth.False"
-    CloseButton="true"
-    DisableBackdropClick="true"
-    Position="DialogPosition.TopCenter"
-    CloseOnEscapeKey="true" />
+<CascadingAuthUser>
+    <MudThemeProvider Theme="@PrimaryTheme.Default"/>
+    <MudSnackbarProvider/>
+    <MudDialogProvider
+        MaxWidth = "MaxWidth.False"
+        CloseButton="true"
+        DisableBackdropClick="true"
+        Position="DialogPosition.TopCenter"
+        CloseOnEscapeKey="true" />
 
-<MudLayout>
-    <AppBar OnDrawerToggle="@DrawerToggle" DrawerOpen="@_drawerOpen"/>
-    <MudDrawer @bind-Open="@_drawerOpen" Elevation="2">
-        <MudDrawerHeader Style="padding: 12px;">
-            <a href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
-        </MudDrawerHeader>
-        <NavMenu />
-    </MudDrawer>
-    <MudMainContent Style="min-height: 520px;">
-        @Body
-    </MudMainContent>
-    <PageFooter />
-</MudLayout>
+
+    <MudLayout>
+        <AppBar OnDrawerToggle="@DrawerToggle" DrawerOpen="@_drawerOpen"/>
+        <MudDrawer @bind-Open="@_drawerOpen" Elevation="2">
+            <MudDrawerHeader Style="padding: 12px;">
+                <a href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
+            </MudDrawerHeader>
+            <NavMenu />
+        </MudDrawer>
+        <MudMainContent Style="min-height: 520px;">
+            @Body
+        </MudMainContent>
+        <PageFooter />
+    </MudLayout>
+</CascadingAuthUser>
 
 @code {
     bool _drawerOpen = false;

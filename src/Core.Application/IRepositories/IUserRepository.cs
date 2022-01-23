@@ -34,7 +34,7 @@ namespace Core.Application.IRepositories
         Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
 
         int GetCount();
-        PaginationResponse<AppUser> GetUsers(string search, Pagination pagination);
+        PagedResponse<AppUser> GetUsers(string search, Pagination pagination);
         Task<GenericResponse<bool>> UpdateUserAsync(AppUser appUser);
     }
 }

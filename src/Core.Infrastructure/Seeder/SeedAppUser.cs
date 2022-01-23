@@ -43,7 +43,8 @@ namespace Core.Infrastructure.Seeder
                     //var hashed = password.HashPassword(adminUser, "admin");
                     //devUser.PasswordHash = hashed;
 
-                    await userManager.CreateAsync(adminUser, "admin");
+                    var result = await userManager.CreateAsync(adminUser, "admin");
+                    if (!result.Succeeded) return;
                     await userManager.AddToRoleAsync(adminUser, UserBaseRole.Admin);
 
                     // Create subscription
@@ -51,11 +52,9 @@ namespace Core.Infrastructure.Seeder
                     {
                         SubscriptionId = 0, // Auto generate
                         UserId = adminUserId,
-                        SubscriptionType = Domain.Enums.SubscriptionType.Staff,
+                        SubscriptionType = Domain.Enums.SubscriptionType.Unlimited,
                         CreatedAt = DateTime.UtcNow,
-                        CreatedBy = adminUserId,
-                        ModifiedAt = DateTime.UtcNow,
-                        ModifiedBy = adminUserId,
+                        CreatedBy = adminUserId
                     };
                     context.Subscriptions.Add(subscription);
                     context.SaveChanges();

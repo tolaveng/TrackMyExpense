@@ -10,22 +10,20 @@
     <DialogContent>
         <EditForm EditContext="@editContext">
             <DataAnnotationsValidator/>
-            <ValidationSummary />
+            @*<ValidationSummary />*@
             <MudGrid>
                 <MudItem xs="12" sm="8">
                     <MudTextField Label="Full Name" @bind-Value="@userModel.FullName" For="@(() => userModel.FullName)" />
                 </MudItem>
                 <MudItem xs="12" sm="4"></MudItem>
-            </MudGrid>
-            <MudGrid>
+            
                 <MudItem xs="12" sm="8">
                     <MudTextField ReadOnly="true" Disabled="true" Label="Email" @bind-Value="@userModel.Email" For="@(() => userModel.Email)" />
                 </MudItem>
                 <MudItem xs="12" sm="4" Style="display:flex; padding-bottom: 0;">
                     <MudCheckBox ReadOnly="true" Disabled="true" Dense="true" Label="Email Confirmed" @bind-Checked="@userModel.EmailConfirmed" For="@(() => userModel.EmailConfirmed)" />
                 </MudItem>
-            </MudGrid>
-            <MudGrid>
+            
                 <MudItem xs="12" sm="8">
                     <MudTextField Label="Phone" @bind-Value="@userModel.PhoneNumber" For="@(() => userModel.PhoneNumber)" />
                 </MudItem>
@@ -48,7 +46,7 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public Guid UserId { get; set; }
+    [Parameter] public Guid UserId { get; set; } = Guid.Empty;
 
     private EditContext editContext;
     private UserModel userModel;
@@ -58,7 +56,7 @@
         userModel = new UserModel();
         editContext = new EditContext(userModel);
 
-        if (UserId == null)
+        if (UserId == Guid.Empty)
         {
             Dialog.Show<AlertDialog>("", 
                 new DialogParameters(){["Message"] = "Sorry, something went wrong. Cannot open user."});

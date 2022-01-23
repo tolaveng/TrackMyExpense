@@ -92,11 +92,11 @@ namespace Core.Application.Services
             return await _userRepository.ResetPasswordAsync(userId, token, password);
         }
 
-        public PaginationResponse<UserDto> GetUsers(string search, Pagination pagination)
+        public PagedResponse<UserDto> GetUsers(string search, Pagination pagination)
         {
             var result = _userRepository.GetUsers(search, pagination);
             var userDtos = _mapper.Map<IEnumerable<UserDto>>(result.Data);
-            return PaginationResponse<UserDto>.Result(userDtos, result.TotalCount);
+            return PagedResponse<UserDto>.Result(userDtos, result.TotalCount);
         }
 
         public int GetCount()

@@ -122,7 +122,13 @@ namespace Core.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     SubscriptionType = table.Column<int>(type: "integer", nullable: false),
-                    ValidAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    PaidAmount = table.Column<decimal>(type: "numeric", nullable: false),
+                    PaidDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    PaidGateway = table.Column<string>(type: "text", nullable: true),
+                    PaidRef = table.Column<string>(type: "text", nullable: true),
+                    PaymentMethod = table.Column<int>(type: "integer", nullable: false),
+                    Currency = table.Column<string>(type: "text", nullable: true),
+                    ValidFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsCanceled = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -375,8 +381,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "0fa7f4f2-ee03-4bc8-86f1-9c5d54a02071", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "c6a82930-9c6c-4aee-bff9-32041286315a", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "ea75fc4c-8bb1-4b31-9de1-a4e4c47eb246", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "cfc98839-457d-4cab-bd18-c7345669e11e", "admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

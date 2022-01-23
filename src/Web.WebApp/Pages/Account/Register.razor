@@ -4,6 +4,7 @@
 
 @using Core.Application.Services.IServices
 @using Core.Domain.Constants
+@using Core.Domain.Entities
 @using Microsoft.AspNetCore.Components
 @using Core.Application.Models
 @using System.ComponentModel.DataAnnotations
@@ -105,11 +106,11 @@
         }
 
         // create
-        var subscription = new SubscriptionDto()
+        var subscription = new Subscription()
         {
             UserId = Guid.Empty,
             SubscriptionType = Core.Domain.Enums.SubscriptionType.Free,
-            ValidAt = DateTime.UtcNow
+            ValidFrom = DateTime.UtcNow
         };
         var user = new UserDto()
         {

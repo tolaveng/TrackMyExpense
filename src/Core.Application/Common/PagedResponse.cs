@@ -6,13 +6,24 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Common
 {
-    public class PaginationResponse<T>
+    public class PagedResponse<T>
     {
         public IEnumerable<T> Data { get; set; }
         public int TotalCount { get; set; }
 
-        public static PaginationResponse<T> Result(IEnumerable<T> data, int totalCount) {
-            return new PaginationResponse<T>()
+        public PagedResponse()
+        {
+
+        }
+
+        public PagedResponse(IEnumerable<T> data, int totalCount)
+        {
+            Data = data;
+            TotalCount = totalCount;
+        }
+
+        public static PagedResponse<T> Result(IEnumerable<T> data, int totalCount) {
+            return new PagedResponse<T>()
             {
                 Data = data,
                 TotalCount = totalCount

@@ -1,0 +1,133 @@
+﻿@using Core.Application.IRepositories
+@using Core.Application.Models
+@using System.ComponentModel.DataAnnotations
+@using Core.Application.Services.IServices
+@using Core.Application.Subscriptions
+@using Core.Domain.Entities
+@using Core.Domain.Enums
+@using MediatR
+@using Web.WebApp.Components
+@using Web.WebApp.Components.Dialogs
+@using Web.WebApp.Extensions
+
+@inject IDialogService Dialog
+@inject IUnitOfWork UnitOfWork
+@inject IMediator Mediator;
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="@editContext">
+            <DataAnnotationsValidator/>
+            <FluentValidationValidator T="SubscriptionDto" TValidator="SubscriptionDtoValidator" />
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudSelect @bind-Value="@InputModel.SubscriptionType" Label="Subscription"  For="@(() => InputModel.SubscriptionType)">
+                        @foreach (SubscriptionType subItem in Enum.GetValues(typeof(SubscriptionType)))
+                        {
+                            <MudSelectItem Value="@subItem">@subItem</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6" Class="d-xs-none">
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Paid Amount" @bind-Value="@InputModel.PaidAmount" For="@(() => InputModel.PaidAmount)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker Label="Paid Date" @bind-Date="@InputModel.PaidDate" For="@(() => InputModel.PaidDate)" DateFormat="dd/MM/yyyy" DisableToolbar="true"/>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker Label="Valid From" @bind-Date="@InputModel.ValidFrom" For="@(() => InputModel.ValidFrom)" DateFormat="dd/MM/yyyy" DisableToolbar="true"/>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker Label="Valid To" @bind-Date="@InputModel.ValidTo" For="@(() => InputModel.ValidTo)" DateFormat="dd/MM/yyyy" DisableToolbar="true"/>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudSelect @bind-Value="@InputModel.PaymentMethod" Label="PaymentMethod"  For="@(() => InputModel.PaymentMethod)">
+                        @foreach (PaymentMethod paymentMethodItem in Enum.GetValues(typeof(PaymentMethod)))
+                        {
+                            <MudSelectItem Value="@paymentMethodItem">@paymentMethodItem</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Paid Gateway" @bind-Value="@InputModel.PaidGateway" For="@(() => InputModel.PaidGateway)" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Paid Reference" @bind-Value="@InputModel.PaidRef" For="@(() => InputModel.PaidRef)" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudCheckBox Label="Is Canceled" Dense="true" Color="@Color.Warning" @bind-Checked="@InputModel.IsCanceled" For="@(() => InputModel.IsCanceled)" />
+                </MudItem>
+            </MudGrid>
+            <ValidationSummary />
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnCloseClicked">Close</MudButton>
+        <MudButton Color="@Color.Primary" Variant="Variant.Filled" OnClick="OnSaveClicked">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public int SubscriptionId { get; set; } = 0;
+    [Parameter] public Guid UserId { get; set; } = Guid.Empty;
+
+    private EditContext editContext;
+    private SubscriptionDto InputModel;
+
+    [CascadingParameter] public UserDto AuthUser { get; set; } = default;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InputModel = new SubscriptionDto();
+        editContext = new EditContext(InputModel);
+        //editContext.AddFluentValidation<SubscriptionDto, SubscriptionDtoValidator>();
+
+        if (AuthUser == null)
+        {
+            await Dialog.ShowMessageBox("Error", "Sorry, please try to log in again.", yesText:"Close");
+            MudDialog.Cancel();
+            return;
+        }
+
+        if (SubscriptionId != 0)
+        {
+            var subscription = await Mediator.Send(new GetSubscription(SubscriptionId));
+            if (subscription == null)
+            {
+                await Dialog.ShowMessageBox("Warning", "Sorry, something went wrong.", yesText:"Close");
+                MudDialog.Cancel();
+                return;
+            }
+
+            InputModel = subscription;
+            editContext = new EditContext(subscription);
+            //editContext.AddFluentValidation<SubscriptionDto, SubscriptionDtoValidator>();
+        }
+    }
+
+    private void OnCloseClicked() => MudDialog.Cancel();
+    private async Task OnSaveClicked() {
+        if (editContext.Validate())
+        {
+            InputModel.UserId = UserId;
+            InputModel.ModifiedBy = AuthUser.Id;
+            InputModel.ModifiedAt = DateTime.UtcNow;
+
+            var subId = await Mediator.Send(new SaveSubscriptionCommand()
+            {
+                    SubscriptionDto = InputModel
+            });
+            MudDialog.Close(DialogResult.Ok(subId));
+        }
+    }
+}

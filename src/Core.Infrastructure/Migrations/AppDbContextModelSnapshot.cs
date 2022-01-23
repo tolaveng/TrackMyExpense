@@ -346,6 +346,9 @@ namespace Core.Infrastructure.Migrations
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsCanceled")
                         .HasColumnType("boolean");
 
@@ -355,13 +358,28 @@ namespace Core.Infrastructure.Migrations
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("PaidAmount")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("PaidDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaidGateway")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PaidRef")
+                        .HasColumnType("text");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
                     b.Property<int>("SubscriptionType")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("ValidAt")
+                    b.Property<DateTime?>("ValidFrom")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ValidTo")
@@ -404,14 +422,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "c6a82930-9c6c-4aee-bff9-32041286315a",
+                            ConcurrencyStamp = "cfc98839-457d-4cab-bd18-c7345669e11e",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "0fa7f4f2-ee03-4bc8-86f1-9c5d54a02071",
+                            ConcurrencyStamp = "ea75fc4c-8bb1-4b31-9de1-a4e4c47eb246",
                             Name = "user",
                             NormalizedName = "USER"
                         });

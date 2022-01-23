@@ -3,8 +3,8 @@
         <MudText>@Message</MudText>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="OnFirstButtonClicked">@FirstButtonText</MudButton>
-        <MudButton Color="@Color" Variant="Variant.Filled" OnClick="OnSecondButtonClicked">@SecondButtonText</MudButton>
+        <MudButton OnClick="OnSecondaryButtonClicked">@SecondaryButtonText</MudButton>
+        <MudButton Color="@Color" Variant="Variant.Filled" OnClick="OnPrimaryButtonClicked">@PrimaryButtonText</MudButton>
     </DialogActions>
 </MudDialog>
 @code {
@@ -12,12 +12,12 @@
 
     [Parameter] public string Message { get; set; }
 
-    [Parameter] public string FirstButtonText { get; set; } = "Cancel";
-    [Parameter] public string SecondButtonText { get; set; } = "Yes";
+    [Parameter] public string SecondaryButtonText { get; set; } = "Cancel";
+    [Parameter] public string PrimaryButtonText { get; set; } = "Confirm";
 
     [Parameter] public Color Color { get; set; } = Color.Primary;
 
-    void OnFirstButtonClicked() => MudDialog.Cancel();
-    void OnSecondButtonClicked() => MudDialog.Close(DialogResult.Ok(true));
+    void OnSecondaryButtonClicked() => MudDialog.Cancel();
+    void OnPrimaryButtonClicked() => MudDialog.Close(DialogResult.Ok(true));
     
 }

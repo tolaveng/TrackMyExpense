@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Core.Infrastructure.Extensions;
+using Core.Domain.Constants;
 
 namespace Core.Infrastructure.Repository
 {
@@ -45,6 +46,8 @@ namespace Core.Infrastructure.Repository
                 var result = await _userManager.CreateAsync(user, appUser.Password);
                 if (result.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, UserBaseRole.User);
+
                     // update subscript after saved
                     foreach (var sub in user.Subscriptions)
                     {
@@ -283,7 +286,7 @@ namespace Core.Infrastructure.Repository
             return false;
         }
 
-        public PaginationResponse<AppUser> GetUsers(string search, Pagination pagination)
+        public PagedResponse<AppUser> GetUsers(string search, Pagination pagination)
         {
             var userQuery = _userManager.Users;
             if (!string.IsNullOrWhiteSpace(search))
@@ -311,7 +314,7 @@ namespace Core.Infrastructure.Repository
                 .Take(pagination.PageSize).ToArray();
             var appUsers = _mapper.Map<IEnumerable<AppUser>>(users);
 
-            return PaginationResponse<AppUser>.Result(appUsers, count);
+            return PagedResponse<AppUser>.Result(appUsers, count);
         }
 
         public int GetCount()

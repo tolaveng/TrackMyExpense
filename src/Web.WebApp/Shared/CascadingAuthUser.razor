@@ -1,0 +1,23 @@
+﻿@using Core.Application.Models
+@using Core.Application.Services.IServices
+@inject IAuthUserService AuthUserService;
+
+<CascadingValue Value="@AuthUser" IsFixed="true" >
+    @ChildContent
+</CascadingValue>
+
+@code {
+    /// Get Authenticate User and cascade
+    /// Uses in MainLayout.razor
+    /// 
+
+    public UserDto AuthUser { get; set; } = default;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthUser = await AuthUserService.GetAuthUserAsync();
+    }
+}

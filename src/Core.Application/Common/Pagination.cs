@@ -12,24 +12,35 @@ namespace Core.Application.Common
         public const string Descending = "DESC";
         public int Page { get; set; }
         public int PageSize { get; set; }
-
+        public string Search { get; set; }
         public string SortDirection { get; set; } = Ascending;
         public string SortBy { get; set; } = String.Empty;
 
-        public Pagination(int page, int pageSize, string sortBy, string sortDir)
+        public Pagination(int page, int pageSize, string search, string sortBy, string sortDirection)
         {
             Page = page;
             PageSize = pageSize;
-            SortDirection = sortDir;
+            Search = search;
             SortBy = sortBy;
+            SortDirection = sortDirection;
+        }
+
+        public Pagination(int page, int pageSize, string sortBy, string sortDirection)
+        {
+            Page = page;
+            PageSize = pageSize;
+            Search = String.Empty;
+            SortBy = sortBy;
+            SortDirection = sortDirection;
         }
 
         public Pagination()
         {
             Page = 1;
             PageSize = 50;
-            SortDirection = Ascending;
+            Search = String.Empty;
             SortBy = String.Empty;
+            SortDirection = Ascending;
         }
     }
 }

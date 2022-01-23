@@ -25,7 +25,7 @@ namespace Core.Application.Services.IServices
         Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
 
         int GetCount();
-        PaginationResponse<UserDto> GetUsers(string search, Pagination pagination);
+        PagedResponse<UserDto> GetUsers(string search, Pagination pagination);
         Task<GenericResponse<bool>> UpdateUserAsync(UserDto userDto);
     }
 }

@@ -1,0 +1,174 @@
+﻿@page "/admin/subscription/{userid}"
+@attribute [Authorize(Roles = UserBaseRole.Admin)]
+
+@using Core.Application.Common
+@using Core.Application.IRepositories
+@using Core.Application.Models
+@using Core.Application.Subscriptions
+@using Core.Domain.Constants
+@using System.Linq.Expressions
+@using Core.Domain.Entities
+@using Core.Domain.Enums
+@using MediatR
+@using Web.WebApp.Components.Dialogs
+
+@inject IDialogService Dialog
+@inject NavigationManager NavigationManager;
+@inject IMediator Mediator;
+
+
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<SubscriptionDto>>>(ServerReload))"
+        Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
+        Loading="@loading" LoadingProgressColor="Color.Info"
+        T= "SubscriptionDto">
+        <ToolBarContent>
+            @*
+            <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+            *@
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
+                Add Subscription
+            </MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortLabel="SubscriptionType" T="SubscriptionDto">Subscription</MudTableSortLabel></MudTh>
+            <MudTh>Amount</MudTh>
+            <MudTh><MudTableSortLabel SortLabel="PaidDate" T="SubscriptionDto">Paid Date</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="ValidFrom" T="SubscriptionDto">Valid From</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="ValidTo" T="SubscriptionDto">Valid To</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="IsCanceled" T="SubscriptionDto">Canceled</MudTableSortLabel></MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Subscription Type">@context.SubscriptionType</MudTd>
+            <MudTd DataLabel="Amount">@context.PaidAmount</MudTd>
+            <MudTd DataLabel="Paid Date" HideSmall="@true">@context.PaidDate?.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Valid From" HideSmall="@true">@context.ValidFrom?.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Valid To" HideSmall="@true">@context.ValidTo?.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Canceled" HideSmall="@true">
+                @if(@context.IsCanceled)
+                {
+                    <MudText Color="@Color.Warning">Cancelled</MudText>
+                }
+            </MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
+                    Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.SubscriptionId))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
+                    Title="Edit" Color="Color.Primary" OnClick="@(() => DeleteRow(context.SubscriptionId))" />
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText>No matching records found</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Loading...</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager HorizontalAlignment="HorizontalAlignment.Left" HideRowsPerPage="false" HidePageNumber="false"
+                InfoFormat="@($"{TotalCount} records")"/>
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+
+    private MudTable<SubscriptionDto> table;
+    private int TotalCount;
+    private string searchString = null;
+    private bool loading = true;
+    private Guid userGuidId;
+
+    private async Task<TableData<SubscriptionDto>> ServerReload(TableState state)
+    {
+
+        if (!Guid.TryParse(UserId, out userGuidId)) {
+            NavigationManager.NavigateTo("/pagenotfound");
+            return new TableData<SubscriptionDto>();
+        };
+        loading = true;
+
+        var pagination = new Pagination()
+        {
+            Page = state.Page,
+            PageSize = state.PageSize,
+            SortBy = state.SortLabel,
+            SortDirection = state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending
+        };
+
+        var result = await Mediator.Send(new GetSubscriptionsPaged()
+        {
+            UserId = userGuidId,
+            Pagination = pagination
+        });
+        TotalCount = result.TotalCount;
+        loading = false;
+        return new TableData<SubscriptionDto>() {TotalItems = result.TotalCount, Items = result.Data};
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+    }
+
+    private async Task EditRow(int subscriptionId)
+    {
+        var parameters = new DialogParameters {
+            ["SubscriptionId"] = subscriptionId,
+            ["UserId"] = userGuidId
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = Dialog.Show<SubscriptionEditDialog>("Edit Subscription", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            await table.ReloadServerData();
+        }
+    }
+
+    private async Task DeleteRow(int subscriptionId)
+    {
+        var dialogParams = new DialogParameters() {
+            ["Message"] = "Are you sure you want to delete this subscription?",
+            ["Color"] = Color.Error,
+            ["PrimaryButtonText"] = "Delete"
+        };
+        var dialog = Dialog.Show<ConfirmDialog>("Delete Subscription", dialogParams);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            try
+            {
+                var deleted = await Mediator.Send(new DeleteSubscriptionCommand(subscriptionId));
+                if (deleted)
+                {
+                    await table.ReloadServerData();
+                    await Dialog.ShowMessageBox("Success", "Subscription has been deleted.", yesText:"Close");   
+                }
+            } catch (Exception)
+            {
+                await Dialog.ShowMessageBox("Error", "Sorry, something went wrong.", yesText:"Close");
+            }
+        }
+    }
+
+    private async Task AddNew()
+    {
+        var dialogParams = new DialogParameters {
+            ["SubscriptionId"] = 0,
+            ["UserId"] = userGuidId
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = Dialog.Show<SubscriptionEditDialog>("New Subscription", dialogParams, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            await table.ReloadServerData();
+        }
+    }
+}
