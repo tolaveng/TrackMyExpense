@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Core.Domain.Entities
 {
-    public abstract class AuditableEntity
+    public abstract class AuditableEntity<T>
     {
+        public T Id { get; set; }
         public DateTime? CreatedAt { get; set; }
         public Guid? CreatedBy { get; set;}
         public DateTime? ModifiedAt { get; set; }

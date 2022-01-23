@@ -9,13 +9,10 @@ using System.Threading.Tasks;
 
 namespace Core.Domain.Entities
 {
-    public class BudgetJar : BaseEntity
+    public class BudgetJar : BaseEntity<Guid>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int BudgetJarId { get; set; }
         public Guid UserId { get; set; }
-        public long? IncomeId { get; set; }
+        public Guid? IncomeId { get; set; }
         public string Name { get; set; }
         public int Percentage { get; set; }
         public Decimal Amount { get; set; }

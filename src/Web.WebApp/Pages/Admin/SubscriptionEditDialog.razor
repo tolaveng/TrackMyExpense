@@ -78,7 +78,7 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-    [Parameter] public int SubscriptionId { get; set; } = 0;
+    [Parameter] public Guid SubscriptionId { get; set; } = Guid.Empty;
     [Parameter] public Guid UserId { get; set; } = Guid.Empty;
 
     private EditContext editContext;
@@ -99,7 +99,7 @@
             return;
         }
 
-        if (SubscriptionId != 0)
+        if (SubscriptionId != Guid.Empty)
         {
             var subscription = await Mediator.Send(new GetSubscription(SubscriptionId));
             if (subscription == null)

@@ -6,11 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Domain.Entities
 {
-    public class Expense : AuditableEntity
+    public class Expense : AuditableEntity<Guid>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long ExpenseId { get; set; }
         public Guid UserId { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
@@ -23,7 +20,7 @@ namespace Core.Domain.Entities
 
         public virtual ICollection<Attachment> Attachments { get; set; }
 
-        public int BudgetJarId { get; set; }
+        public Guid BudgetJarId { get; set; }
         public virtual BudgetJar BudgetJar { get; set; }
         public virtual ICollection<Category> Categories { get; set; }
 

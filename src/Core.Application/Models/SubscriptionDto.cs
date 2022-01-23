@@ -10,7 +10,7 @@ namespace Core.Application.Models
 {
     public class SubscriptionDto : Auditable
     {
-        public int SubscriptionId { get; set; }
+        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public SubscriptionType SubscriptionType { get; set; }
         public Decimal PaidAmount { get; set; }

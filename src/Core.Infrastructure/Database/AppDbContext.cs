@@ -29,6 +29,7 @@ namespace Core.Infrastructure.Database
             _configurator.Configure(optionsBuilder);
         }
 
+        public DbSet<SysAttribute> SysAttributes { get; set; }
         public DbSet<BudgetJar> BudgetJars { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Expense> Expenses { get; set; }
@@ -61,9 +62,11 @@ namespace Core.Infrastructure.Database
                 .HasMany(x => x.Categories)
                 .WithMany(x => x.Expenses);
             modelBuilder.Entity<Expense>().HasMany(x => x.Attachments).WithOne().OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<Income>().HasMany(x => x.BudgetJars).WithOne().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Income>().HasMany(x => x.BudgetJars).WithOne().HasForeignKey(x => x.IncomeId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Expense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<AppIdentityUser>().HasMany(x => x.Subscriptions).WithOne().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<RecurrentExpense>().HasMany(x => x.Categories).WithOne().OnDelete(DeleteBehavior.SetNull);
 
             // Seed Default Data
             modelBuilder.ApplyConfiguration(new AppRoleConfig());

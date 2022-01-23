@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220116221527_InitDataTables")]
+    [Migration("20220123054027_InitDataTables")]
     partial class InitDataTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,32 +26,38 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("CategoryExpense", b =>
                 {
-                    b.Property<int>("CategoriesCategoryId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("CategoriesId")
+                        .HasColumnType("uuid");
 
-                    b.Property<long>("ExpensesExpenseId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid>("ExpensesId")
+                        .HasColumnType("uuid");
 
-                    b.HasKey("CategoriesCategoryId", "ExpensesExpenseId");
+                    b.HasKey("CategoriesId", "ExpensesId");
 
-                    b.HasIndex("ExpensesExpenseId");
+                    b.HasIndex("ExpensesId");
 
                     b.ToTable("CategoryExpense");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Attachment", b =>
                 {
-                    b.Property<string>("AttachmentId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("text");
+                        .HasColumnType("uuid");
 
-                    b.Property<long?>("ExpenseId")
-                        .HasColumnType("bigint");
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("ExpenseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
 
                     b.Property<string>("Url")
                         .HasColumnType("text");
 
-                    b.HasKey("AttachmentId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ExpenseId");
 
@@ -60,11 +66,9 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.BudgetJar", b =>
                 {
-                    b.Property<int>("BudgetJarId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BudgetJarId"));
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
@@ -75,8 +79,8 @@ namespace Core.Infrastructure.Migrations
                     b.Property<string>("IconName")
                         .HasColumnType("text");
 
-                    b.Property<long?>("IncomeId")
-                        .HasColumnType("bigint");
+                    b.Property<Guid?>("IncomeId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsSystem")
                         .HasColumnType("boolean");
@@ -90,7 +94,7 @@ namespace Core.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("BudgetJarId");
+                    b.HasKey("Id");
 
                     b.HasIndex("IncomeId");
 
@@ -99,7 +103,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            BudgetJarId = 1,
+                            Id = new Guid("d3d4bb69-9332-46b4-8fcd-ee6ea725b9d6"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -109,7 +113,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            BudgetJarId = 2,
+                            Id = new Guid("414cb93b-7ef6-4e64-8c16-bcf8c23a2e04"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -119,7 +123,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            BudgetJarId = 3,
+                            Id = new Guid("ebd32c80-cc7e-4d57-b2fb-754eed9b8db3"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -129,7 +133,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            BudgetJarId = 4,
+                            Id = new Guid("0e847ca7-6f22-434e-9214-b0bc7dd96741"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -139,7 +143,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            BudgetJarId = 5,
+                            Id = new Guid("e6f3ca20-1154-4d9d-9805-277ab940f8e4"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -149,7 +153,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            BudgetJarId = 6,
+                            Id = new Guid("8104b036-c59c-4707-b571-a33de1fa5c29"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -161,11 +165,9 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Category", b =>
                 {
-                    b.Property<int>("CategoryId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
@@ -179,7 +181,7 @@ namespace Core.Infrastructure.Migrations
                     b.Property<int?>("RecurrentExpenseId")
                         .HasColumnType("integer");
 
-                    b.HasKey("CategoryId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RecurrentExpenseId");
 
@@ -188,11 +190,9 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
                 {
-                    b.Property<long>("ExpenseId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("ExpenseId"));
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
@@ -200,8 +200,8 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("BudgetJarId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("BudgetJarId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -242,7 +242,7 @@ namespace Core.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("ExpenseId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BudgetJarId");
 
@@ -251,14 +251,15 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Income", b =>
                 {
-                    b.Property<long>("IncomeId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("IncomeId"));
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("PeriodFrom")
                         .HasColumnType("timestamp with time zone");
@@ -269,18 +270,18 @@ namespace Core.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("IncomeId");
+                    b.HasKey("Id");
 
                     b.ToTable("Incomes");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.RecurrentExpense", b =>
                 {
-                    b.Property<int>("RecurrentExpenseId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RecurrentExpenseId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
@@ -288,8 +289,8 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("BudgetJarId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("BudgetJarId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -324,7 +325,7 @@ namespace Core.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("RecurrentExpenseId");
+                    b.HasKey("Id");
 
                     b.HasIndex("BudgetJarId");
 
@@ -333,11 +334,9 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.Subscription", b =>
                 {
-                    b.Property<int>("SubscriptionId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SubscriptionId"));
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
@@ -387,11 +386,34 @@ namespace Core.Infrastructure.Migrations
                     b.Property<DateTime?>("ValidTo")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("SubscriptionId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Subscriptions");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.SysAttribute", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SysAttributes");
                 });
 
             modelBuilder.Entity("Core.Infrastructure.Database.Identity.AppIdentityRole", b =>
@@ -424,14 +446,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "cfc98839-457d-4cab-bd18-c7345669e11e",
+                            ConcurrencyStamp = "509ce0f5-040b-4cbf-b5df-13e46f648156",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "ea75fc4c-8bb1-4b31-9de1-a4e4c47eb246",
+                            ConcurrencyStamp = "d85508bf-5340-4291-9574-25c882d7d76e",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -615,13 +637,13 @@ namespace Core.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.Category", null)
                         .WithMany()
-                        .HasForeignKey("CategoriesCategoryId")
+                        .HasForeignKey("CategoriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Expense", null)
                         .WithMany()
-                        .HasForeignKey("ExpensesExpenseId")
+                        .HasForeignKey("ExpensesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -646,7 +668,8 @@ namespace Core.Infrastructure.Migrations
                 {
                     b.HasOne("Core.Domain.Entities.RecurrentExpense", null)
                         .WithMany("Categories")
-                        .HasForeignKey("RecurrentExpenseId");
+                        .HasForeignKey("RecurrentExpenseId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
@@ -665,7 +688,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.BudgetJar", "BudgetJar")
                         .WithMany()
                         .HasForeignKey("BudgetJarId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.Navigation("BudgetJar");

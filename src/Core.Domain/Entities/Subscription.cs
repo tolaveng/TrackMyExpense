@@ -5,11 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Domain.Entities
 {
-    public class Subscription : AuditableEntity
+    public class Subscription : AuditableEntity<Guid>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int SubscriptionId { get; set; }
         public Guid UserId  { get; set; }
         public SubscriptionType SubscriptionType { get; set; }
         public Decimal PaidAmount { get; set; }

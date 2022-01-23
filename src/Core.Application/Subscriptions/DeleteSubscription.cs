@@ -10,8 +10,8 @@ namespace Core.Application.Subscriptions
 {
     public class DeleteSubscriptionCommand : IRequest<bool>
     {
-        public int SubscriptionId { get; }
-        public DeleteSubscriptionCommand(int subscriptionId)
+        public Guid SubscriptionId { get; }
+        public DeleteSubscriptionCommand(Guid subscriptionId)
         {
             SubscriptionId = subscriptionId;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Domain.Enitities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,11 +9,8 @@ using System.Threading.Tasks;
 
 namespace Core.Domain.Entities
 {
-    public class Income
+    public class Income : BaseEntity<Guid>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long IncomeId { get; set; }
         public Guid UserId  { get; set; }
         public decimal Amount { get; set; }
         public DateTime PeriodFrom { get; set; }

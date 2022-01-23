@@ -1,4 +1,5 @@
-﻿using Core.Domain.Enums;
+﻿using Core.Domain.Enitities;
+using Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace Core.Domain.Entities
 {
-    public class AppUser
+    public class AppUser : BaseEntity<Guid>
     {
-        public Guid Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public bool EmailConfirmed { get; set; }

@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Subscriptions
 {
-    public class SaveSubscriptionCommand : IRequest<int>
+    public class SaveSubscriptionCommand : IRequest<Guid>
     {
         public SubscriptionDto SubscriptionDto { get; set; }
     }
 
-    public class SaveSubscriptionHandler : IRequestHandler<SaveSubscriptionCommand, int>
+    public class SaveSubscriptionHandler : IRequestHandler<SaveSubscriptionCommand, Guid>
     {
         public readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -26,7 +26,7 @@ namespace Core.Application.Subscriptions
             _unitOfWork =unitOfWork;
             _mapper = mapper;
         }
-        public async Task<int> Handle(SaveSubscriptionCommand request, CancellationToken cancellationToken)
+        public async Task<Guid> Handle(SaveSubscriptionCommand request, CancellationToken cancellationToken)
         {
             var subscription = _mapper.Map<Subscription>(request.SubscriptionDto);
 
@@ -43,8 +43,9 @@ namespace Core.Application.Subscriptions
                 subscription.ValidTo = DateTime.SpecifyKind(subscription.ValidTo.Value, DateTimeKind.Utc);
             }
 
-            if (subscription.SubscriptionId == 0)
+            if (subscription.Id == Guid.Empty)
             {
+                subscription.Id = Guid.NewGuid();
                 await _unitOfWork.SubscriptionRepository.Insert(subscription);
             } else
             {
@@ -53,7 +54,7 @@ namespace Core.Application.Subscriptions
             
             await _unitOfWork.SaveAsync();
 
-            return subscription.SubscriptionId;
+            return subscription.Id;
         }
     }
 }

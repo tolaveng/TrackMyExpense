@@ -16,7 +16,7 @@ namespace Core.Infrastructure.Seeder
             var jars = new List<BudgetJar>() {
                 new BudgetJar()
                 {
-                    BudgetJarId = 1,
+                    Id = Guid.NewGuid(),
                     Name = "Necessities",
                     Percentage = 55,
                     Amount = 0,
@@ -25,7 +25,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    BudgetJarId = 2,
+                    Id = Guid.NewGuid(),
                     Name = "Long Term Saving",
                     Percentage = 10,
                     Amount = 0,
@@ -34,7 +34,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    BudgetJarId = 3,
+                    Id = Guid.NewGuid(),
                     Name = "Wants",
                     Percentage = 10,
                     Amount = 0,
@@ -43,7 +43,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    BudgetJarId = 4,
+                    Id = Guid.NewGuid(),
                     Name = "Education",
                     Percentage = 10,
                     Amount = 0,
@@ -52,7 +52,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    BudgetJarId = 5,
+                    Id = Guid.NewGuid(),
                     Name = "Financial Freedom",
                     Percentage = 10,
                     Amount = 0,
@@ -61,7 +61,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    BudgetJarId = 6,
+                    Id = Guid.NewGuid(),
                     Name = "Others",
                     Percentage = 5,
                     Amount = 0,

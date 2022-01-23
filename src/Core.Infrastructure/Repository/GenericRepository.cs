@@ -44,6 +44,17 @@ namespace Core.Infrastructure.Repository
             return false;
         }
 
+        public async Task<bool> Delete(Guid id)
+        {
+            var record = await _db.FindAsync(id);
+            if (record != null)
+            {
+                _db.Remove(record);
+                return true;
+            }
+            return false;
+        }
+
         public bool Delete(T entity)
         {
             if (_context.Entry(entity).State == EntityState.Detached)

@@ -55,9 +55,9 @@
             </MudTd>
             <MudTd>
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
-                    Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.SubscriptionId))" />
+                    Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
-                    Title="Edit" Color="Color.Primary" OnClick="@(() => DeleteRow(context.SubscriptionId))" />
+                    Title="Edit" Color="Color.Primary" OnClick="@(() => DeleteRow(context.Id))" />
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
@@ -116,7 +116,7 @@
         table.ReloadServerData();
     }
 
-    private async Task EditRow(int subscriptionId)
+    private async Task EditRow(Guid subscriptionId)
     {
         var parameters = new DialogParameters {
             ["SubscriptionId"] = subscriptionId,
@@ -131,7 +131,7 @@
         }
     }
 
-    private async Task DeleteRow(int subscriptionId)
+    private async Task DeleteRow(Guid subscriptionId)
     {
         var dialogParams = new DialogParameters() {
             ["Message"] = "Are you sure you want to delete this subscription?",
@@ -160,7 +160,7 @@
     private async Task AddNew()
     {
         var dialogParams = new DialogParameters {
-            ["SubscriptionId"] = 0,
+            ["SubscriptionId"] = Guid.Empty,
             ["UserId"] = userGuidId
         };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };

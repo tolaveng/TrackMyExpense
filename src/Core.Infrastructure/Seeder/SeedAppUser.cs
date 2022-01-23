@@ -50,7 +50,7 @@ namespace Core.Infrastructure.Seeder
                     // Create subscription
                     var subscription = new Subscription()
                     {
-                        SubscriptionId = 0, // Auto generate
+                        Id = Guid.NewGuid(),
                         UserId = adminUserId,
                         SubscriptionType = Domain.Enums.SubscriptionType.Unlimited,
                         CreatedAt = DateTime.UtcNow,

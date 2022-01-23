@@ -7,11 +7,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Domain.Entities
 {
-    public class RecurrentExpense : BaseEntity
+    public class RecurrentExpense : BaseEntity<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int RecurrentExpenseId { get; set; }
         public Guid UserId { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
@@ -20,7 +17,7 @@ namespace Core.Domain.Entities
         public bool IsTaxable { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 
-        public int BudgetJarId { get; set; }
+        public Guid BudgetJarId { get; set; }
         public virtual BudgetJar BudgetJar { get; set; }
         public virtual ICollection<Category> Categories { get; set; }
 

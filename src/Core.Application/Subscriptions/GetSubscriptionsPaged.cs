@@ -35,7 +35,7 @@ namespace Core.Application.Subscriptions
             var subRepository = _unitOfWork.SubscriptionRepository;
             var pagination = request.Pagination;
             
-            Func<IQueryable<Subscription>, IOrderedQueryable<Subscription>> orderBy = x => x.OrderByDescending(z => z.SubscriptionId);
+            Func<IQueryable<Subscription>, IOrderedQueryable<Subscription>> orderBy = x => x.OrderByDescending(z => z.Id);
             switch (pagination.SortBy)
             {
                 case "SubscriptionType":

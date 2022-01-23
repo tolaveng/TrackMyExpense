@@ -28,6 +28,7 @@ namespace Core.Application.IRepositories
         Task InsertRange(IEnumerable<T> entities);
         bool Update(T entity);
         Task<bool> Delete(int id);
+        Task<bool> Delete(Guid id);
         bool DeleteRange(IEnumerable<T> entities);
     }
 }
