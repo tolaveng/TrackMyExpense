@@ -1,0 +1,26 @@
+﻿@using Core.Domain.Constants
+
+<MudPaper Elevation="0" Class="pa-2 mt-2 mb-2 site-breadcrumb">
+    @if (IsAdmin)
+    {
+        <MudButton Link="/admin" Variant="Variant.Text" Style="text-transform:none"
+            StartIcon="@Icons.Filled.AdminPanelSettings">
+            Admin
+        </MudButton>
+    } else
+    {
+        <MudButton Link="/" Variant="Variant.Text" Style="text-transform:none"
+            StartIcon="@Icons.Filled.Home">
+            Home
+        </MudButton>
+    }
+    @ChildContent
+</MudPaper>
+
+@code {
+    [Parameter]
+    public bool IsAdmin { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

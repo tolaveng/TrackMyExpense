@@ -1,0 +1,17 @@
+﻿<MudIcon Icon="@Icons.Filled.ArrowRight" />
+<MudButton Link="@Href" Variant="Variant.Text" Style="text-transform:none" StartIcon="@Icon"
+    Disabled="@(string.IsNullOrWhiteSpace(Href))" Class="@(string.IsNullOrWhiteSpace(Href) ? "disabled" : "")">
+    @Title
+</MudButton>
+
+
+@code {
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string Href { get; set; } = "";
+
+    [Parameter]
+    public string Title { get; set; }
+}

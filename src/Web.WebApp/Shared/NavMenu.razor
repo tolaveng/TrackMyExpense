@@ -3,15 +3,30 @@
 <MudNavMenu>
     <AuthorizeView Roles=@UserBaseRole.Admin>
         <Authorized>
-            <MudNavGroup Title="Administrator" Expanded="true">
-                <MudNavLink Href="/admin/users"><span class="oi oi-person" aria-hidden="true"></span> Users</MudNavLink>
-                <MudNavLink Href="/admin/categories">Categories</MudNavLink>
+            <MudNavGroup Title="Administrator" Expanded="true" IconColor="@Color.Primary" Icon="@Icons.Filled.AdminPanelSettings">
+                <MudNavLink Href="/admin/users" IconColor="@Color.Primary" Icon="@Icons.Filled.People">
+                    Accounts
+                </MudNavLink>
+                <MudNavLink Href="/admin/budgetjars" IconColor="@Color.Primary" Icon="@Icons.Filled.Paid">
+                    Budget Jars
+                </MudNavLink>
+                <MudNavLink Href="/admin/categories" IconColor="@Color.Primary" Icon="@Icons.Filled.Category">
+                    Categories
+                 </MudNavLink>
+                <MudNavLink Href="/admin/pageeditor/term" IconColor="@Color.Primary" Icon="@Icons.Filled.AssignmentTurnedIn">
+                    Terms
+                </MudNavLink>
+                <MudNavLink Href="/admin/pageeditor/privacy" IconColor="@Color.Primary" Icon="@Icons.Filled.Assignment">
+                    Privacy
+                </MudNavLink>
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView>
         <Authorized>
-            <MudNavLink Href="/account/logout"><span class="oi oi-power-standby" aria-hidden="true"></span> Log Out</MudNavLink>
+            <MudNavLink Href="/account/logout" IconColor="@Color.Error" Icon="@Icons.Filled.Logout">
+                <MudText Color="@Color.Error">Log Out</MudText>
+            </MudNavLink>
         </Authorized>
     </AuthorizeView>
 </MudNavMenu>

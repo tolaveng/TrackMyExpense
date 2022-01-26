@@ -163,6 +163,22 @@ a, .btn-link {
     opacity: 0;
 }
 
+.site-breadcrumb,
+.site-breadcrumb a,
+.site-breadcrumb a:active,
+.site-breadcrumb a:visited {
+    color: #0366d6 !important;
+    text-decoration: none !important;
+}
+
+.site-breadcrumb > a:hover {
+    color: #009688 !important;
+}
+
+.site-breadcrumb .disabled {
+    color: #212121 !important;
+}
+
 .mud-dialog-content {
     max-height: 640px;
     overflow-y: scroll;

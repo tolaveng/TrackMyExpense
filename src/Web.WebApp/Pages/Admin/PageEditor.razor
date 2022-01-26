@@ -10,6 +10,10 @@
 @inject NavigationManager Navigation;
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumb IsAdmin="true">
+        <BreadcrumbItem Title=@($"Edit Page: {PageName.ToUpper()}") />
+    </Breadcrumb>
+
     <MudCard>
         <MudCardHeader>
             <CardHeaderContent>
@@ -33,16 +37,30 @@
     [Parameter]
     public string PageName { get; set; }
     private string[] allowPageNames = new[] { "term", "privacy" };
-    
+
     private PageHtmlDto pageHtml = new PageHtmlDto();
     private bool isLoading = true;
     private bool isSubmitting = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!allowPageNames.Contains(PageName))
+        {
+            Navigation.NavigateTo("../pagenotfound", true);
+            return;
+        }
+
+        isLoading = true;
+        pageHtml = await PageHtmlService.GetByNameAsync(PageName);
+        isLoading = false;
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
         if (!allowPageNames.Contains(PageName))
         {
-            Navigation.NavigateTo("../pagenotfound");
+            Navigation.NavigateTo("../pagenotfound", true);
             return;
         }
 
