@@ -46,7 +46,7 @@ namespace Core.Application.Subscriptions
             if (subscription.Id == Guid.Empty)
             {
                 subscription.Id = Guid.NewGuid();
-                await _unitOfWork.SubscriptionRepository.Insert(subscription);
+                await _unitOfWork.SubscriptionRepository.InsertAsync(subscription);
             } else
             {
                 _unitOfWork.SubscriptionRepository.Update(subscription);

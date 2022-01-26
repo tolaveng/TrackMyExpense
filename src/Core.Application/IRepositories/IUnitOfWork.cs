@@ -9,6 +9,8 @@ namespace Core.Application.IRepositories
 {
     public interface IUnitOfWork : IDisposable
     {
+        IGenericRepository<SysAttribute> SysAttributeRepository { get; }
+        IGenericRepository<PageHtml> PageHtmlRepository { get; }
         IGenericRepository<Subscription> SubscriptionRepository { get; }
         IGenericRepository<Expense> ExpenseRepository { get; }
         IGenericRepository<Category> CategoryRepository { get; }

@@ -24,6 +24,7 @@ using MudBlazor.Services;
 using Core.Infrastructure.Seeder;
 using FluentValidation;
 using Core.Application.Models;
+using MudBlazor;
 
 namespace Web.WebApp
 {
@@ -96,6 +97,8 @@ namespace Web.WebApp
             services.AddScoped<IAuthUserService, AuthUserService>();
 
             services.AddSingleton<IEmailService, EmailService>();
+            services.AddScoped<ISysAttributeService, SysAttributeService>();
+            services.AddScoped<IPageHtmlService, PageHtmlService > ();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserService, UserService>();
@@ -119,7 +122,19 @@ namespace Web.WebApp
             });
             
 
-            services.AddMudServices();
+            services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
+
+                config.SnackbarConfiguration.PreventDuplicates = true;
+                config.SnackbarConfiguration.NewestOnTop = false;
+                config.SnackbarConfiguration.ShowCloseIcon = true;
+                config.SnackbarConfiguration.VisibleStateDuration = 10000;
+                config.SnackbarConfiguration.HideTransitionDuration = 500;
+                config.SnackbarConfiguration.ShowTransitionDuration = 500;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            });
+
             services.AddRazorPages();
             services.AddControllers()
                 .AddNewtonsoftJson(opt =>

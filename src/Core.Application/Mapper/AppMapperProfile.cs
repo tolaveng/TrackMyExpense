@@ -13,6 +13,8 @@ namespace Core.Application.Mapper
                 .ForMember(x => x.Password, x => x.MapFrom(z => string.Empty))
                 ;
 
+            CreateMap<SysAttribute, SysAttributeDto>().ReverseMap();
+            CreateMap<PageHtml, PageHtmlDto>().ReverseMap();
             CreateMap<Subscription, SubscriptionDto>().ReverseMap();
         }
     }

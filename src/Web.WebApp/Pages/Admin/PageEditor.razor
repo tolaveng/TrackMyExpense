@@ -1,0 +1,71 @@
+﻿@page "/admin/pageeditor/{PageName}"
+@attribute [Authorize(Roles = UserBaseRole.Admin)]
+
+@using Core.Application.Models
+@using Core.Application.Services.IServices
+@using Core.Domain.Constants
+
+@inject ISnackbar Snackbar
+@inject IPageHtmlService PageHtmlService
+@inject NavigationManager Navigation;
+
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <MudCard>
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudTextField Label="Title" @bind-Value="@pageHtml.Title" />
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true" hidden="@(!isLoading)"/>
+            <textarea @bind="pageHtml.Content" style="width: 100%; height: 100%; min-height: 420px; padding: 12px;" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@isSubmitting" OnClick="OnSubmitHandler">
+                Save
+                <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true" hidden="@(!isSubmitting)"/>
+            </MudButton>
+        </MudCardActions>
+        </MudCard>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string PageName { get; set; }
+    private string[] allowPageNames = new[] { "term", "privacy" };
+    
+    private PageHtmlDto pageHtml = new PageHtmlDto();
+    private bool isLoading = true;
+    private bool isSubmitting = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!allowPageNames.Contains(PageName))
+        {
+            Navigation.NavigateTo("../pagenotfound");
+            return;
+        }
+
+        isLoading = true;
+        pageHtml = await PageHtmlService.GetByNameAsync(PageName);
+        isLoading = false;
+    }
+
+    private async Task OnSubmitHandler()
+    {
+        isSubmitting = true;
+        pageHtml.Name = PageName;
+        try
+        {
+            pageHtml.Id = await PageHtmlService.SaveAsync(pageHtml);
+            Snackbar.Add("Saved successfully", Severity.Success);
+
+        } catch(Exception)
+        {
+            Snackbar.Add("Sorry, save failed. Please again later.", Severity.Error);
+        }
+
+        isSubmitting = false;
+    }
+
+}

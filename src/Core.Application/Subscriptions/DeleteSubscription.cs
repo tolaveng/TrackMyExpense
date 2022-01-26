@@ -28,7 +28,7 @@ namespace Core.Application.Subscriptions
         public async Task<bool> Handle(DeleteSubscriptionCommand request, CancellationToken cancellationToken)
         {
             var subRespository = _unitOfWork.SubscriptionRepository;
-            var deleted = await subRespository.Delete(request.SubscriptionId);
+            var deleted = await subRespository.DeleteAsync(request.SubscriptionId);
             if (deleted)
             {
                 await _unitOfWork.SaveAsync();

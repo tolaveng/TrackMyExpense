@@ -12,7 +12,10 @@ namespace Core.Infrastructure.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-        private IGenericRepository<Subscription> _SubscriptionRepository;
+
+        private IGenericRepository<SysAttribute> _sysAttributeRepository;
+        private IGenericRepository<PageHtml> _pageHtmlRepository;
+        private IGenericRepository<Subscription> _subscriptionRepository;
         private IGenericRepository<Expense> _expenseRepository;
         private IGenericRepository<Category> _categoryRepository;
 
@@ -21,7 +24,9 @@ namespace Core.Infrastructure.Repository
             _context = context;
         }
 
-        public IGenericRepository<Subscription> SubscriptionRepository => _SubscriptionRepository ??= new GenericRepository<Subscription>(_context);
+        public IGenericRepository<SysAttribute> SysAttributeRepository => _sysAttributeRepository ??= new GenericRepository<SysAttribute>(_context);
+        public IGenericRepository<PageHtml> PageHtmlRepository => _pageHtmlRepository ??= new GenericRepository<PageHtml>(_context);
+        public IGenericRepository<Subscription> SubscriptionRepository => _subscriptionRepository ??= new GenericRepository<Subscription>(_context);
         public IGenericRepository<Expense> ExpenseRepository => _expenseRepository ??= new GenericRepository<Expense>(_context);
         public IGenericRepository<Category> CategoryRepository => _categoryRepository ??= new GenericRepository<Category>(_context);
 

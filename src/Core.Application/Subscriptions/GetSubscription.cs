@@ -32,7 +32,7 @@ namespace Core.Application.Subscriptions
 
         public async Task<SubscriptionDto> Handle(GetSubscription request, CancellationToken cancellationToken)
         {
-            var subscription = await _unitOfWork.SubscriptionRepository.Get(z => z.Id == request.SubscriptionId);
+            var subscription = await _unitOfWork.SubscriptionRepository.GetAsync(z => z.Id == request.SubscriptionId);
             if (subscription == null) return null;
             return _mapper.Map<SubscriptionDto>(subscription);
         }

@@ -33,7 +33,7 @@ namespace Core.Infrastructure.Repository
             return await _db.CountAsync(expression);
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             var record = await _db.FindAsync(id);
             if (record != null)
@@ -44,7 +44,7 @@ namespace Core.Infrastructure.Repository
             return false;
         }
 
-        public async Task<bool> Delete(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
             var record = await _db.FindAsync(id);
             if (record != null)
@@ -71,7 +71,7 @@ namespace Core.Infrastructure.Repository
             return true;
         }
 
-        public async Task<T> Get(Expression<Func<T, bool>> expression, List<string> includes = null)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> expression, List<string> includes = null)
         {
             IQueryable<T> query = _db;
             if (includes != null)
@@ -139,14 +139,16 @@ namespace Core.Infrastructure.Repository
             return await query.AsNoTracking().Skip(page * pageSize).Take(pageSize).ToListAsync();
         }
 
-        public async Task Insert(T entity)
+        public async Task<bool> InsertAsync(T entity)
         {
-            await _db.AddAsync(entity);
+            var result = await _db.AddAsync(entity);
+            return result.State == EntityState.Added;
         }
 
-        public async Task InsertRange(IEnumerable<T> entities)
+        public async Task<bool> InsertRangeAsync(IEnumerable<T> entities)
         {
             await _db.AddRangeAsync(entities);
+            return true;
         }
 
         public bool Update(T entity)

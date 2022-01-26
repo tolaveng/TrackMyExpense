@@ -13,6 +13,8 @@ namespace Core.Domain.Entities
     {
         public Guid UserId { get; set; }
         public Guid? IncomeId { get; set; }
+
+        [MaxLength(128)]
         public string Name { get; set; }
         public int Percentage { get; set; }
         public Decimal Amount { get; set; }

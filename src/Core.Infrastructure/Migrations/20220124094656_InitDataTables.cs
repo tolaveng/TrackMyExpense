@@ -27,6 +27,21 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PageHtmls",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Content = table.Column<string>(type: "text", nullable: true),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PageHtmls", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -45,8 +60,7 @@ namespace Core.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Text = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Value = table.Column<string>(type: "text", nullable: true),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
@@ -89,7 +103,7 @@ namespace Core.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     IncomeId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Percentage = table.Column<int>(type: "integer", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     IconName = table.Column<string>(type: "text", nullable: true),
@@ -316,7 +330,8 @@ namespace Core.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Url = table.Column<string>(type: "text", nullable: true),
                     ExpenseId = table.Column<Guid>(type: "uuid", nullable: true),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
@@ -337,7 +352,7 @@ namespace Core.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CategoryName = table.Column<string>(type: "text", nullable: true),
+                    CategoryName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     IconName = table.Column<string>(type: "text", nullable: true),
                     RecurrentExpenseId = table.Column<int>(type: "integer", nullable: true),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
@@ -382,12 +397,12 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "Amount", "Archived", "IconName", "IncomeId", "IsSystem", "Name", "Percentage", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("0e847ca7-6f22-434e-9214-b0bc7dd96741"), 0m, false, null, null, true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("414cb93b-7ef6-4e64-8c16-bcf8c23a2e04"), 0m, false, null, null, true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("8104b036-c59c-4707-b571-a33de1fa5c29"), 0m, false, null, null, true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("d3d4bb69-9332-46b4-8fcd-ee6ea725b9d6"), 0m, false, null, null, true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("e6f3ca20-1154-4d9d-9805-277ab940f8e4"), 0m, false, null, null, true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("ebd32c80-cc7e-4d57-b2fb-754eed9b8db3"), 0m, false, null, null, true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") }
+                    { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), 0m, false, null, null, true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"), 0m, false, null, null, true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"), 0m, false, null, null, true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"), 0m, false, null, null, true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), 0m, false, null, null, true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"), 0m, false, null, null, true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") }
                 });
 
             migrationBuilder.InsertData(
@@ -395,8 +410,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "d85508bf-5340-4291-9574-25c882d7d76e", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "509ce0f5-040b-4cbf-b5df-13e46f648156", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "0a246e30-56df-4f30-8dba-35325e03d576", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "347b2cab-6f50-47d9-9be6-2517d14457bc", "admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -479,6 +494,9 @@ namespace Core.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "CategoryExpense");
+
+            migrationBuilder.DropTable(
+                name: "PageHtmls");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");

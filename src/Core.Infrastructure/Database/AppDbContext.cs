@@ -30,6 +30,7 @@ namespace Core.Infrastructure.Database
         }
 
         public DbSet<SysAttribute> SysAttributes { get; set; }
+        public DbSet<PageHtml> PageHtmls { get; set; }
         public DbSet<BudgetJar> BudgetJars { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Expense> Expenses { get; set; }

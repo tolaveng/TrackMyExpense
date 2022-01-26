@@ -50,7 +50,12 @@ namespace Core.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Url")
                         .HasColumnType("text");
@@ -84,7 +89,8 @@ namespace Core.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<int>("Percentage")
                         .HasColumnType("integer");
@@ -101,7 +107,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d3d4bb69-9332-46b4-8fcd-ee6ea725b9d6"),
+                            Id = new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -111,7 +117,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("414cb93b-7ef6-4e64-8c16-bcf8c23a2e04"),
+                            Id = new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -121,7 +127,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ebd32c80-cc7e-4d57-b2fb-754eed9b8db3"),
+                            Id = new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -131,7 +137,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0e847ca7-6f22-434e-9214-b0bc7dd96741"),
+                            Id = new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -141,7 +147,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e6f3ca20-1154-4d9d-9805-277ab940f8e4"),
+                            Id = new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -151,7 +157,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("8104b036-c59c-4707-b571-a33de1fa5c29"),
+                            Id = new Guid("eee63caf-e26a-4265-817c-259d47e14aba"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -171,7 +177,8 @@ namespace Core.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("CategoryName")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("IconName")
                         .HasColumnType("text");
@@ -271,6 +278,31 @@ namespace Core.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Incomes");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.PageHtml", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PageHtmls");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.RecurrentExpense", b =>
@@ -401,10 +433,8 @@ namespace Core.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Text")
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
@@ -444,14 +474,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "509ce0f5-040b-4cbf-b5df-13e46f648156",
+                            ConcurrencyStamp = "347b2cab-6f50-47d9-9be6-2517d14457bc",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "d85508bf-5340-4291-9574-25c882d7d76e",
+                            ConcurrencyStamp = "0a246e30-56df-4f30-8dba-35325e03d576",
                             Name = "user",
                             NormalizedName = "USER"
                         });

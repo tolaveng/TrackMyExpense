@@ -8,6 +8,7 @@ namespace Core.Domain.Entities
 {
     public class Category : BaseEntity<Guid>
     {
+        [MaxLength(128)]
         public string CategoryName { get; set; }
         public string IconName { get; set; }
 

@@ -1,0 +1,40 @@
+﻿@page "/page/{PageName}"
+@using Core.Application.Models
+@using Core.Application.Services.IServices
+@using System.Web
+
+@inject IPageHtmlService PageHtmlService
+@inject NavigationManager Navigation;
+
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    @if(isLoading)
+    {
+        <MudProgressCircular Color="Color.Secondary" Size="Size.Small" Indeterminate="true"/>
+    } else {
+        @((MarkupString)pageHtml.Content)
+        <SetPageTitle Value="@pageHtml.Title" />
+    }
+</MudContainer>
+
+@code {
+    [Parameter]
+    public string PageName { get; set; }
+
+    private string[] allowPageNames = new[] { "term", "privacy" };
+    
+    private PageHtmlDto pageHtml = new PageHtmlDto();
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!allowPageNames.Contains(PageName))
+        {
+            Navigation.NavigateTo("../pagenotfound");
+            return;
+        }
+
+        isLoading = true;
+        pageHtml = await PageHtmlService.GetByNameAsync(PageName);
+        isLoading = false;
+    }
+}
