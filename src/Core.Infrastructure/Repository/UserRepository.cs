@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using Core.Infrastructure.Extensions;
 using Core.Domain.Constants;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Infrastructure.Repository
 {
@@ -25,13 +26,13 @@ namespace Core.Infrastructure.Repository
         private readonly IMapper _mapper;
         private readonly ILogger<UserRepository> _logger;
 
-        public UserRepository(AppDbContext context,
+        public UserRepository(IDbContextFactory<AppDbContext> dbContextFactory,
             UserManager<AppIdentityUser> userManager,
             SignInManager<AppIdentityUser> signInManager,
             IMapper mapper,
             ILogger<UserRepository> logger)
         {
-            _context = context;
+            _context = dbContextFactory.CreateDbContext();
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;

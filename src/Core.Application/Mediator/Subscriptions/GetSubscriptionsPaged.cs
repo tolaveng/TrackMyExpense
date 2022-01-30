@@ -11,7 +11,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Application.Subscriptions
+namespace Core.Application.Mediator.Subscriptions
 {
     public class GetSubscriptionsPaged : IRequest<PagedResponse<SubscriptionDto>>
     {

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Infrastructure.Repository
 {
@@ -19,9 +20,9 @@ namespace Core.Infrastructure.Repository
         private IGenericRepository<Expense> _expenseRepository;
         private IGenericRepository<Category> _categoryRepository;
 
-        public UnitOfWork(AppDbContext context)
+        public UnitOfWork(IDbContextFactory<AppDbContext> dbContextFactory)
         {
-            _context = context;
+            _context = dbContextFactory.CreateDbContext();
         }
 
         public IGenericRepository<SysAttribute> SysAttributeRepository => _sysAttributeRepository ??= new GenericRepository<SysAttribute>(_context);

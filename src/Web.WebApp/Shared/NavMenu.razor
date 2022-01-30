@@ -1,11 +1,11 @@
 ﻿@using Core.Domain.Constants
 
-<MudNavMenu>
+<MudNavMenu Class="drawer">
     <AuthorizeView Roles=@UserBaseRole.Admin>
         <Authorized>
             <MudNavGroup Title="Administrator" Expanded="true" IconColor="@Color.Primary" Icon="@Icons.Filled.AdminPanelSettings">
                 <MudNavLink Href="/admin/users" IconColor="@Color.Primary" Icon="@Icons.Filled.People">
-                    Accounts
+                    Users
                 </MudNavLink>
                 <MudNavLink Href="/admin/budgetjars" IconColor="@Color.Primary" Icon="@Icons.Filled.Paid">
                     Budget Jars
@@ -24,7 +24,7 @@
     </AuthorizeView>
     <AuthorizeView>
         <Authorized>
-            <MudNavLink Href="/account/logout" IconColor="@Color.Error" Icon="@Icons.Filled.Logout">
+            <MudNavLink Href="/account/logout" IconColor="@Color.Error" Icon="@Icons.Filled.Logout" Class="drawer-item-bottom">
                 <MudText Color="@Color.Error">Log Out</MudText>
             </MudNavLink>
         </Authorized>

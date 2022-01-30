@@ -107,7 +107,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"),
+                            Id = new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -147,7 +147,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"),
+                            Id = new Guid("eee63caf-e26a-4265-817c-259d47e14aba"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -157,7 +157,7 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("eee63caf-e26a-4265-817c-259d47e14aba"),
+                            Id = new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"),
                             Amount = 0m,
                             Archived = false,
                             IsSystem = true,
@@ -474,14 +474,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "347b2cab-6f50-47d9-9be6-2517d14457bc",
+                            ConcurrencyStamp = "1bc3f309-b2d8-47ad-a2eb-ab06b91aaede",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "0a246e30-56df-4f30-8dba-35325e03d576",
+                            ConcurrencyStamp = "e242db02-7dcd-4b29-b937-4fe4c5c174e9",
                             Name = "user",
                             NormalizedName = "USER"
                         });

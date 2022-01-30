@@ -10,9 +10,9 @@
 @inject NavigationManager Navigation;
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
-    <Breadcrumb IsAdmin="true">
-        <BreadcrumbItem Title=@($"Edit Page: {PageName.ToUpper()}") />
-    </Breadcrumb>
+    <Breadcrumbs IsAdmin="true">
+        <BreadcrumbsItem Title=@($"Edit Page: {PageName.ToUpper()}") />
+    </Breadcrumbs>
 
     <MudCard>
         <MudCardHeader>

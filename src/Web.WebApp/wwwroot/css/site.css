@@ -163,6 +163,16 @@ a, .btn-link {
     opacity: 0;
 }
 
+.drawer {
+    position: relative;
+    height: 100%;
+}
+
+.drawer-item-bottom {
+    position: absolute;
+    bottom: 16px;
+}
+
 .site-breadcrumb,
 .site-breadcrumb a,
 .site-breadcrumb a:active,

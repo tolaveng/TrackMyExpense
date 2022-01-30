@@ -397,12 +397,12 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "Amount", "Archived", "IconName", "IncomeId", "IsSystem", "Name", "Percentage", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), 0m, false, null, null, true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), 0m, false, null, null, true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"), 0m, false, null, null, true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"), 0m, false, null, null, true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"), 0m, false, null, null, true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), 0m, false, null, null, true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"), 0m, false, null, null, true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") }
+                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), 0m, false, null, null, true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"), 0m, false, null, null, true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") }
                 });
 
             migrationBuilder.InsertData(
@@ -410,8 +410,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "0a246e30-56df-4f30-8dba-35325e03d576", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "347b2cab-6f50-47d9-9be6-2517d14457bc", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "e242db02-7dcd-4b29-b937-4fe4c5c174e9", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "1bc3f309-b2d8-47ad-a2eb-ab06b91aaede", "admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

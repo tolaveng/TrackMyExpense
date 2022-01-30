@@ -4,6 +4,7 @@ using Core.Infrastructure.Database;
 using Core.Infrastructure.Database.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -17,10 +18,12 @@ namespace Core.Infrastructure.Seeder
             using( var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
+                //var dbContextFactory = serviceScope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+                //var context = await dbContextFactory.CreateDbContextAsync();
                 var userManager = serviceScope.ServiceProvider.GetService<UserManager<AppIdentityUser>>();
                 var roleManager = serviceScope.ServiceProvider.GetService<RoleManager<AppIdentityRole>>();
 
-                var adminUserId = Guid.NewGuid();
+                var adminUserId = Guid.Parse("68b59f54-fe8c-4a03-b597-c4771560c60b");
                 
                 var adminUser = new AppIdentityUser
                 {

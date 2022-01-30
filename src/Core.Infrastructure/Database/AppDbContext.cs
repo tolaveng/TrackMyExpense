@@ -6,7 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
+using System.Text;
 
 namespace Core.Infrastructure.Database
 {
@@ -14,20 +18,10 @@ namespace Core.Infrastructure.Database
 
     public class AppDbContext : IdentityDbContext<AppIdentityUser, AppIdentityRole, Guid>
     {
-        private readonly IWebHostEnvironment _environment;
-        private readonly IAppDbContextConfigurator _configurator;
-
-        public AppDbContext(IAppDbContextConfigurator configurator, IWebHostEnvironment environment)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            _environment = environment;
-            _configurator = configurator;
         }
 
-        // https://www.npgsql.org/efcore/index.html
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            _configurator.Configure(optionsBuilder);
-        }
 
         public DbSet<SysAttribute> SysAttributes { get; set; }
         public DbSet<PageHtml> PageHtmls { get; set; }

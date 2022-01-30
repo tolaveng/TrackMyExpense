@@ -16,7 +16,7 @@ namespace Core.Infrastructure.Seeder
             var jars = new List<BudgetJar>() {
                 new BudgetJar()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("2f32317b-7ce2-469b-91fc-a277d300f667"),
                     Name = "Necessities",
                     Percentage = 55,
                     Amount = 0,
@@ -25,7 +25,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("4adc7f4f-d3cd-4188-826c-410b729cfe8c"),
                     Name = "Long Term Saving",
                     Percentage = 10,
                     Amount = 0,
@@ -34,7 +34,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"),
                     Name = "Wants",
                     Percentage = 10,
                     Amount = 0,
@@ -43,7 +43,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"),
                     Name = "Education",
                     Percentage = 10,
                     Amount = 0,
@@ -52,7 +52,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("eee63caf-e26a-4265-817c-259d47e14aba"),
                     Name = "Financial Freedom",
                     Percentage = 10,
                     Amount = 0,
@@ -61,7 +61,7 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJar()
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("f20c473d-1fbf-4666-a88a-2f77594e1ea4"),
                     Name = "Others",
                     Percentage = 5,
                     Amount = 0,

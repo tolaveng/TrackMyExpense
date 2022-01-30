@@ -12,9 +12,9 @@
 
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
-    <Breadcrumb IsAdmin="true">
-        <BreadcrumbItem Icon="@Icons.Filled.People" Title="Accounts" />
-    </Breadcrumb>
+    <Breadcrumbs IsAdmin="true">
+        <BreadcrumbsItem Icon="@Icons.Filled.People" Title="Users" />
+    </Breadcrumbs>
     <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<UserDto>>>(ServerReload))"
         Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
         Loading="@loading" LoadingProgressColor="Color.Info"

@@ -22,9 +22,8 @@ using Core.Application.Settings;
 using Microsoft.AspNetCore.Http;
 using MudBlazor.Services;
 using Core.Infrastructure.Seeder;
-using FluentValidation;
-using Core.Application.Models;
 using MudBlazor;
+using Microsoft.EntityFrameworkCore;
 
 namespace Web.WebApp
 {
@@ -179,9 +178,19 @@ namespace Web.WebApp
 
         private void AddDatabase(IServiceCollection services)
         {
-            services.Configure<PostgresOptions>(Configuration);
-            services.AddSingleton<IAppDbContextConfigurator, AppDbContextConfigurator>();
-            services.AddDbContext<AppDbContext>();
+            services.AddOptions();
+            var databaseSetting = Configuration.GetRequiredSection("DatabaseSetting");
+            services.Configure<DatabaseSetting>(databaseSetting);
+            
+            services.AddPooledDbContextFactory<AppDbContext>(opt => {
+                if (Environment.IsDevelopment()) opt.EnableSensitiveDataLogging();
+                opt.UseNpgsql(DatabaseConnection.GetConnectionString(databaseSetting.Get<DatabaseSetting>()));
+            });
+
+            //services.AddDbContext<AppDbContext>();
+            services.AddScoped<AppDbContext>(x =>
+                x.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext()
+            );
         }
 
         private void AddAppIdentity(IServiceCollection services, IWebHostEnvironment env)

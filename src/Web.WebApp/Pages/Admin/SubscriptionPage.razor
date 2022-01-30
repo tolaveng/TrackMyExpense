@@ -4,7 +4,7 @@
 @using Core.Application.Common
 @using Core.Application.IRepositories
 @using Core.Application.Models
-@using Core.Application.Subscriptions
+@using Core.Application.Mediator.Subscriptions
 @using Core.Domain.Constants
 @using System.Linq.Expressions
 @using Core.Domain.Entities
@@ -18,10 +18,10 @@
 
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
-    <Breadcrumb IsAdmin="true">
-        <BreadcrumbItem Icon="@Icons.Filled.People" Title="Accounts" Href="/admin/users" />
-        <BreadcrumbItem Icon="@Icons.Filled.CreditCard" Title="Subscriptions" />
-    </Breadcrumb>
+    <Breadcrumbs IsAdmin="true">
+        <BreadcrumbsItem Icon="@Icons.Filled.People" Title="Users" Href="/admin/users" />
+        <BreadcrumbsItem Icon="@Icons.Filled.CreditCard" Title="Subscriptions" />
+    </Breadcrumbs>
 
     <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<SubscriptionDto>>>(ServerReload))"
         Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
