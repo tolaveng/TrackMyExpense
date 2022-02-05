@@ -12,10 +12,6 @@
 @using MediatR
 @using Web.WebApp.Components.Dialogs
 
-@inject IDialogService Dialog
-@inject NavigationManager NavigationManager;
-@inject IMediator Mediator;
-
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs IsAdmin="true">
@@ -62,7 +58,7 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
                     Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
-                    Title="Edit" Color="Color.Primary" OnClick="@(() => DeleteRow(context.Id))" />
+                    Title="Delete" OnClick="@(() => DeleteRow(context.Id))" />
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
@@ -79,6 +75,11 @@
 </MudContainer>
 
 @code {
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] IDialogService Dialog { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
     [Parameter]
     public string UserId { get; set; }
 
@@ -153,11 +154,11 @@
                 if (deleted)
                 {
                     await table.ReloadServerData();
-                    await Dialog.ShowMessageBox("Success", "Subscription has been deleted.", yesText:"Close");   
+                    Snackbar.Add("Subscription has been deleted successfully.", Severity.Success);
                 }
             } catch (Exception)
             {
-                await Dialog.ShowMessageBox("Error", "Sorry, something went wrong.", yesText:"Close");
+                Snackbar.Add("Sorry, cannot delete the subscription. Please try again later", Severity.Error);
             }
         }
     }

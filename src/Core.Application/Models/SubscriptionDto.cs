@@ -24,9 +24,9 @@ namespace Core.Application.Models
         public bool IsCanceled { get; set; }
     }
 
-    public class SubscriptionDtoValidator : AbstractValidator<SubscriptionDto>
+    public class SubscriptionValidator : AbstractValidator<SubscriptionDto>
     {
-        public SubscriptionDtoValidator()
+        public SubscriptionValidator()
         {
             RuleFor(x => x.PaidAmount)
                 .NotEmpty().When(x => x.SubscriptionType == SubscriptionType.Monthly || x.SubscriptionType == SubscriptionType.Yearly)

@@ -1,0 +1,206 @@
+﻿@page "/admin/budgetjars"
+@using Core.Application.Mediator.BudgetJars
+@using Core.Application.Models
+@using MediatR;
+@using Web.WebApp.Components.Dialogs
+
+
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumbs IsAdmin="true">
+        <BreadcrumbsItem Title="Budget Jars"  Icon="@Icons.Filled.Paid" />
+    </Breadcrumbs>
+
+    <MudCard>
+        <MudCardContent>
+            <MudForm Model="@model" @ref="@form">
+            <MudTable Items="@BudgetJars" Hover="true" Loading="isLoading" CanCancelEdit="true"
+              SortLabel="Sort By" CommitEditTooltip="Save Change" CustomFooter="true"
+              RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+              RowEditCommit="CommitChange" IsEditRowSwitchingBlocked="false" >
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BudgetJarDto, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BudgetJarDto, object>(x=>x.Percentage)">Percentage</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<BudgetJarDto, object>(x=>x.IconName)">Icon Name</MudTableSortLabel></MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Percentage">@context.Percentage %</MudTd>
+                    <MudTd DataLabel="IconName">@context.IconName</MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
+                        Title="Delete" OnClick="@(() => DeleteRow(context.Id))" />
+                    </MudTd>
+                </RowTemplate>
+                <RowEditingTemplate>
+                    <MudTd DataLabel="Name">
+                        <MudTextField @bind-Value="@context.Name" Required />
+                    </MudTd>
+                    <MudTd DataLabel="Percentage">
+                        <MudTextField @bind-Value="@context.Percentage" Required />
+                    </MudTd>
+                    <MudTd DataLabel="Icon Name">
+                        <MudTextField @bind-Value="@context.IconName" />
+                    </MudTd>
+                </RowEditingTemplate>
+                <FooterContent>
+                    <MudTd><MudTextField @bind-Value="model.Name" Validation="@(validator.ValidateValue)"
+                        For="@(() => model.Name)" Immediate="true" Label="Name" /></MudTd>
+
+                    <MudTd><MudTextField @bind-Value="model.Percentage" Validation="@(validator.ValidateValue)"
+                        For="@(() => model.Percentage)" Immediate="true" Label="Percentage" /></MudTd>
+
+                    <MudTd><MudTextField @bind-Value="model.IconName" Validation="@(validator.ValidateValue)"
+                        For="@(() => model.IconName)" Immediate="true" Label="Icon Name" /></MudTd>
+
+                    <MudTd>
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" Style="text-transform:none"
+                        Size="Size.Small" Color="Color.Primary" OnClick="@(async () => await Submit())">
+                            Add
+                        </MudButton>
+                    </MudTd>
+                </FooterContent>
+            </MudTable>
+            </MudForm>
+        </MudCardContent>
+        <MudCardActions>      
+        </MudCardActions>
+        <MudOverlay Visible="isLoading" DarkBackground="true" AutoClose="false" Absolute="true">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true"/>
+    </MudOverlay>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] IDialogService Dialog { get; set; }
+
+    private bool isLoading = false;
+    private List<BudgetJarDto> BudgetJars = new List<BudgetJarDto>();
+
+    private MudForm form;
+    private BudgetJarDto model = new BudgetJarDto();
+
+    private BudgetJarValidator validator = new BudgetJarValidator();
+
+    private BudgetJarDto elementBeforeEdit;
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+        {
+            Name = ((BudgetJarDto)element).Name,
+            Percentage = ((BudgetJarDto)element).Percentage,
+            IconName = ((BudgetJarDto)element).IconName
+        };
+    }
+
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((BudgetJarDto)element).Name = elementBeforeEdit.Name;
+        ((BudgetJarDto)element).Percentage = elementBeforeEdit.Percentage;
+        ((BudgetJarDto)element).IconName = elementBeforeEdit.IconName;
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        isLoading = true;
+        BudgetJars = await Mediator.Send(new GetBudgetJarsQuery(true));
+        isLoading = false;
+    }
+
+    private void CommitChange(object element)
+    {
+        isLoading = true;
+        StateHasChanged();
+        var budgetJar = (BudgetJarDto)element;
+        InvokeAsync(async () => {
+            var saved = await SaveChange(budgetJar);
+            if (!saved)
+            {
+                budgetJar.Name = elementBeforeEdit.Name;
+                budgetJar.Percentage = elementBeforeEdit.Percentage;
+                budgetJar.IconName = elementBeforeEdit.IconName;
+            }
+            isLoading = false;
+            StateHasChanged();
+        });
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+        if (!form.IsValid) return;
+        isLoading = true;
+        await SaveChange(model);
+        isLoading = false;
+    }
+
+    private async Task<bool> SaveChange(BudgetJarDto budgetJar)
+    {
+        Snackbar.Clear();
+        try
+        {
+            // 100% sum
+            var sumPercents = BudgetJars.Sum(x => x.Percentage);
+            if (sumPercents > 100)
+            {
+                Snackbar.Add("Total of all percentages cannot be greater than 100.", Severity.Error);
+                return false;
+            }
+            if (budgetJar.Id == null || budgetJar.Id == Guid.Empty)
+            {
+                if (sumPercents + budgetJar.Percentage > 100)
+                {
+                    Snackbar.Add("Total of all percentages cannot be greater than 100.", Severity.Error);
+                    return false;
+                }
+            }
+
+            budgetJar.IsSystem = true;
+            var savedId = await Mediator.Send(new SaveBudgetJarCommand(budgetJar));
+
+            // update UI
+            if (BudgetJars.All(x => x.Id != savedId))
+            {
+                budgetJar.Id = savedId;
+                BudgetJars.Add(BudgetJarDto.Copy(budgetJar));
+            }
+            form.Reset();
+            Snackbar.Add("Budget Jar saved successfully", Severity.Success);
+            return true;
+        }
+        catch(Exception ex)
+        {
+            Snackbar.Add("Something went wrong, please try again later", Severity.Error);
+            return false;
+        }
+    }
+
+    private async Task DeleteRow(Guid id)
+    {
+        var dialogParams = new DialogParameters() {
+            ["Message"] = "Are you sure you want to delete this budget jar?",
+            ["Color"] = Color.Error,
+            ["PrimaryButtonText"] = "Delete"
+        };
+        var dialog = Dialog.Show<ConfirmDialog>("Delete Budget Jar", dialogParams);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            try
+            {
+                var deleted = await Mediator.Send(new DeleteBudgetJarCommand(id));
+                if (deleted)
+                {
+                    BudgetJars.Remove(BudgetJars.Single(x => x.Id == id));
+                    StateHasChanged();
+                    Snackbar.Add("Budget Jar has been deleted successfully.", Severity.Success);
+                }
+            } catch (Exception)
+            {
+                Snackbar.Add("Sorry, cannot delete the budget jar. Please try again later", Severity.Error);
+            }
+        }
+    }
+}

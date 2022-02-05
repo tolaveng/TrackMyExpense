@@ -18,7 +18,7 @@
     <DialogContent>
         <EditForm EditContext="@editContext">
             <DataAnnotationsValidator/>
-            <FluentValidationValidator T="SubscriptionDto" TValidator="SubscriptionDtoValidator" />
+            <FluentValidationValidator T="SubscriptionDto" TValidator="SubscriptionValidator" />
             <MudGrid>
                 <MudItem xs="12" sm="6">
                     <MudSelect @bind-Value="@InputModel.SubscriptionType" Label="Subscription"  For="@(() => InputModel.SubscriptionType)">

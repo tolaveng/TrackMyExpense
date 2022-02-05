@@ -12,6 +12,7 @@ namespace Core.Application.IRepositories
         IGenericRepository<SysAttribute> SysAttributeRepository { get; }
         IGenericRepository<PageHtml> PageHtmlRepository { get; }
         IGenericRepository<Subscription> SubscriptionRepository { get; }
+        IGenericRepository<BudgetJar> BudgetJarRepository { get; }
         IGenericRepository<Expense> ExpenseRepository { get; }
         IGenericRepository<Category> CategoryRepository { get; }
         Task SaveAsync();
