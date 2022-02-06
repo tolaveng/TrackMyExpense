@@ -17,9 +17,11 @@ namespace Core.Infrastructure.Repository
         private IGenericRepository<SysAttribute> _sysAttributeRepository;
         private IGenericRepository<PageHtml> _pageHtmlRepository;
         private IGenericRepository<BudgetJar> _budgetJarRepository;
+        private IGenericRepository<BudgetJarTemplate> _budgetJarTemplateRepository;
         private IGenericRepository<Subscription> _subscriptionRepository;
         private IGenericRepository<Expense> _expenseRepository;
         private IGenericRepository<Category> _categoryRepository;
+        private IGenericRepository<Icon> _iconRepository;
 
         public UnitOfWork(IDbContextFactory<AppDbContext> dbContextFactory)
         {
@@ -29,9 +31,11 @@ namespace Core.Infrastructure.Repository
         public IGenericRepository<SysAttribute> SysAttributeRepository => _sysAttributeRepository ??= new GenericRepository<SysAttribute>(_context);
         public IGenericRepository<PageHtml> PageHtmlRepository => _pageHtmlRepository ??= new GenericRepository<PageHtml>(_context);
         public IGenericRepository<BudgetJar> BudgetJarRepository => _budgetJarRepository ??= new GenericRepository<BudgetJar>(_context);
+        public IGenericRepository<BudgetJarTemplate> BudgetJarTemplateRepository => _budgetJarTemplateRepository ??= new GenericRepository<BudgetJarTemplate>(_context);
         public IGenericRepository<Subscription> SubscriptionRepository => _subscriptionRepository ??= new GenericRepository<Subscription>(_context);
         public IGenericRepository<Expense> ExpenseRepository => _expenseRepository ??= new GenericRepository<Expense>(_context);
         public IGenericRepository<Category> CategoryRepository => _categoryRepository ??= new GenericRepository<Category>(_context);
+        public IGenericRepository<Icon> IconRepository => _iconRepository ??= new GenericRepository<Icon>(_context);
 
         private bool disposed = false;
 

@@ -25,13 +25,14 @@ namespace Core.Infrastructure.Database
 
         public DbSet<SysAttribute> SysAttributes { get; set; }
         public DbSet<PageHtml> PageHtmls { get; set; }
+        public DbSet<BudgetJarTemplate> BudgetJarTemplates { get; set; }
         public DbSet<BudgetJar> BudgetJars { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Income> Incomes { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<RecurrentExpense> RecurrentExpenses { get; set; }
-
+        public DbSet<Icon> Icons { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,10 +63,13 @@ namespace Core.Infrastructure.Database
             modelBuilder.Entity<AppIdentityUser>().HasMany(x => x.Subscriptions).WithOne().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<RecurrentExpense>().HasMany(x => x.Categories).WithOne().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<BudgetJarTemplate>().HasOne(x => x.Icon);
+            modelBuilder.Entity<BudgetJar>().HasOne(x => x.Icon);
 
             // Seed Default Data
             modelBuilder.ApplyConfiguration(new AppRoleConfig());
-            modelBuilder.ApplyConfiguration(new BudgetJarDefaultConfig());
+            modelBuilder.ApplyConfiguration(new IconConfig());
+            modelBuilder.ApplyConfiguration(new BudgetJarTemplateConfig());
         }
     }
 }

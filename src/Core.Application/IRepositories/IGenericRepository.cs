@@ -14,16 +14,16 @@ namespace Core.Application.IRepositories
 
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-            List<string>? includes = null
+            string[]? includes = null
             );
 
         Task<IEnumerable<T>> GetPagedAsync(int page, int pageSize,
             Expression<Func<T, bool>>? expression = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-            List<string>? includes = null
+            string[]? includes = null
             );
 
-        Task<T> GetAsync(Expression<Func<T, bool>> expression, List<string>? includes = null);
+        Task<T> GetAsync(Expression<Func<T, bool>> expression, string[]? includes = null);
         Task<bool> InsertAsync(T entity);
         Task<bool> InsertRangeAsync(IEnumerable<T> entities);
         bool Update(T entity);

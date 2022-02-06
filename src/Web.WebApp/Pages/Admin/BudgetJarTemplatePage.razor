@@ -1,6 +1,8 @@
-﻿@page "/admin/budgetjars"
+﻿@page "/admin/budgetjartemplates"
 @using Core.Application.Mediator.BudgetJars
+@using Core.Application.Mediator.Icons
 @using Core.Application.Models
+@using Core.Domain.Enums
 @using MediatR;
 @using Web.WebApp.Components.Dialogs
 
@@ -18,15 +20,15 @@
               RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
               RowEditCommit="CommitChange" IsEditRowSwitchingBlocked="false" >
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BudgetJarDto, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<BudgetJarDto, object>(x=>x.Percentage)">Percentage</MudTableSortLabel></MudTh>
-                    <MudTh><MudTableSortLabel SortBy="new Func<BudgetJarDto, object>(x=>x.IconName)">Icon Name</MudTableSortLabel></MudTh>
-                    <MudTh></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BudgetJarTemplateDto, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
+                    <MudTh Style="width: 100px"><MudTableSortLabel SortBy="new Func<BudgetJarTemplateDto, object>(x=>x.Percentage)">Percentage</MudTableSortLabel></MudTh>
+                    <MudTh Style="width: 250px">Icon</MudTh>
+                    <MudTh>Action</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Percentage">@context.Percentage %</MudTd>
-                    <MudTd DataLabel="IconName">@context.IconName</MudTd>
+                    <MudTd DataLabel="IconName">@context.Icon.Name</MudTd>
                     <MudTd>
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
                         Title="Delete" OnClick="@(() => DeleteRow(context.Id))" />
@@ -39,8 +41,14 @@
                     <MudTd DataLabel="Percentage">
                         <MudTextField @bind-Value="@context.Percentage" Required />
                     </MudTd>
-                    <MudTd DataLabel="Icon Name">
-                        <MudTextField @bind-Value="@context.IconName" />
+                    <MudTd DataLabel="Icon">
+                        <MudSelect @bind-Value="@context.IconId" Label="Icon" Style="width: 250px">
+                        @foreach(var icon in IconAssets)
+                            {
+                             <MudSelectItem Value="@(icon.Id)">
+                                <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
+                            }
+                        </MudSelect>
                     </MudTd>
                 </RowEditingTemplate>
                 <FooterContent>
@@ -49,10 +57,15 @@
 
                     <MudTd><MudTextField @bind-Value="model.Percentage" Validation="@(validator.ValidateValue)"
                         For="@(() => model.Percentage)" Immediate="true" Label="Percentage" /></MudTd>
-
-                    <MudTd><MudTextField @bind-Value="model.IconName" Validation="@(validator.ValidateValue)"
-                        For="@(() => model.IconName)" Immediate="true" Label="Icon Name" /></MudTd>
-
+                    <MudTd>
+                        <MudSelect @bind-Value="model.IconId" Label="Icon" Style="width: 250px">
+                        @foreach(var icon in IconAssets)
+                            {
+                             <MudSelectItem Value="@icon.Id">
+                                <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudTd>
                     <MudTd>
                         <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" Style="text-transform:none"
                         Size="Size.Small" Color="Color.Primary" OnClick="@(async () => await Submit())">
@@ -62,6 +75,7 @@
                 </FooterContent>
             </MudTable>
             </MudForm>
+
         </MudCardContent>
         <MudCardActions>      
         </MudCardActions>
@@ -77,52 +91,66 @@
     [Inject] IDialogService Dialog { get; set; }
 
     private bool isLoading = false;
-    private List<BudgetJarDto> BudgetJars = new List<BudgetJarDto>();
+    private Guid otherIconId;
+    private List<BudgetJarTemplateDto> BudgetJars = new List<BudgetJarTemplateDto>();
+    private List<IconDto> IconAssets = new List<IconDto>();
 
     private MudForm form;
-    private BudgetJarDto model = new BudgetJarDto();
+    private BudgetJarTemplateDto model = new BudgetJarTemplateDto();
 
-    private BudgetJarValidator validator = new BudgetJarValidator();
+    private BudgetJarTemplateValidator validator = new BudgetJarTemplateValidator();
 
-    private BudgetJarDto elementBeforeEdit;
+    private BudgetJarTemplateDto elementBeforeEdit;
     private void BackupItem(object element)
     {
         elementBeforeEdit = new()
         {
-            Name = ((BudgetJarDto)element).Name,
-            Percentage = ((BudgetJarDto)element).Percentage,
-            IconName = ((BudgetJarDto)element).IconName
+            Name = ((BudgetJarTemplateDto)element).Name,
+            Percentage = ((BudgetJarTemplateDto)element).Percentage,
+            IconId = ((BudgetJarTemplateDto)element).IconId
         };
     }
 
     private void ResetItemToOriginalValues(object element)
     {
-        ((BudgetJarDto)element).Name = elementBeforeEdit.Name;
-        ((BudgetJarDto)element).Percentage = elementBeforeEdit.Percentage;
-        ((BudgetJarDto)element).IconName = elementBeforeEdit.IconName;
+        ((BudgetJarTemplateDto)element).Name = elementBeforeEdit.Name;
+        ((BudgetJarTemplateDto)element).Percentage = elementBeforeEdit.Percentage;
+        ((BudgetJarTemplateDto)element).IconId = elementBeforeEdit.IconId;
     }
 
     protected async override Task OnInitializedAsync()
     {
         isLoading = true;
-        BudgetJars = await Mediator.Send(new GetBudgetJarsQuery(true));
+        BudgetJars = await Mediator.Send(new GetBudgetJarTemplatesQuery(true));
+        IconAssets = await Mediator.Send(new GetIconsQuery(IconCategory.BudgetJar));
+
+        // other icon
+        var otherIcon = IconAssets.FirstOrDefault(x => x.Name == "Others");
+        if (otherIcon != null && model.IconId == Guid.Empty)
+        {
+            otherIconId = otherIcon.Id;
+            model.IconId = otherIconId;
+        }
         isLoading = false;
     }
+
 
     private void CommitChange(object element)
     {
         isLoading = true;
         StateHasChanged();
-        var budgetJar = (BudgetJarDto)element;
+        var budgetJar = (BudgetJarTemplateDto)element;
         InvokeAsync(async () => {
             var saved = await SaveChange(budgetJar);
             if (!saved)
             {
                 budgetJar.Name = elementBeforeEdit.Name;
                 budgetJar.Percentage = elementBeforeEdit.Percentage;
-                budgetJar.IconName = elementBeforeEdit.IconName;
+                budgetJar.IconId = elementBeforeEdit.IconId;
             }
             isLoading = false;
+            // hack icon
+            model.IconId = otherIconId;
             StateHasChanged();
         });
     }
@@ -133,10 +161,13 @@
         if (!form.IsValid) return;
         isLoading = true;
         await SaveChange(model);
+
+        model = new BudgetJarTemplateDto();
+        model.IconId = otherIconId;
         isLoading = false;
     }
 
-    private async Task<bool> SaveChange(BudgetJarDto budgetJar)
+    private async Task<bool> SaveChange(BudgetJarTemplateDto budgetJar)
     {
         Snackbar.Clear();
         try
@@ -158,13 +189,14 @@
             }
 
             budgetJar.IsSystem = true;
-            var savedId = await Mediator.Send(new SaveBudgetJarCommand(budgetJar));
+            budgetJar.Icon = IconAssets.Single(x => x.Id == budgetJar.IconId);
+            var savedId = await Mediator.Send(new SaveBudgetJarTemplateCommand(budgetJar));
 
             // update UI
             if (BudgetJars.All(x => x.Id != savedId))
             {
                 budgetJar.Id = savedId;
-                BudgetJars.Add(BudgetJarDto.Copy(budgetJar));
+                BudgetJars.Add(BudgetJarTemplateDto.Copy(budgetJar));
             }
             form.Reset();
             Snackbar.Add("Budget Jar saved successfully", Severity.Success);
@@ -190,7 +222,7 @@
         {
             try
             {
-                var deleted = await Mediator.Send(new DeleteBudgetJarCommand(id));
+                var deleted = await Mediator.Send(new DeleteBudgetJarTemplateCommand(id));
                 if (deleted)
                 {
                     BudgetJars.Remove(BudgetJars.Single(x => x.Id == id));

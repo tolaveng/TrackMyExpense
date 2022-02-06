@@ -11,6 +11,23 @@ namespace Core.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Icons",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    Path = table.Column<string>(type: "text", nullable: true),
+                    IconType = table.Column<int>(type: "integer", nullable: false),
+                    IconCategory = table.Column<int>(type: "integer", nullable: false),
+                    Ordinal = table.Column<int>(type: "integer", nullable: false),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Icons", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Incomes",
                 columns: table => new
                 {
@@ -97,22 +114,50 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BudgetJarTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Percentage = table.Column<int>(type: "integer", nullable: false),
+                    IsSystem = table.Column<bool>(type: "boolean", nullable: false),
+                    IconId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BudgetJarTemplates", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BudgetJarTemplates_Icons_IconId",
+                        column: x => x.IconId,
+                        principalTable: "Icons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BudgetJars",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IncomeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IncomeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Percentage = table.Column<int>(type: "integer", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    IconName = table.Column<string>(type: "text", nullable: true),
-                    IsSystem = table.Column<bool>(type: "boolean", nullable: false),
+                    IconId = table.Column<Guid>(type: "uuid", nullable: false),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BudgetJars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BudgetJars_Icons_IconId",
+                        column: x => x.IconId,
+                        principalTable: "Icons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BudgetJars_Incomes_IncomeId",
                         column: x => x.IncomeId,
@@ -393,16 +438,16 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "BudgetJars",
-                columns: new[] { "Id", "Amount", "Archived", "IconName", "IncomeId", "IsSystem", "Name", "Percentage", "UserId" },
+                table: "Icons",
+                columns: new[] { "Id", "Archived", "IconCategory", "IconType", "Name", "Ordinal", "Path" },
                 values: new object[,]
                 {
-                    { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), 0m, false, null, null, true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"), 0m, false, null, null, true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"), 0m, false, null, null, true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"), 0m, false, null, null, true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), 0m, false, null, null, true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"), 0m, false, null, null, true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") }
+                    { new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), false, 0, 0, "Financial Freedom", 5, "/assets/icons/financial-freedom.png" },
+                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, 0, 0, "Education", 4, "/assets/icons/education.png" },
+                    { new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), false, 0, 0, "Long Term Saving", 2, "/assets/icons/long-term-saving.png" },
+                    { new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), false, 0, 0, "Necessities", 1, "/assets/icons/necessities.png" },
+                    { new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"), false, 0, 0, "Others", 6, "/assets/icons/others.png" },
+                    { new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), false, 0, 0, "Wants", 3, "/assets/icons/wants.png" }
                 });
 
             migrationBuilder.InsertData(
@@ -410,8 +455,21 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "e242db02-7dcd-4b29-b937-4fe4c5c174e9", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "1bc3f309-b2d8-47ad-a2eb-ab06b91aaede", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "16047b73-f15a-4840-aaaf-a20e0203de48", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "a7ceb324-f453-4653-9e3a-a49ccf2c8de7", "admin", "ADMIN" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "BudgetJarTemplates",
+                columns: new[] { "Id", "Archived", "IconId", "IsSystem", "Name", "Percentage", "UserId" },
+                values: new object[,]
+                {
+                    { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), false, new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"), false, new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"), false, new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"), false, new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), false, new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"), false, new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"), true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -420,9 +478,19 @@ namespace Core.Infrastructure.Migrations
                 column: "ExpenseId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BudgetJars_IconId",
+                table: "BudgetJars",
+                column: "IconId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BudgetJars_IncomeId",
                 table: "BudgetJars",
                 column: "IncomeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BudgetJarTemplates_IconId",
+                table: "BudgetJarTemplates",
+                column: "IconId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_RecurrentExpenseId",
@@ -493,6 +561,9 @@ namespace Core.Infrastructure.Migrations
                 name: "Attachment");
 
             migrationBuilder.DropTable(
+                name: "BudgetJarTemplates");
+
+            migrationBuilder.DropTable(
                 name: "CategoryExpense");
 
             migrationBuilder.DropTable(
@@ -536,6 +607,9 @@ namespace Core.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "BudgetJars");
+
+            migrationBuilder.DropTable(
+                name: "Icons");
 
             migrationBuilder.DropTable(
                 name: "Incomes");

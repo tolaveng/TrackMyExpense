@@ -17,6 +17,8 @@ namespace Core.Application.Mapper
             CreateMap<PageHtml, PageHtmlDto>().ReverseMap();
             CreateMap<Subscription, SubscriptionDto>().ReverseMap();
             CreateMap<BudgetJar, BudgetJarDto>().ReverseMap();
+            CreateMap<BudgetJarTemplate, BudgetJarTemplateDto>().ReverseMap();
+            CreateMap<Icon, IconDto>().ReverseMap();
         }
     }
 }

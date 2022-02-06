@@ -79,10 +79,41 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("IconName")
-                        .HasColumnType("text");
+                    b.Property<Guid>("IconId")
+                        .HasColumnType("uuid");
 
-                    b.Property<Guid?>("IncomeId")
+                    b.Property<Guid>("IncomeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<int>("Percentage")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IconId");
+
+                    b.HasIndex("IncomeId");
+
+                    b.ToTable("BudgetJars");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.BudgetJarTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("IconId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsSystem")
@@ -100,16 +131,16 @@ namespace Core.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IncomeId");
+                    b.HasIndex("IconId");
 
-                    b.ToTable("BudgetJars");
+                    b.ToTable("BudgetJarTemplates");
 
                     b.HasData(
                         new
                         {
                             Id = new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"),
-                            Amount = 0m,
                             Archived = false,
+                            IconId = new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"),
                             IsSystem = true,
                             Name = "Necessities",
                             Percentage = 55,
@@ -118,8 +149,8 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"),
-                            Amount = 0m,
                             Archived = false,
+                            IconId = new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"),
                             IsSystem = true,
                             Name = "Long Term Saving",
                             Percentage = 10,
@@ -128,8 +159,8 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"),
-                            Amount = 0m,
                             Archived = false,
+                            IconId = new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"),
                             IsSystem = true,
                             Name = "Wants",
                             Percentage = 10,
@@ -138,8 +169,8 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"),
-                            Amount = 0m,
                             Archived = false,
+                            IconId = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
                             IsSystem = true,
                             Name = "Education",
                             Percentage = 10,
@@ -148,8 +179,8 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("eee63caf-e26a-4265-817c-259d47e14aba"),
-                            Amount = 0m,
                             Archived = false,
+                            IconId = new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"),
                             IsSystem = true,
                             Name = "Financial Freedom",
                             Percentage = 10,
@@ -158,8 +189,8 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"),
-                            Amount = 0m,
                             Archived = false,
+                            IconId = new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"),
                             IsSystem = true,
                             Name = "Others",
                             Percentage = 5,
@@ -252,6 +283,97 @@ namespace Core.Infrastructure.Migrations
                     b.HasIndex("BudgetJarId");
 
                     b.ToTable("Expenses");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Icon", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("IconCategory")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("IconType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Icons");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"),
+                            Archived = false,
+                            IconCategory = 0,
+                            IconType = 0,
+                            Name = "Necessities",
+                            Ordinal = 1,
+                            Path = "/assets/icons/necessities.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"),
+                            Archived = false,
+                            IconCategory = 0,
+                            IconType = 0,
+                            Name = "Long Term Saving",
+                            Ordinal = 2,
+                            Path = "/assets/icons/long-term-saving.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"),
+                            Archived = false,
+                            IconCategory = 0,
+                            IconType = 0,
+                            Name = "Wants",
+                            Ordinal = 3,
+                            Path = "/assets/icons/wants.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
+                            Archived = false,
+                            IconCategory = 0,
+                            IconType = 0,
+                            Name = "Education",
+                            Ordinal = 4,
+                            Path = "/assets/icons/education.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"),
+                            Archived = false,
+                            IconCategory = 0,
+                            IconType = 0,
+                            Name = "Financial Freedom",
+                            Ordinal = 5,
+                            Path = "/assets/icons/financial-freedom.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"),
+                            Archived = false,
+                            IconCategory = 0,
+                            IconType = 0,
+                            Name = "Others",
+                            Ordinal = 6,
+                            Path = "/assets/icons/others.png"
+                        });
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Income", b =>
@@ -474,14 +596,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "1bc3f309-b2d8-47ad-a2eb-ab06b91aaede",
+                            ConcurrencyStamp = "a7ceb324-f453-4653-9e3a-a49ccf2c8de7",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "e242db02-7dcd-4b29-b937-4fe4c5c174e9",
+                            ConcurrencyStamp = "16047b73-f15a-4840-aaaf-a20e0203de48",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -686,10 +808,30 @@ namespace Core.Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Domain.Entities.BudgetJar", b =>
                 {
+                    b.HasOne("Core.Domain.Entities.Icon", "Icon")
+                        .WithMany()
+                        .HasForeignKey("IconId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Domain.Entities.Income", null)
                         .WithMany("BudgetJars")
                         .HasForeignKey("IncomeId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Icon");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.BudgetJarTemplate", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Icon", "Icon")
+                        .WithMany()
+                        .HasForeignKey("IconId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Icon");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Category", b =>

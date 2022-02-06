@@ -71,7 +71,7 @@ namespace Core.Infrastructure.Repository
             return true;
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> expression, List<string> includes = null)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> expression, string[] includes = null)
         {
             IQueryable<T> query = _db;
             if (includes != null)
@@ -91,7 +91,7 @@ namespace Core.Infrastructure.Repository
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> expression = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string[] includes = null)
         {
             IQueryable<T> query = _db;
             if (expression != null)
@@ -115,7 +115,7 @@ namespace Core.Infrastructure.Repository
             return await query.AsNoTracking().ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetPagedAsync(int page, int pageSize, Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, List<string> includes = null)
+        public async Task<IEnumerable<T>> GetPagedAsync(int page, int pageSize, Expression<Func<T, bool>> expression = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string[] includes = null)
         {
             IQueryable<T> query = _db;
             if (expression != null)
