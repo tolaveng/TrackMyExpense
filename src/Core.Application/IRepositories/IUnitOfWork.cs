@@ -15,7 +15,7 @@ namespace Core.Application.IRepositories
         IGenericRepository<BudgetJar> BudgetJarRepository { get; }
         IGenericRepository<BudgetJarTemplate> BudgetJarTemplateRepository { get; }
         IGenericRepository<Expense> ExpenseRepository { get; }
-        IGenericRepository<Category> CategoryRepository { get; }
+        IGenericRepository<ExpenseGroup> ExpenseGroupRepository { get; }
         IGenericRepository<Icon> IconRepository { get; }
         Task SaveAsync();
     }

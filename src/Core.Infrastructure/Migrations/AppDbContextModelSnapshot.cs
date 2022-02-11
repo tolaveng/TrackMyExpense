@@ -22,21 +22,6 @@ namespace Core.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CategoryExpense", b =>
-                {
-                    b.Property<Guid>("CategoriesId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ExpensesId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("CategoriesId", "ExpensesId");
-
-                    b.HasIndex("ExpensesId");
-
-                    b.ToTable("CategoryExpense");
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Attachment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -188,40 +173,14 @@ namespace Core.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"),
+                            Id = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
                             Archived = false,
-                            IconId = new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"),
+                            IconId = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
                             IsSystem = true,
                             Name = "Others",
                             Percentage = 5,
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         });
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Category", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("CategoryName")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("IconName")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("RecurrentExpenseId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RecurrentExpenseId");
-
-                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
@@ -250,6 +209,9 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("ExpenseGroupId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsTaxable")
                         .HasColumnType("boolean");
@@ -282,7 +244,204 @@ namespace Core.Infrastructure.Migrations
 
                     b.HasIndex("BudgetJarId");
 
+                    b.HasIndex("ExpenseGroupId");
+
+                    b.HasIndex("PaidDate");
+
                     b.ToTable("Expenses");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.ExpenseGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("IconId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IconId");
+
+                    b.ToTable("ExpenseGroups");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"),
+                            Archived = false,
+                            IconId = new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"),
+                            IsSystem = true,
+                            Name = "Grocery",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("d6552f54-0c69-431e-9907-34147dd2c029"),
+                            Archived = false,
+                            IconId = new Guid("d6552f54-0c69-431e-9907-34147dd2c029"),
+                            IsSystem = true,
+                            Name = "Clothes",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
+                            Archived = false,
+                            IconId = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
+                            IsSystem = true,
+                            Name = "Education",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"),
+                            Archived = false,
+                            IconId = new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"),
+                            IsSystem = true,
+                            Name = "Eat Out",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"),
+                            Archived = false,
+                            IconId = new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"),
+                            IsSystem = true,
+                            Name = "Transport",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"),
+                            Archived = false,
+                            IconId = new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"),
+                            IsSystem = true,
+                            Name = "Utilities",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("6550b905-6763-4e97-9038-50ec50d68853"),
+                            Archived = false,
+                            IconId = new Guid("6550b905-6763-4e97-9038-50ec50d68853"),
+                            IsSystem = true,
+                            Name = "Medicines",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"),
+                            Archived = false,
+                            IconId = new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"),
+                            IsSystem = true,
+                            Name = "Investment",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"),
+                            Archived = false,
+                            IconId = new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"),
+                            IsSystem = true,
+                            Name = "Family",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"),
+                            Archived = false,
+                            IconId = new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"),
+                            IsSystem = true,
+                            Name = "Furniture",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"),
+                            Archived = false,
+                            IconId = new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"),
+                            IsSystem = true,
+                            Name = "Petro",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"),
+                            Archived = false,
+                            IconId = new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"),
+                            IsSystem = true,
+                            Name = "Car",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"),
+                            Archived = false,
+                            IconId = new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"),
+                            IsSystem = true,
+                            Name = "Insurance",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"),
+                            Archived = false,
+                            IconId = new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"),
+                            IsSystem = true,
+                            Name = "Toys",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"),
+                            Archived = false,
+                            IconId = new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"),
+                            IsSystem = true,
+                            Name = "Donate",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"),
+                            Archived = false,
+                            IconId = new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"),
+                            IsSystem = true,
+                            Name = "Households",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"),
+                            Archived = false,
+                            IconId = new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"),
+                            IsSystem = true,
+                            Name = "Gardens",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
+                            Archived = false,
+                            IconId = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
+                            IsSystem = true,
+                            Name = "Others",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        });
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Icon", b =>
@@ -294,22 +453,25 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("IconCategory")
-                        .HasColumnType("integer");
-
                     b.Property<int>("IconType")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
-
-                    b.Property<int>("Ordinal")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Path")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Icons");
 
@@ -318,60 +480,360 @@ namespace Core.Infrastructure.Migrations
                         {
                             Id = new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"),
                             Archived = false,
-                            IconCategory = 0,
                             IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
                             Name = "Necessities",
-                            Ordinal = 1,
                             Path = "/assets/icons/necessities.png"
                         },
                         new
                         {
                             Id = new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"),
                             Archived = false,
-                            IconCategory = 0,
                             IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
                             Name = "Long Term Saving",
-                            Ordinal = 2,
                             Path = "/assets/icons/long-term-saving.png"
                         },
                         new
                         {
                             Id = new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"),
                             Archived = false,
-                            IconCategory = 0,
                             IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
                             Name = "Wants",
-                            Ordinal = 3,
                             Path = "/assets/icons/wants.png"
                         },
                         new
                         {
                             Id = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
                             Archived = false,
-                            IconCategory = 0,
                             IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
                             Name = "Education",
-                            Ordinal = 4,
                             Path = "/assets/icons/education.png"
                         },
                         new
                         {
                             Id = new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"),
                             Archived = false,
-                            IconCategory = 0,
                             IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
                             Name = "Financial Freedom",
-                            Ordinal = 5,
                             Path = "/assets/icons/financial-freedom.png"
                         },
                         new
                         {
-                            Id = new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"),
+                            Id = new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"),
                             Archived = false,
-                            IconCategory = 0,
                             IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Grocery",
+                            Path = "/assets/icons/grocery.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("d6552f54-0c69-431e-9907-34147dd2c029"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Clothes",
+                            Path = "/assets/icons/clothes.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Eat Out",
+                            Path = "/assets/icons/eat-out.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Transport",
+                            Path = "/assets/icons/transport.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Utilities",
+                            Path = "/assets/icons/utilities.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("6550b905-6763-4e97-9038-50ec50d68853"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Medicines",
+                            Path = "/assets/icons/medicine.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Investment",
+                            Path = "/assets/icons/investment.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Family",
+                            Path = "/assets/icons/family.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Furniture",
+                            Path = "/assets/icons/furniture.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Petro",
+                            Path = "/assets/icons/petro.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Car",
+                            Path = "/assets/icons/car.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Insurance",
+                            Path = "/assets/icons/insurance.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Toys",
+                            Path = "/assets/icons/toy.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Donate",
+                            Path = "/assets/icons/donate.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Households",
+                            Path = "/assets/icons/household-items.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Gardens",
+                            Path = "/assets/icons/garden.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("05269476-13c6-451d-9259-5bcf2480ef1e"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Baby",
+                            Path = "/assets/icons/baby.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("4006be63-25d4-4425-9702-2ba10dc721bb"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Travel",
+                            Path = "/assets/icons/travel.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("52afbf57-54d3-4fe6-a680-40375679b5ff"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Holiday",
+                            Path = "/assets/icons/holiday.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("9392f6a9-f9aa-4d9e-9ab2-8d89ba455ea9"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Vaccation",
+                            Path = "/assets/icons/vaccation.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("56f4421e-10b6-4940-b594-01de569fde12"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Saving",
+                            Path = "/assets/icons/Saving.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("79cf43bd-c6d4-4834-b677-52c9b359473e"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Honey Moon",
+                            Path = "/assets/icons/honeymoon.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("4bb8d462-187a-4370-bb1e-e0fb99d233e0"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Bakery",
+                            Path = "/assets/icons/bakery.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("476501c2-92df-4e9f-a863-dfd93dd937c0"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Marry",
+                            Path = "/assets/icons/marry.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("2f67a4c3-7186-47da-9ead-407be93a675e"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Gas",
+                            Path = "/assets/icons/gas.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("b028a67a-b2e3-44a7-953f-de1c0959262b"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Electricity",
+                            Path = "/assets/icons/electricity.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("f0ffaf46-dde9-47e0-a9f1-d64785d4dfe7"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Gift",
+                            Path = "/assets/icons/gift.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("e1fc64f8-3154-4880-9732-37b5615592bd"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Shirt",
+                            Path = "/assets/icons/shirt.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("8470c1bc-d85c-4f94-9133-b1ba2945f7f2"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Jeans",
+                            Path = "/assets/icons/jeans.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("eff825bc-673f-43e3-a422-1df323bf274d"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
+                            Name = "Tools",
+                            Path = "/assets/icons/tools.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            IsSystem = true,
                             Name = "Others",
-                            Ordinal = 6,
                             Path = "/assets/icons/others.png"
                         });
                 });
@@ -447,6 +909,9 @@ namespace Core.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("ExpenseGroupId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("FinishDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -480,6 +945,8 @@ namespace Core.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BudgetJarId");
+
+                    b.HasIndex("ExpenseGroupId");
 
                     b.ToTable("RecurrentExpenses");
                 });
@@ -596,14 +1063,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "a7ceb324-f453-4653-9e3a-a49ccf2c8de7",
+                            ConcurrencyStamp = "5e422d18-2f9b-4143-ac14-eadce3415156",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "16047b73-f15a-4840-aaaf-a20e0203de48",
+                            ConcurrencyStamp = "d16c45b7-a990-4309-9cd3-eaf317c1184e",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -783,21 +1250,6 @@ namespace Core.Infrastructure.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CategoryExpense", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.Category", null)
-                        .WithMany()
-                        .HasForeignKey("CategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.Expense", null)
-                        .WithMany()
-                        .HasForeignKey("ExpensesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Attachment", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Expense", null)
@@ -811,7 +1263,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Icon", "Icon")
                         .WithMany()
                         .HasForeignKey("IconId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Income", null)
@@ -834,14 +1286,6 @@ namespace Core.Infrastructure.Migrations
                     b.Navigation("Icon");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Category", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.RecurrentExpense", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("RecurrentExpenseId")
-                        .OnDelete(DeleteBehavior.SetNull);
-                });
-
             modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
                 {
                     b.HasOne("Core.Domain.Entities.BudgetJar", "BudgetJar")
@@ -850,7 +1294,26 @@ namespace Core.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.ExpenseGroup", "ExpenseGroup")
+                        .WithMany()
+                        .HasForeignKey("ExpenseGroupId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.Navigation("BudgetJar");
+
+                    b.Navigation("ExpenseGroup");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.ExpenseGroup", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.Icon", "Icon")
+                        .WithMany()
+                        .HasForeignKey("IconId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Icon");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.RecurrentExpense", b =>
@@ -861,7 +1324,15 @@ namespace Core.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
+                    b.HasOne("Core.Domain.Entities.ExpenseGroup", "ExpenseGroup")
+                        .WithMany()
+                        .HasForeignKey("ExpenseGroupId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.Navigation("BudgetJar");
+
+                    b.Navigation("ExpenseGroup");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Subscription", b =>
@@ -932,11 +1403,6 @@ namespace Core.Infrastructure.Migrations
             modelBuilder.Entity("Core.Domain.Entities.Income", b =>
                 {
                     b.Navigation("BudgetJars");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.RecurrentExpense", b =>
-                {
-                    b.Navigation("Categories");
                 });
 
             modelBuilder.Entity("Core.Infrastructure.Database.Identity.AppIdentityUser", b =>

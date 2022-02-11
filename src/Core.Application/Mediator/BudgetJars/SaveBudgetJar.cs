@@ -37,6 +37,7 @@ namespace Core.Application.Mediator.BudgetJars
             if (budgetJar.Id == Guid.Empty)
             {
                 budgetJar.Id = Guid.NewGuid();
+                budgetJar.Icon = null;  // prevent adding new icon
                 await _unitOfWork.BudgetJarRepository.InsertAsync(budgetJar);
             }
             else

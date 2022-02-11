@@ -1,5 +1,5 @@
-﻿@page "/admin/budgetjartemplates"
-@using Core.Application.Mediator.BudgetJars
+﻿@page "/admin/expense-groups"
+@using Core.Application.Mediator.Categories
 @using Core.Application.Mediator.Icons
 @using Core.Application.Models
 @using Core.Domain.Enums
@@ -9,25 +9,23 @@
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs IsAdmin="true">
-        <BreadcrumbsItem Title="Budget Jars"  Icon="@Icons.Filled.Paid" />
+        <BreadcrumbsItem Title="Expense Groups"  Icon="@Icons.Filled.Category" />
     </Breadcrumbs>
 
     <MudCard>
         <MudCardContent>
             <MudForm Model="@model" @ref="@form">
-            <MudTable Items="@BudgetJars" Hover="true" Loading="isLoading" CanCancelEdit="true"
+            <MudTable Items="@expenseGroups" Hover="true" Loading="isLoading" CanCancelEdit="true"
               SortLabel="Sort By" CommitEditTooltip="Save Change" CustomFooter="true"
               RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
               RowEditCommit="CommitChange" IsEditRowSwitchingBlocked="false" >
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BudgetJarTemplateDto, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
-                    <MudTh Style="width: 100px"><MudTableSortLabel SortBy="new Func<BudgetJarTemplateDto, object>(x=>x.Percentage)">Percentage</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ExpenseGroupDto, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
                     <MudTh Style="width: 250px">Icon</MudTh>
                     <MudTh>Actions</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
-                    <MudTd DataLabel="Percentage">@context.Percentage %</MudTd>
                     <MudTd DataLabel="IconName">
                         <img src=".@context.Icon.Path" height="24" width="24" class="mr-2" />
                         @context.Icon.Name
@@ -41,12 +39,9 @@
                     <MudTd DataLabel="Name">
                         <MudTextField @bind-Value="@context.Name" Required />
                     </MudTd>
-                    <MudTd DataLabel="Percentage">
-                        <MudTextField @bind-Value="@context.Percentage" Required />
-                    </MudTd>
                     <MudTd DataLabel="Icon">
                         <MudSelect @bind-Value="@context.IconId" Label="Icon" Style="width: 250px">
-                        @foreach(var icon in IconAssets)
+                            @foreach(var icon in iconAssets)
                             {
                              <MudSelectItem Value="@(icon.Id)">
                                 <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
@@ -57,13 +52,10 @@
                 <FooterContent>
                     <MudTd><MudTextField @bind-Value="model.Name" Validation="@(validator.ValidateValue)"
                         For="@(() => model.Name)" Immediate="true" Label="Name" /></MudTd>
-
-                    <MudTd><MudTextField @bind-Value="model.Percentage" Validation="@(validator.ValidateValue)"
-                        For="@(() => model.Percentage)" Immediate="true" Label="Percentage" /></MudTd>
                     <MudTd>
                         <MudSelect @bind-Value="model.IconId" Label="Icon" Style="width: 250px">
                             <MudSelectItem Value="@Guid.Empty">Select Icon</MudSelectItem>
-                            @foreach(var icon in IconAssets)
+                            @foreach(var icon in iconAssets)
                             {
                              <MudSelectItem Value="@icon.Id">
                                 <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
@@ -95,37 +87,35 @@
     [Inject] IDialogService Dialog { get; set; }
 
     private bool isLoading = false;
-    private List<BudgetJarTemplateDto> BudgetJars = new List<BudgetJarTemplateDto>();
-    private List<IconDto> IconAssets = new List<IconDto>();
+    private List<ExpenseGroupDto> expenseGroups = new List<ExpenseGroupDto>();
+    private List<IconDto> iconAssets = new List<IconDto>();
 
     private MudForm form;
-    private BudgetJarTemplateDto model = new BudgetJarTemplateDto();
+    private ExpenseGroupDto model = new ExpenseGroupDto();
 
-    private BudgetJarTemplateValidator validator = new BudgetJarTemplateValidator();
+    private ExpenseGroupValidator validator = new ExpenseGroupValidator();
 
-    private BudgetJarTemplateDto elementBeforeEdit;
+    private ExpenseGroupDto elementBeforeEdit;
     private void BackupItem(object element)
     {
         elementBeforeEdit = new()
         {
-            Name = ((BudgetJarTemplateDto)element).Name,
-            Percentage = ((BudgetJarTemplateDto)element).Percentage,
-            IconId = ((BudgetJarTemplateDto)element).IconId
+            Name = ((ExpenseGroupDto)element).Name,
+            IconId = ((ExpenseGroupDto)element).IconId
         };
     }
 
     private void ResetItemToOriginalValues(object element)
     {
-        ((BudgetJarTemplateDto)element).Name = elementBeforeEdit.Name;
-        ((BudgetJarTemplateDto)element).Percentage = elementBeforeEdit.Percentage;
-        ((BudgetJarTemplateDto)element).IconId = elementBeforeEdit.IconId;
+        ((ExpenseGroupDto)element).Name = elementBeforeEdit.Name;
+        ((ExpenseGroupDto)element).IconId = elementBeforeEdit.IconId;
     }
 
     protected async override Task OnInitializedAsync()
     {
         isLoading = true;
-        BudgetJars = await Mediator.Send(new GetBudgetJarTemplatesQuery(true));
-        IconAssets = await Mediator.Send(new GetIconsQuery());
+        expenseGroups = await Mediator.Send(new GetExpenseGroupsQuery(true));
+        iconAssets = await Mediator.Send(new GetIconsQuery());
         isLoading = false;
     }
 
@@ -134,14 +124,13 @@
     {
         isLoading = true;
         StateHasChanged();
-        var budgetJar = (BudgetJarTemplateDto)element;
+        var expenseGroup = (ExpenseGroupDto)element;
         InvokeAsync(async () => {
-            var saved = await SaveChange(budgetJar);
+            var saved = await SaveChange(expenseGroup);
             if (!saved)
             {
-                budgetJar.Name = elementBeforeEdit.Name;
-                budgetJar.Percentage = elementBeforeEdit.Percentage;
-                budgetJar.IconId = elementBeforeEdit.IconId;
+                expenseGroup.Name = elementBeforeEdit.Name;
+                expenseGroup.IconId = elementBeforeEdit.IconId;
             }
             isLoading = false;
             StateHasChanged();
@@ -155,43 +144,27 @@
         isLoading = true;
         await SaveChange(model);
 
-        model = new BudgetJarTemplateDto();
+        model = new ExpenseGroupDto();
         isLoading = false;
     }
 
-    private async Task<bool> SaveChange(BudgetJarTemplateDto budgetJar)
+    private async Task<bool> SaveChange(ExpenseGroupDto expenseGroup)
     {
         Snackbar.Clear();
         try
         {
-            // 100% sum
-            var sumPercents = BudgetJars.Sum(x => x.Percentage);
-            if (sumPercents > 100)
-            {
-                Snackbar.Add("Total of all percentages cannot be greater than 100.", Severity.Error);
-                return false;
-            }
-            if (budgetJar.Id == null || budgetJar.Id == Guid.Empty)
-            {
-                if (sumPercents + budgetJar.Percentage > 100)
-                {
-                    Snackbar.Add("Total of all percentages cannot be greater than 100.", Severity.Error);
-                    return false;
-                }
-            }
-
-            budgetJar.IsSystem = true;
-            budgetJar.Icon = IconAssets.Single(x => x.Id == budgetJar.IconId);
-            var savedId = await Mediator.Send(new SaveBudgetJarTemplateCommand(budgetJar));
+            expenseGroup.IsSystem = true;
+            expenseGroup.Icon = iconAssets.Single(x => x.Id == expenseGroup.IconId);
+            var savedId = await Mediator.Send(new SaveExpenseGroupCommand(expenseGroup));
 
             // update UI
-            if (BudgetJars.All(x => x.Id != savedId))
+            if (expenseGroups.All(x => x.Id != savedId))
             {
-                budgetJar.Id = savedId;
-                BudgetJars.Add(BudgetJarTemplateDto.Clone(budgetJar));
+                expenseGroup.Id = savedId;
+                expenseGroups.Add(ExpenseGroupDto.Clone(expenseGroup));
             }
             form.Reset();
-            Snackbar.Add("Budget Jar saved successfully", Severity.Success);
+            Snackbar.Add("Expense Group saved successfully", Severity.Success);
             return true;
         }
         catch(Exception ex)
@@ -204,26 +177,26 @@
     private async Task DeleteRow(Guid id)
     {
         var dialogParams = new DialogParameters() {
-            ["Message"] = "Are you sure you want to delete this budget jar?",
+            ["Message"] = "Are you sure you want to delete this expense group?",
             ["Color"] = Color.Error,
             ["PrimaryButtonText"] = "Delete"
         };
-        var dialog = Dialog.Show<ConfirmDialog>("Delete Budget Jar", dialogParams);
+        var dialog = Dialog.Show<ConfirmDialog>("Delete Expense Group", dialogParams);
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
             try
             {
-                var deleted = await Mediator.Send(new DeleteBudgetJarTemplateCommand(id));
+                var deleted = await Mediator.Send(new DeleteExpenseGroupCommand(id));
                 if (deleted)
                 {
-                    BudgetJars.Remove(BudgetJars.Single(x => x.Id == id));
+                    expenseGroups.Remove(expenseGroups.Single(x => x.Id == id));
                     StateHasChanged();
-                    Snackbar.Add("Budget Jar has been deleted successfully.", Severity.Success);
+                    Snackbar.Add("Expense Group has been deleted successfully.", Severity.Success);
                 }
             } catch (Exception)
             {
-                Snackbar.Add("Sorry, cannot delete the budget jar. Please try again later", Severity.Error);
+                Snackbar.Add("Sorry, cannot delete the expense group. Please try again later", Severity.Error);
             }
         }
     }

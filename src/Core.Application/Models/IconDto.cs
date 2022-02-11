@@ -13,7 +13,7 @@ namespace Core.Application.Models
         public string Name { get; set; }
         public string Path { get; set; }
         public IconType IconType { get; set; }
-        public IconCategory IconCategory { get; set; }
-        public int Ordinal { get; set; }
+        public bool IsHidden { get; set; }
+        public bool IsSystem { get; set; }
     }
 }

@@ -1,16 +1,10 @@
 ﻿using Core.Domain.Entities;
-using Core.Infrastructure.Configurations;
 using Core.Infrastructure.Database.Identity;
 using Core.Infrastructure.Seeder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using System;
-using System.Text;
 
 namespace Core.Infrastructure.Database
 {
@@ -27,7 +21,7 @@ namespace Core.Infrastructure.Database
         public DbSet<PageHtml> PageHtmls { get; set; }
         public DbSet<BudgetJarTemplate> BudgetJarTemplates { get; set; }
         public DbSet<BudgetJar> BudgetJars { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<ExpenseGroup> ExpenseGroups { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Income> Incomes { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
@@ -54,22 +48,24 @@ namespace Core.Infrastructure.Database
 
             // Relationship:
             // https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
-            modelBuilder.Entity<Expense>()
-                .HasMany(x => x.Categories)
-                .WithMany(x => x.Expenses);
             modelBuilder.Entity<Expense>().HasMany(x => x.Attachments).WithOne().OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<Income>().HasMany(x => x.BudgetJars).WithOne().HasForeignKey(x => x.IncomeId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Expense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Expense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Expense>().HasIndex(x => x.PaidDate);
+            modelBuilder.Entity<Income>().HasMany(x => x.BudgetJars).WithOne().HasForeignKey(x => x.IncomeId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<AppIdentityUser>().HasMany(x => x.Subscriptions).WithOne().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<RecurrentExpense>().HasMany(x => x.Categories).WithOne().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<BudgetJarTemplate>().HasOne(x => x.Icon);
-            modelBuilder.Entity<BudgetJar>().HasOne(x => x.Icon);
+            modelBuilder.Entity<ExpenseGroup>().HasOne(x => x.Icon);
+            modelBuilder.Entity<BudgetJar>().HasOne(x => x.Icon).WithMany().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Icon>().HasIndex(x => x.Name).IsUnique();
 
             // Seed Default Data
             modelBuilder.ApplyConfiguration(new AppRoleConfig());
             modelBuilder.ApplyConfiguration(new IconConfig());
             modelBuilder.ApplyConfiguration(new BudgetJarTemplateConfig());
+            modelBuilder.ApplyConfiguration(new ExpenseGroupConfig());
         }
     }
 }

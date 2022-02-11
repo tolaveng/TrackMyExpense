@@ -9,7 +9,7 @@ namespace Core.Domain.Enums
     public enum IconType
     {
         Asset,
-        Local,
+        Upload,
         Web
     }
 }

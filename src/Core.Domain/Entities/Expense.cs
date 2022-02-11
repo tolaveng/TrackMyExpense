@@ -22,7 +22,8 @@ namespace Core.Domain.Entities
 
         public Guid BudgetJarId { get; set; }
         public virtual BudgetJar BudgetJar { get; set; }
-        public virtual ICollection<Category> Categories { get; set; }
+        public Guid ExpenseGroupId { get; set; }
+        public virtual ExpenseGroup ExpenseGroup { get; set; }
 
         public int? RecurrentExpenseId { get; set; }
     }

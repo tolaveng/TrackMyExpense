@@ -2,9 +2,6 @@
 using Core.Application.IRepositories;
 using Core.Infrastructure.Database;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +17,7 @@ namespace Core.Infrastructure.Repository
         private IGenericRepository<BudgetJarTemplate> _budgetJarTemplateRepository;
         private IGenericRepository<Subscription> _subscriptionRepository;
         private IGenericRepository<Expense> _expenseRepository;
-        private IGenericRepository<Category> _categoryRepository;
+        private IGenericRepository<ExpenseGroup> _expenseGroupRepository;
         private IGenericRepository<Icon> _iconRepository;
 
         public UnitOfWork(IDbContextFactory<AppDbContext> dbContextFactory)
@@ -34,7 +31,7 @@ namespace Core.Infrastructure.Repository
         public IGenericRepository<BudgetJarTemplate> BudgetJarTemplateRepository => _budgetJarTemplateRepository ??= new GenericRepository<BudgetJarTemplate>(_context);
         public IGenericRepository<Subscription> SubscriptionRepository => _subscriptionRepository ??= new GenericRepository<Subscription>(_context);
         public IGenericRepository<Expense> ExpenseRepository => _expenseRepository ??= new GenericRepository<Expense>(_context);
-        public IGenericRepository<Category> CategoryRepository => _categoryRepository ??= new GenericRepository<Category>(_context);
+        public IGenericRepository<ExpenseGroup> ExpenseGroupRepository => _expenseGroupRepository ??= new GenericRepository<ExpenseGroup>(_context);
         public IGenericRepository<Icon> IconRepository => _iconRepository ??= new GenericRepository<Icon>(_context);
 
         private bool disposed = false;

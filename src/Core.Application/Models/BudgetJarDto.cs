@@ -14,7 +14,7 @@ namespace Core.Application.Models
         public Guid IconId { get; set; }
         public IconDto Icon { get; set; } = new IconDto();
 
-        public static BudgetJarDto Copy(BudgetJarDto budgetJar)
+        public static BudgetJarDto Clone(BudgetJarDto budgetJar)
         {
             return new BudgetJarDto()
             {

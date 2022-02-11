@@ -18,6 +18,7 @@ namespace Core.Application.Mapper
             CreateMap<Subscription, SubscriptionDto>().ReverseMap();
             CreateMap<BudgetJar, BudgetJarDto>().ReverseMap();
             CreateMap<BudgetJarTemplate, BudgetJarTemplateDto>().ReverseMap();
+            CreateMap<ExpenseGroup, ExpenseGroupDto>().ReverseMap();
             CreateMap<Icon, IconDto>().ReverseMap();
         }
     }

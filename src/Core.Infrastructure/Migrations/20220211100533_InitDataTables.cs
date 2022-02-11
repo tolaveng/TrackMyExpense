@@ -18,8 +18,8 @@ namespace Core.Infrastructure.Migrations
                     Name = table.Column<string>(type: "text", nullable: true),
                     Path = table.Column<string>(type: "text", nullable: true),
                     IconType = table.Column<int>(type: "integer", nullable: false),
-                    IconCategory = table.Column<int>(type: "integer", nullable: false),
-                    Ordinal = table.Column<int>(type: "integer", nullable: false),
+                    IsHidden = table.Column<bool>(type: "boolean", nullable: false),
+                    IsSystem = table.Column<bool>(type: "boolean", nullable: false),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -137,6 +137,28 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExpenseGroups",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    IsSystem = table.Column<bool>(type: "boolean", nullable: false),
+                    IconId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpenseGroups", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExpenseGroups_Icons_IconId",
+                        column: x => x.IconId,
+                        principalTable: "Icons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BudgetJars",
                 columns: table => new
                 {
@@ -157,7 +179,7 @@ namespace Core.Infrastructure.Migrations
                         column: x => x.IconId,
                         principalTable: "Icons",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_BudgetJars_Incomes_IncomeId",
                         column: x => x.IncomeId,
@@ -320,6 +342,7 @@ namespace Core.Infrastructure.Migrations
                     IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
                     BudgetJarId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExpenseGroupId = table.Column<Guid>(type: "uuid", nullable: false),
                     RecurrentExpenseId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
@@ -334,6 +357,12 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_Expenses_BudgetJars_BudgetJarId",
                         column: x => x.BudgetJarId,
                         principalTable: "BudgetJars",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Expenses_ExpenseGroups_ExpenseGroupId",
+                        column: x => x.ExpenseGroupId,
+                        principalTable: "ExpenseGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
@@ -352,6 +381,7 @@ namespace Core.Infrastructure.Migrations
                     IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
                     BudgetJarId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExpenseGroupId = table.Column<Guid>(type: "uuid", nullable: false),
                     Repeat = table.Column<int>(type: "integer", nullable: false),
                     RepeatDay = table.Column<int>(type: "integer", nullable: false),
                     RepeatDaily = table.Column<string>(type: "text", nullable: true),
@@ -366,6 +396,12 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_RecurrentExpenses_BudgetJars_BudgetJarId",
                         column: x => x.BudgetJarId,
                         principalTable: "BudgetJars",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_RecurrentExpenses_ExpenseGroups_ExpenseGroupId",
+                        column: x => x.ExpenseGroupId,
+                        principalTable: "ExpenseGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                 });
@@ -392,62 +428,47 @@ namespace Core.Infrastructure.Migrations
                         onDelete: ReferentialAction.SetNull);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Categories",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CategoryName = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    IconName = table.Column<string>(type: "text", nullable: true),
-                    RecurrentExpenseId = table.Column<int>(type: "integer", nullable: true),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Categories", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Categories_RecurrentExpenses_RecurrentExpenseId",
-                        column: x => x.RecurrentExpenseId,
-                        principalTable: "RecurrentExpenses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CategoryExpense",
-                columns: table => new
-                {
-                    CategoriesId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ExpensesId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CategoryExpense", x => new { x.CategoriesId, x.ExpensesId });
-                    table.ForeignKey(
-                        name: "FK_CategoryExpense_Categories_CategoriesId",
-                        column: x => x.CategoriesId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CategoryExpense_Expenses_ExpensesId",
-                        column: x => x.ExpensesId,
-                        principalTable: "Expenses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.InsertData(
                 table: "Icons",
-                columns: new[] { "Id", "Archived", "IconCategory", "IconType", "Name", "Ordinal", "Path" },
+                columns: new[] { "Id", "Archived", "IconType", "IsHidden", "IsSystem", "Name", "Path" },
                 values: new object[,]
                 {
-                    { new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), false, 0, 0, "Financial Freedom", 5, "/assets/icons/financial-freedom.png" },
-                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, 0, 0, "Education", 4, "/assets/icons/education.png" },
-                    { new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), false, 0, 0, "Long Term Saving", 2, "/assets/icons/long-term-saving.png" },
-                    { new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), false, 0, 0, "Necessities", 1, "/assets/icons/necessities.png" },
-                    { new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"), false, 0, 0, "Others", 6, "/assets/icons/others.png" },
-                    { new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), false, 0, 0, "Wants", 3, "/assets/icons/wants.png" }
+                    { new Guid("05269476-13c6-451d-9259-5bcf2480ef1e"), false, 0, false, true, "Baby", "/assets/icons/baby.png" },
+                    { new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), false, 0, false, true, "Financial Freedom", "/assets/icons/financial-freedom.png" },
+                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), false, 0, false, true, "Donate", "/assets/icons/donate.png" },
+                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, 0, false, true, "Education", "/assets/icons/education.png" },
+                    { new Guid("2f67a4c3-7186-47da-9ead-407be93a675e"), false, 0, false, true, "Gas", "/assets/icons/gas.png" },
+                    { new Guid("4006be63-25d4-4425-9702-2ba10dc721bb"), false, 0, false, true, "Travel", "/assets/icons/travel.png" },
+                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), false, 0, false, true, "Gardens", "/assets/icons/garden.png" },
+                    { new Guid("476501c2-92df-4e9f-a863-dfd93dd937c0"), false, 0, false, true, "Marry", "/assets/icons/marry.png" },
+                    { new Guid("4bb8d462-187a-4370-bb1e-e0fb99d233e0"), false, 0, false, true, "Bakery", "/assets/icons/bakery.png" },
+                    { new Guid("52afbf57-54d3-4fe6-a680-40375679b5ff"), false, 0, false, true, "Holiday", "/assets/icons/holiday.png" },
+                    { new Guid("56f4421e-10b6-4940-b594-01de569fde12"), false, 0, false, true, "Saving", "/assets/icons/Saving.png" },
+                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), false, 0, false, true, "Utilities", "/assets/icons/utilities.png" },
+                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), false, 0, false, true, "Eat Out", "/assets/icons/eat-out.png" },
+                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, 0, false, true, "Medicines", "/assets/icons/medicine.png" },
+                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, 0, false, true, "Petro", "/assets/icons/petro.png" },
+                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, 0, false, true, "Others", "/assets/icons/others.png" },
+                    { new Guid("79cf43bd-c6d4-4834-b677-52c9b359473e"), false, 0, false, true, "Honey Moon", "/assets/icons/honeymoon.png" },
+                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, 0, false, true, "Investment", "/assets/icons/investment.png" },
+                    { new Guid("8470c1bc-d85c-4f94-9133-b1ba2945f7f2"), false, 0, false, true, "Jeans", "/assets/icons/jeans.png" },
+                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), false, 0, false, true, "Grocery", "/assets/icons/grocery.png" },
+                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), false, 0, false, true, "Furniture", "/assets/icons/furniture.png" },
+                    { new Guid("9392f6a9-f9aa-4d9e-9ab2-8d89ba455ea9"), false, 0, false, true, "Vaccation", "/assets/icons/vaccation.png" },
+                    { new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), false, 0, false, true, "Long Term Saving", "/assets/icons/long-term-saving.png" },
+                    { new Guid("b028a67a-b2e3-44a7-953f-de1c0959262b"), false, 0, false, true, "Electricity", "/assets/icons/electricity.png" },
+                    { new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), false, 0, false, true, "Necessities", "/assets/icons/necessities.png" },
+                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), false, 0, false, true, "Toys", "/assets/icons/toy.png" },
+                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), false, 0, false, true, "Clothes", "/assets/icons/clothes.png" },
+                    { new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), false, 0, false, true, "Wants", "/assets/icons/wants.png" },
+                    { new Guid("e1fc64f8-3154-4880-9732-37b5615592bd"), false, 0, false, true, "Shirt", "/assets/icons/shirt.png" },
+                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), false, 0, false, true, "Car", "/assets/icons/car.png" },
+                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), false, 0, false, true, "Households", "/assets/icons/household-items.png" },
+                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), false, 0, false, true, "Transport", "/assets/icons/transport.png" },
+                    { new Guid("eff825bc-673f-43e3-a422-1df323bf274d"), false, 0, false, true, "Tools", "/assets/icons/tools.png" },
+                    { new Guid("f0ffaf46-dde9-47e0-a9f1-d64785d4dfe7"), false, 0, false, true, "Gift", "/assets/icons/gift.png" },
+                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), false, 0, false, true, "Insurance", "/assets/icons/insurance.png" },
+                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), false, 0, false, true, "Family", "/assets/icons/family.png" }
                 });
 
             migrationBuilder.InsertData(
@@ -455,8 +476,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "16047b73-f15a-4840-aaaf-a20e0203de48", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "a7ceb324-f453-4653-9e3a-a49ccf2c8de7", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "d16c45b7-a990-4309-9cd3-eaf317c1184e", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "5e422d18-2f9b-4143-ac14-eadce3415156", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -467,9 +488,34 @@ namespace Core.Infrastructure.Migrations
                     { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), false, new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"), false, new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"), false, new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"), false, new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), false, new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("f20c473d-1fbf-4666-a88a-2f77594e1ea4"), false, new Guid("c4d34c7e-3ab4-46f7-9050-5574d6b312bc"), true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") }
+                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), false, new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ExpenseGroups",
+                columns: new[] { "Id", "Archived", "IconId", "IsSystem", "Name", "UserId" },
+                values: new object[,]
+                {
+                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), false, new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), true, "Donate", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), false, new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), true, "Gardens", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), false, new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), true, "Utilities", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), false, new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), true, "Eat Out", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, new Guid("6550b905-6763-4e97-9038-50ec50d68853"), true, "Medicines", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), true, "Petro", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), true, "Investment", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), false, new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), true, "Grocery", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), false, new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), true, "Furniture", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), false, new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), true, "Toys", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), false, new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), true, "Clothes", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), false, new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), true, "Car", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), false, new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), true, "Households", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), false, new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), true, "Transport", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), false, new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), true, "Insurance", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), false, new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), true, "Family", new Guid("00000000-0000-0000-0000-000000000000") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -493,14 +539,9 @@ namespace Core.Infrastructure.Migrations
                 column: "IconId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Categories_RecurrentExpenseId",
-                table: "Categories",
-                column: "RecurrentExpenseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CategoryExpense_ExpensesId",
-                table: "CategoryExpense",
-                column: "ExpensesId");
+                name: "IX_ExpenseGroups_IconId",
+                table: "ExpenseGroups",
+                column: "IconId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_BudgetJarId",
@@ -508,9 +549,30 @@ namespace Core.Infrastructure.Migrations
                 column: "BudgetJarId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Expenses_ExpenseGroupId",
+                table: "Expenses",
+                column: "ExpenseGroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Expenses_PaidDate",
+                table: "Expenses",
+                column: "PaidDate");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Icons_Name",
+                table: "Icons",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RecurrentExpenses_BudgetJarId",
                 table: "RecurrentExpenses",
                 column: "BudgetJarId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecurrentExpenses_ExpenseGroupId",
+                table: "RecurrentExpenses",
+                column: "ExpenseGroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
@@ -564,10 +626,10 @@ namespace Core.Infrastructure.Migrations
                 name: "BudgetJarTemplates");
 
             migrationBuilder.DropTable(
-                name: "CategoryExpense");
+                name: "PageHtmls");
 
             migrationBuilder.DropTable(
-                name: "PageHtmls");
+                name: "RecurrentExpenses");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
@@ -591,9 +653,6 @@ namespace Core.Infrastructure.Migrations
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
-                name: "Categories");
-
-            migrationBuilder.DropTable(
                 name: "Expenses");
 
             migrationBuilder.DropTable(
@@ -603,16 +662,16 @@ namespace Core.Infrastructure.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "RecurrentExpenses");
-
-            migrationBuilder.DropTable(
                 name: "BudgetJars");
 
             migrationBuilder.DropTable(
-                name: "Icons");
+                name: "ExpenseGroups");
 
             migrationBuilder.DropTable(
                 name: "Incomes");
+
+            migrationBuilder.DropTable(
+                name: "Icons");
         }
     }
 }

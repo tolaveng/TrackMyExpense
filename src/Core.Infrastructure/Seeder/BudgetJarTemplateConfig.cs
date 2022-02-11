@@ -56,11 +56,11 @@ namespace Core.Infrastructure.Seeder
                 },
                 new BudgetJarTemplate()
                 {
-                    Id = Guid.Parse("f20c473d-1fbf-4666-a88a-2f77594e1ea4"),
+                    Id = Guid.Parse("6B7C5AD3-82C5-4AFC-AD66-A2A895A4BF7B"),
                     Name = "Others",
                     Percentage = 5,
                     IsSystem = true,
-                    IconId = Guid.Parse("C4D34C7E-3AB4-46F7-9050-5574D6B312BC"),
+                    IconId = Guid.Parse("6B7C5AD3-82C5-4AFC-AD66-A2A895A4BF7B"),
                 }
             };
             builder.HasData(jars);
