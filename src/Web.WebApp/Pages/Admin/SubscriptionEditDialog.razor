@@ -28,8 +28,7 @@
                         }
                     </MudSelect>
                 </MudItem>
-                <MudItem xs="12" sm="6" Class="d-xs-none">
-                </MudItem>
+                <MudItem xs="12" sm="6" Class="d-none d-sm-flex"></MudItem>
 
                 <MudItem xs="12" sm="6">
                     <MudTextField Label="Paid Amount" @bind-Value="@InputModel.PaidAmount" For="@(() => InputModel.PaidAmount)" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney" />

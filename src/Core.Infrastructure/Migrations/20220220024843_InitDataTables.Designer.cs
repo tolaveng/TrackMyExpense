@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220211100533_InitDataTables")]
+    [Migration("20220220024843_InitDataTables")]
     partial class InitDataTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -461,9 +461,6 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("IsHidden")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsSystem")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -484,7 +481,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Necessities",
                             Path = "/assets/icons/necessities.png"
                         },
@@ -494,7 +490,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Long Term Saving",
                             Path = "/assets/icons/long-term-saving.png"
                         },
@@ -504,7 +499,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Wants",
                             Path = "/assets/icons/wants.png"
                         },
@@ -514,7 +508,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Education",
                             Path = "/assets/icons/education.png"
                         },
@@ -524,7 +517,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Financial Freedom",
                             Path = "/assets/icons/financial-freedom.png"
                         },
@@ -534,7 +526,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Grocery",
                             Path = "/assets/icons/grocery.png"
                         },
@@ -544,7 +535,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Clothes",
                             Path = "/assets/icons/clothes.png"
                         },
@@ -554,7 +544,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Eat Out",
                             Path = "/assets/icons/eat-out.png"
                         },
@@ -564,7 +553,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Transport",
                             Path = "/assets/icons/transport.png"
                         },
@@ -574,7 +562,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Utilities",
                             Path = "/assets/icons/utilities.png"
                         },
@@ -584,7 +571,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Medicines",
                             Path = "/assets/icons/medicine.png"
                         },
@@ -594,7 +580,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Investment",
                             Path = "/assets/icons/investment.png"
                         },
@@ -604,7 +589,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Family",
                             Path = "/assets/icons/family.png"
                         },
@@ -614,7 +598,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Furniture",
                             Path = "/assets/icons/furniture.png"
                         },
@@ -624,7 +607,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Petro",
                             Path = "/assets/icons/petro.png"
                         },
@@ -634,7 +616,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Car",
                             Path = "/assets/icons/car.png"
                         },
@@ -644,7 +625,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Insurance",
                             Path = "/assets/icons/insurance.png"
                         },
@@ -654,7 +634,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Toys",
                             Path = "/assets/icons/toy.png"
                         },
@@ -664,7 +643,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Donate",
                             Path = "/assets/icons/donate.png"
                         },
@@ -674,7 +652,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Households",
                             Path = "/assets/icons/household-items.png"
                         },
@@ -684,7 +661,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Gardens",
                             Path = "/assets/icons/garden.png"
                         },
@@ -694,7 +670,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Baby",
                             Path = "/assets/icons/baby.png"
                         },
@@ -704,7 +679,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Travel",
                             Path = "/assets/icons/travel.png"
                         },
@@ -714,7 +688,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Holiday",
                             Path = "/assets/icons/holiday.png"
                         },
@@ -724,7 +697,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Vaccation",
                             Path = "/assets/icons/vaccation.png"
                         },
@@ -734,7 +706,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Saving",
                             Path = "/assets/icons/Saving.png"
                         },
@@ -744,7 +715,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Honey Moon",
                             Path = "/assets/icons/honeymoon.png"
                         },
@@ -754,7 +724,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Bakery",
                             Path = "/assets/icons/bakery.png"
                         },
@@ -764,7 +733,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Marry",
                             Path = "/assets/icons/marry.png"
                         },
@@ -774,7 +742,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Gas",
                             Path = "/assets/icons/gas.png"
                         },
@@ -784,7 +751,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Electricity",
                             Path = "/assets/icons/electricity.png"
                         },
@@ -794,7 +760,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Gift",
                             Path = "/assets/icons/gift.png"
                         },
@@ -804,7 +769,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Shirt",
                             Path = "/assets/icons/shirt.png"
                         },
@@ -814,7 +778,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Jeans",
                             Path = "/assets/icons/jeans.png"
                         },
@@ -824,7 +787,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Tools",
                             Path = "/assets/icons/tools.png"
                         },
@@ -834,7 +796,6 @@ namespace Core.Infrastructure.Migrations
                             Archived = false,
                             IconType = 0,
                             IsHidden = false,
-                            IsSystem = true,
                             Name = "Others",
                             Path = "/assets/icons/others.png"
                         });
@@ -1065,14 +1026,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "5e422d18-2f9b-4143-ac14-eadce3415156",
+                            ConcurrencyStamp = "4ee07722-ca82-4a71-abfc-ccc18f72c37c",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "d16c45b7-a990-4309-9cd3-eaf317c1184e",
+                            ConcurrencyStamp = "90d2f472-66aa-41ef-a0f2-5c885a237c4a",
                             Name = "user",
                             NormalizedName = "USER"
                         });

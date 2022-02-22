@@ -40,7 +40,7 @@
             <MudTh><MudTableSortLabel SortLabel="ValidFrom" T="SubscriptionDto">Valid From</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="ValidTo" T="SubscriptionDto">Valid To</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="IsCanceled" T="SubscriptionDto">Canceled</MudTableSortLabel></MudTh>
-            <MudTh></MudTh>
+            <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Subscription Type">@context.SubscriptionType</MudTd>
@@ -54,7 +54,7 @@
                     <MudText Color="@Color.Warning">Cancelled</MudText>
                 }
             </MudTd>
-            <MudTd>
+            <MudTd DataLabel="Actions">
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
                     Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
@@ -69,7 +69,7 @@
         </LoadingContent>
         <PagerContent>
             <MudTablePager HorizontalAlignment="HorizontalAlignment.Left" HideRowsPerPage="false" HidePageNumber="false"
-                InfoFormat="@($"{TotalCount} records")"/>
+                InfoFormat="@($"{TotalItems} records")"/>
         </PagerContent>
     </MudTable>
 </MudContainer>
@@ -84,7 +84,7 @@
     public string UserId { get; set; }
 
     private MudTable<SubscriptionDto> table;
-    private int TotalCount;
+    private int TotalItems;
     private string searchString = null;
     private bool loading = true;
     private Guid userGuidId;
@@ -98,20 +98,15 @@
         };
         loading = true;
 
-        var pagination = new Pagination()
-        {
-            Page = state.Page,
-            PageSize = state.PageSize,
-            SortBy = state.SortLabel,
-            SortDirection = state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending
-        };
+        var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel,
+            state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending);
 
         var result = await Mediator.Send(new GetSubscriptionsPaged()
         {
             UserId = userGuidId,
             Pagination = pagination
         });
-        TotalCount = result.TotalCount;
+        TotalItems = result.TotalCount;
         loading = false;
         return new TableData<SubscriptionDto>() {TotalItems = result.TotalCount, Items = result.Data};
     }
@@ -146,20 +141,18 @@
         };
         var dialog = Dialog.Show<ConfirmDialog>("Delete Subscription", dialogParams);
         var result = await dialog.Result;
-        if (!result.Cancelled)
+        if (result.Cancelled) return;
+        try
         {
-            try
+            var deleted = await Mediator.Send(new DeleteSubscriptionCommand(subscriptionId));
+            if (deleted)
             {
-                var deleted = await Mediator.Send(new DeleteSubscriptionCommand(subscriptionId));
-                if (deleted)
-                {
-                    await table.ReloadServerData();
-                    Snackbar.Add("Subscription has been deleted successfully.", Severity.Success);
-                }
-            } catch (Exception)
-            {
-                Snackbar.Add("Sorry, cannot delete the subscription. Please try again later", Severity.Error);
+                await table.ReloadServerData();
+                Snackbar.Add("Subscription has been deleted successfully.", Severity.Success);
             }
+        } catch (Exception)
+        {
+            Snackbar.Add("Sorry, cannot delete the subscription. Please try again later", Severity.Error);
         }
     }
 

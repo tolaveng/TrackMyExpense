@@ -1,0 +1,234 @@
+﻿@using Core.Application.Common.Files
+@using Core.Application.IRepositories
+@using Core.Application.Mediator.Icons
+@using Core.Application.Models
+@using Core.Application.Providers.IProviders
+@using Core.Application.Services.IServices
+@using Core.Domain.Enums
+@using MediatR
+@using System.IO
+@using System.Threading
+@using Web.WebApp.Components
+
+@implements IDisposable
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="@editContext">
+            <DataAnnotationsValidator/>
+            <FluentValidationValidator T="IconDto" TValidator="IconValidator" />
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Label="Name" @bind-Value="@inputModel.Name" For="@(() => inputModel.Name)"/>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect @bind-Value="@inputModel.IconType" Label="Type"
+                    For="@(() => inputModel.IconType)"
+                    >
+                        @foreach (IconType type in Enum.GetValues(typeof(IconType)))
+                        {
+                            if (type == IconType.Asset) continue;
+                            <MudSelectItem Value="@type">@type</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+
+                @if (inputModel.IconType == IconType.Upload)
+                {
+                    <MudItem xs="12" sm="6">
+                        <InputFile id="fileInput" OnChange="InputFileChanged" hidden />
+                        <MudButton HtmlTag="label" Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Filled.Image"
+                            for="fileInput" Disabled="isUploading">
+                            <span>Upload Icon Image</span>
+                        </MudButton>
+                        @if (browserFile != null && !string.IsNullOrWhiteSpace(browserFile.Name))
+                        {
+                            <div style="font-size: small">@browserFile.Name</div>
+                        }
+                    </MudItem>
+                } else
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudTextField Label="Path" @bind-Value="@inputModel.Path" For="@(() => inputModel.Path)"/>
+                    </MudItem>
+                }
+
+                <MudItem xs="12" sm="6">
+                    <MudCheckBox Label="Hidden" Dense="true" @bind-Checked="@inputModel.IsHidden" For="@(() => inputModel.IsHidden)" />
+                </MudItem>
+                <MudItem xs="12">
+                    @if (isUploading)
+                    {
+                        <MudProgressLinear Size="Size.Small" Value="@uploadProgress" />
+                    }
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnCloseClicked">Close</MudButton>
+        <MudButton Color="@Color.Primary" Variant="Variant.Filled" OnClick="OnSaveClicked">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] IDialogService Dialog { get; set; }
+    [Inject] IUnitOfWork UnitOfWork { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IFileUploadFactory FileUploadFactory { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Guid IconId { get; set; } = Guid.Empty;
+
+    private EditContext editContext;
+    private IconDto inputModel;
+    private IBrowserFile browserFile;
+    private bool isNew;
+    private string[] allowExtensions = new []{".png", ".jpg", ".jpeg" };
+    private long maxFileSize = 100 * 1024; // 100 K
+    private bool isUploading = false;
+    private double uploadProgress;
+    private CancellationTokenSource cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        inputModel = new IconDto();
+        inputModel.IconType = IconType.Upload;
+        editContext = new EditContext(inputModel);
+
+        if (IconId != Guid.Empty)
+        {
+            var icon = await Mediator.Send(new GetIconRequest(IconId));
+            if (icon == null)
+            {
+                await Dialog.ShowMessageBox("Warning", "Sorry, something went wrong.", yesText:"Close");
+                MudDialog.Cancel();
+                return;
+            }
+            inputModel = icon;
+            editContext = new EditContext(inputModel);
+        }
+        isNew = IconId == Guid.Empty;
+    }
+
+    public void Dispose()
+    {
+        cts.Cancel();
+        cts.Dispose();
+    }
+
+    private void InputFileChanged(InputFileChangeEventArgs e)
+    {
+        if (inputModel.IconType != IconType.Upload) return;
+        var file = e.File;
+        if (file.Size > maxFileSize)
+        {
+            Snackbar.Add($"Image file size must be less than {Math.Abs(maxFileSize / 1024)} KB", Severity.Error);
+            return;
+        }
+
+        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+        if (string.IsNullOrEmpty(ext) || !allowExtensions.Contains(ext))
+        {
+            Snackbar.Add($"File type must be ({string.Join(", ", allowExtensions)})", Severity.Error);
+            return;
+        }
+
+        browserFile = file;
+    }
+
+    private void OnCloseClicked() {
+        MudDialog.Cancel();
+    }
+
+    private async Task OnSaveClicked() {
+        if (!editContext.Validate()) return;
+        if (inputModel.IconType == IconType.Upload && browserFile == null &&
+            string.IsNullOrWhiteSpace(inputModel.Path))
+        {
+            Snackbar.Add("Please select a file to upload", Severity.Error);
+            return;
+        }
+
+        if (isNew)
+        {
+            inputModel.Id = Guid.NewGuid();
+        }
+
+        if (inputModel.IconType == IconType.Upload && browserFile != null)
+        {   
+            var fileName = await FilUploadHander(inputModel.Id.ToString());
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+                inputModel.Path = fileName;
+            } else
+            {
+                inputModel.Path = string.Empty;
+                return;
+            }
+        }
+        if (string.IsNullOrWhiteSpace(inputModel.Path))
+        {
+            Snackbar.Add("Path cannot be empty", Severity.Error);
+            return;
+        }
+        await Mediator.Send(new SaveIconCommand(inputModel, isNew));
+        MudDialog.Close(DialogResult.Ok(1));
+    }
+
+    private void updateProgress(object sender, int progress)
+    {
+        uploadProgress = progress;
+        StateHasChanged();
+    }
+
+    private async Task<string> FilUploadHander(string fileName) {
+        if (browserFile == null) return null;
+
+        var fileUploadService = FileUploadFactory.GetFileUploadService();
+        fileUploadService.AllowExtensions = allowExtensions;
+        fileUploadService.MaxFileSize = maxFileSize;
+        fileUploadService.UploadProgress += updateProgress;
+
+        if (browserFile.Size > maxFileSize)
+        {
+            Snackbar.Add($"Image file size must be less than {maxFileSize}", Severity.Error);
+            return null;
+        }
+
+        isUploading = true;
+        try
+        {
+            var fileUpload = new FileUploadRequest(
+                browserFile.OpenReadStream(fileUploadService.MaxFileSize),
+                browserFile.Name, browserFile.Size);
+
+            var result = await fileUploadService.UploadIconFileAsync(fileUpload, fileName, cts.Token);
+            if (result.Succeeded)
+            {
+                uploadProgress = 100;
+                isUploading = false;
+                return result.FileName;
+
+            } else
+            {
+                Snackbar.Clear();
+                uploadProgress = 0;
+                isUploading = false;
+                Snackbar.Add(result.Message, Severity.Error);
+                return null;
+            }
+
+        } 
+        catch (Exception ex)
+        {
+            cts.Cancel();
+            Snackbar.Clear();
+            uploadProgress = 0;
+            isUploading = false;
+            Snackbar.Add("Unexpected error occured. File upload failed.", Severity.Error);
+            return null;
+        }
+    }
+}

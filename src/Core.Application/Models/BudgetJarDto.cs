@@ -2,9 +2,8 @@
 
 namespace Core.Application.Models
 {
-    public class BudgetJarDto
+    public class BudgetJarDto : EntityDto<Guid>
     {
-        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid? IncomeId { get; set; }
 

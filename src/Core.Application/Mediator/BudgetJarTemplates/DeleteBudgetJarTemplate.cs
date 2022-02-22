@@ -1,12 +1,7 @@
 ﻿using Core.Application.IRepositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Core.Application.Mediator.BudgetJars
+namespace Core.Application.Mediator.BudgetJarTemplates
 {
     public class DeleteBudgetJarTemplateCommand : IRequest<bool>
     {

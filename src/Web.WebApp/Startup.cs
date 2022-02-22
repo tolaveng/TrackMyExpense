@@ -24,6 +24,9 @@ using MudBlazor.Services;
 using Core.Infrastructure.Seeder;
 using MudBlazor;
 using Microsoft.EntityFrameworkCore;
+using Core.Application.Providers.IProviders;
+using Core.Application.Providers;
+using Microsoft.Extensions.FileProviders;
 
 namespace Web.WebApp
 {
@@ -95,15 +98,22 @@ namespace Web.WebApp
             services.AddHttpContextAccessor();
             services.AddScoped<IAuthUserService, AuthUserService>();
 
+            services.AddSingleton<IFileDirectoryProvider, FileDirectoryProvider>();
             services.AddSingleton<IEmailService, EmailService>();
+
             services.AddScoped<ISysAttributeService, SysAttributeService>();
             services.AddScoped<IPageHtmlService, PageHtmlService > ();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserService, UserService>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IFileUploadFactory, FileUploadFactory>();
+            services.AddTransient<FileUploadLocalService>()
+                .AddTransient<IFileUploadService, FileUploadLocalService>(x => x.GetService<FileUploadLocalService>());
+            //services.AddTransient<IFileUploadService, FileUploadAzureService>(x => x.GetService<FileUploadAzureService>());
 
             // Config Settings
             services.Configure<EmailSetting>(Configuration.GetSection("EmailSetting"));
+            services.Configure<FileUploadSetting>(Configuration.GetSection("FileUploadSetting"));
             services.Configure<ReCaptchaSetting>(Configuration.GetSection("ReCaptcha"));
 
             // Config route option
@@ -148,7 +158,6 @@ namespace Web.WebApp
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
                 SeedAppUser.SeedAdminUser(app);
             }
             else
@@ -160,6 +169,14 @@ namespace Web.WebApp
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            // Serve local upload file
+            var fileUploadSetting = Configuration.GetSection("FileUploadSetting").Get<FileUploadSetting>();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(fileUploadSetting.UploadDir),
+                RequestPath = new PathString(fileUploadSetting.UploadWebUrl)
+            });
 
             app.UseRouting();
             app.UseCookiePolicy();

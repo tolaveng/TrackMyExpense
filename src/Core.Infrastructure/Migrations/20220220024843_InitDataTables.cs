@@ -19,7 +19,6 @@ namespace Core.Infrastructure.Migrations
                     Path = table.Column<string>(type: "text", nullable: true),
                     IconType = table.Column<int>(type: "integer", nullable: false),
                     IsHidden = table.Column<bool>(type: "boolean", nullable: false),
-                    IsSystem = table.Column<bool>(type: "boolean", nullable: false),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -430,45 +429,45 @@ namespace Core.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Icons",
-                columns: new[] { "Id", "Archived", "IconType", "IsHidden", "IsSystem", "Name", "Path" },
+                columns: new[] { "Id", "Archived", "IconType", "IsHidden", "Name", "Path" },
                 values: new object[,]
                 {
-                    { new Guid("05269476-13c6-451d-9259-5bcf2480ef1e"), false, 0, false, true, "Baby", "/assets/icons/baby.png" },
-                    { new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), false, 0, false, true, "Financial Freedom", "/assets/icons/financial-freedom.png" },
-                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), false, 0, false, true, "Donate", "/assets/icons/donate.png" },
-                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, 0, false, true, "Education", "/assets/icons/education.png" },
-                    { new Guid("2f67a4c3-7186-47da-9ead-407be93a675e"), false, 0, false, true, "Gas", "/assets/icons/gas.png" },
-                    { new Guid("4006be63-25d4-4425-9702-2ba10dc721bb"), false, 0, false, true, "Travel", "/assets/icons/travel.png" },
-                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), false, 0, false, true, "Gardens", "/assets/icons/garden.png" },
-                    { new Guid("476501c2-92df-4e9f-a863-dfd93dd937c0"), false, 0, false, true, "Marry", "/assets/icons/marry.png" },
-                    { new Guid("4bb8d462-187a-4370-bb1e-e0fb99d233e0"), false, 0, false, true, "Bakery", "/assets/icons/bakery.png" },
-                    { new Guid("52afbf57-54d3-4fe6-a680-40375679b5ff"), false, 0, false, true, "Holiday", "/assets/icons/holiday.png" },
-                    { new Guid("56f4421e-10b6-4940-b594-01de569fde12"), false, 0, false, true, "Saving", "/assets/icons/Saving.png" },
-                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), false, 0, false, true, "Utilities", "/assets/icons/utilities.png" },
-                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), false, 0, false, true, "Eat Out", "/assets/icons/eat-out.png" },
-                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, 0, false, true, "Medicines", "/assets/icons/medicine.png" },
-                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, 0, false, true, "Petro", "/assets/icons/petro.png" },
-                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, 0, false, true, "Others", "/assets/icons/others.png" },
-                    { new Guid("79cf43bd-c6d4-4834-b677-52c9b359473e"), false, 0, false, true, "Honey Moon", "/assets/icons/honeymoon.png" },
-                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, 0, false, true, "Investment", "/assets/icons/investment.png" },
-                    { new Guid("8470c1bc-d85c-4f94-9133-b1ba2945f7f2"), false, 0, false, true, "Jeans", "/assets/icons/jeans.png" },
-                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), false, 0, false, true, "Grocery", "/assets/icons/grocery.png" },
-                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), false, 0, false, true, "Furniture", "/assets/icons/furniture.png" },
-                    { new Guid("9392f6a9-f9aa-4d9e-9ab2-8d89ba455ea9"), false, 0, false, true, "Vaccation", "/assets/icons/vaccation.png" },
-                    { new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), false, 0, false, true, "Long Term Saving", "/assets/icons/long-term-saving.png" },
-                    { new Guid("b028a67a-b2e3-44a7-953f-de1c0959262b"), false, 0, false, true, "Electricity", "/assets/icons/electricity.png" },
-                    { new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), false, 0, false, true, "Necessities", "/assets/icons/necessities.png" },
-                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), false, 0, false, true, "Toys", "/assets/icons/toy.png" },
-                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), false, 0, false, true, "Clothes", "/assets/icons/clothes.png" },
-                    { new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), false, 0, false, true, "Wants", "/assets/icons/wants.png" },
-                    { new Guid("e1fc64f8-3154-4880-9732-37b5615592bd"), false, 0, false, true, "Shirt", "/assets/icons/shirt.png" },
-                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), false, 0, false, true, "Car", "/assets/icons/car.png" },
-                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), false, 0, false, true, "Households", "/assets/icons/household-items.png" },
-                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), false, 0, false, true, "Transport", "/assets/icons/transport.png" },
-                    { new Guid("eff825bc-673f-43e3-a422-1df323bf274d"), false, 0, false, true, "Tools", "/assets/icons/tools.png" },
-                    { new Guid("f0ffaf46-dde9-47e0-a9f1-d64785d4dfe7"), false, 0, false, true, "Gift", "/assets/icons/gift.png" },
-                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), false, 0, false, true, "Insurance", "/assets/icons/insurance.png" },
-                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), false, 0, false, true, "Family", "/assets/icons/family.png" }
+                    { new Guid("05269476-13c6-451d-9259-5bcf2480ef1e"), false, 0, false, "Baby", "/assets/icons/baby.png" },
+                    { new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), false, 0, false, "Financial Freedom", "/assets/icons/financial-freedom.png" },
+                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), false, 0, false, "Donate", "/assets/icons/donate.png" },
+                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, 0, false, "Education", "/assets/icons/education.png" },
+                    { new Guid("2f67a4c3-7186-47da-9ead-407be93a675e"), false, 0, false, "Gas", "/assets/icons/gas.png" },
+                    { new Guid("4006be63-25d4-4425-9702-2ba10dc721bb"), false, 0, false, "Travel", "/assets/icons/travel.png" },
+                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), false, 0, false, "Gardens", "/assets/icons/garden.png" },
+                    { new Guid("476501c2-92df-4e9f-a863-dfd93dd937c0"), false, 0, false, "Marry", "/assets/icons/marry.png" },
+                    { new Guid("4bb8d462-187a-4370-bb1e-e0fb99d233e0"), false, 0, false, "Bakery", "/assets/icons/bakery.png" },
+                    { new Guid("52afbf57-54d3-4fe6-a680-40375679b5ff"), false, 0, false, "Holiday", "/assets/icons/holiday.png" },
+                    { new Guid("56f4421e-10b6-4940-b594-01de569fde12"), false, 0, false, "Saving", "/assets/icons/Saving.png" },
+                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), false, 0, false, "Utilities", "/assets/icons/utilities.png" },
+                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), false, 0, false, "Eat Out", "/assets/icons/eat-out.png" },
+                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, 0, false, "Medicines", "/assets/icons/medicine.png" },
+                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, 0, false, "Petro", "/assets/icons/petro.png" },
+                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, 0, false, "Others", "/assets/icons/others.png" },
+                    { new Guid("79cf43bd-c6d4-4834-b677-52c9b359473e"), false, 0, false, "Honey Moon", "/assets/icons/honeymoon.png" },
+                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, 0, false, "Investment", "/assets/icons/investment.png" },
+                    { new Guid("8470c1bc-d85c-4f94-9133-b1ba2945f7f2"), false, 0, false, "Jeans", "/assets/icons/jeans.png" },
+                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), false, 0, false, "Grocery", "/assets/icons/grocery.png" },
+                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), false, 0, false, "Furniture", "/assets/icons/furniture.png" },
+                    { new Guid("9392f6a9-f9aa-4d9e-9ab2-8d89ba455ea9"), false, 0, false, "Vaccation", "/assets/icons/vaccation.png" },
+                    { new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), false, 0, false, "Long Term Saving", "/assets/icons/long-term-saving.png" },
+                    { new Guid("b028a67a-b2e3-44a7-953f-de1c0959262b"), false, 0, false, "Electricity", "/assets/icons/electricity.png" },
+                    { new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), false, 0, false, "Necessities", "/assets/icons/necessities.png" },
+                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), false, 0, false, "Toys", "/assets/icons/toy.png" },
+                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), false, 0, false, "Clothes", "/assets/icons/clothes.png" },
+                    { new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), false, 0, false, "Wants", "/assets/icons/wants.png" },
+                    { new Guid("e1fc64f8-3154-4880-9732-37b5615592bd"), false, 0, false, "Shirt", "/assets/icons/shirt.png" },
+                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), false, 0, false, "Car", "/assets/icons/car.png" },
+                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), false, 0, false, "Households", "/assets/icons/household-items.png" },
+                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), false, 0, false, "Transport", "/assets/icons/transport.png" },
+                    { new Guid("eff825bc-673f-43e3-a422-1df323bf274d"), false, 0, false, "Tools", "/assets/icons/tools.png" },
+                    { new Guid("f0ffaf46-dde9-47e0-a9f1-d64785d4dfe7"), false, 0, false, "Gift", "/assets/icons/gift.png" },
+                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), false, 0, false, "Insurance", "/assets/icons/insurance.png" },
+                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), false, 0, false, "Family", "/assets/icons/family.png" }
                 });
 
             migrationBuilder.InsertData(
@@ -476,8 +475,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "d16c45b7-a990-4309-9cd3-eaf317c1184e", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "5e422d18-2f9b-4143-ac14-eadce3415156", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "90d2f472-66aa-41ef-a0f2-5c885a237c4a", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "4ee07722-ca82-4a71-abfc-ccc18f72c37c", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(

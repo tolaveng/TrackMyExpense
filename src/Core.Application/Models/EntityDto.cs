@@ -5,14 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Core.Application.Models
-{
-    public class Auditable<T>
+{   
+    public abstract class EntityDto<T>
     {
         public T Id { get; set; } = default(T);
-        public DateTime? CreatedAt { get; set; }
-        public Guid? CreatedBy { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-        public Guid? ModifiedBy { get; set; }
         public bool Archived { get; set; }
     }
 }

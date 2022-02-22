@@ -32,7 +32,7 @@
             <MudTh>Email Confirmed</MudTh>
             <MudTh>Phone Confirmed</MudTh>
             <MudTh>Account Disabled</MudTh>
-            <MudTh></MudTh>
+            <MudTh>Actions</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Full Name">@context.FullName</MudTd>
@@ -56,7 +56,7 @@
                     <MudIcon Icon="@Icons.Filled.Check" Color="Color.Warning" Title="Yes" />
                 }
             </MudTd>
-            <MudTd>
+            <MudTd DataLabel="Actions">
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
                 Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
                 &nbsp;
@@ -95,7 +95,9 @@
         UserList = result.Data;
         totalItems = result.TotalCount;
         loading = false;
-        return new TableData<UserDto>() {TotalItems = totalItems, Items = UserList};
+        return await Task.FromResult<TableData<UserDto>>(
+            new TableData<UserDto>() {TotalItems = totalItems, Items = UserList}
+        );
     }
 
     private void OnSearch(string text)

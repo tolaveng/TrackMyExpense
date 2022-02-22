@@ -1,5 +1,6 @@
 ﻿@page "/admin/budgetjartemplates"
-@using Core.Application.Mediator.BudgetJars
+
+@using Core.Application.Mediator.BudgetJarTemplates
 @using Core.Application.Mediator.Icons
 @using Core.Application.Models
 @using Core.Domain.Enums
@@ -29,7 +30,7 @@
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Percentage">@context.Percentage %</MudTd>
                     <MudTd DataLabel="IconName">
-                        <img src=".@context.Icon.Path" height="24" width="24" class="mr-2" />
+                        <img src=".@context.Icon.IconUrl" height="24" width="24" class="mr-2" />
                         @context.Icon.Name
                     </MudTd>
                     <MudTd>
@@ -49,7 +50,7 @@
                         @foreach(var icon in IconAssets)
                             {
                              <MudSelectItem Value="@(icon.Id)">
-                                <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
+                                <img src=".@icon.IconUrl" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
                             }
                         </MudSelect>
                     </MudTd>
@@ -66,7 +67,7 @@
                             @foreach(var icon in IconAssets)
                             {
                              <MudSelectItem Value="@icon.Id">
-                                <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
+                                <img src=".@icon.IconUrl" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
                             }
                         </MudSelect>
                     </MudTd>
@@ -171,7 +172,7 @@
                 Snackbar.Add("Total of all percentages cannot be greater than 100.", Severity.Error);
                 return false;
             }
-            if (budgetJar.Id == null || budgetJar.Id == Guid.Empty)
+            if (budgetJar.Id == Guid.Empty)
             {
                 if (sumPercents + budgetJar.Percentage > 100)
                 {
@@ -194,7 +195,7 @@
             Snackbar.Add("Budget Jar saved successfully", Severity.Success);
             return true;
         }
-        catch(Exception ex)
+        catch(Exception)
         {
             Snackbar.Add("Something went wrong, please try again later", Severity.Error);
             return false;

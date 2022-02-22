@@ -22,7 +22,6 @@ namespace Core.Infrastructure.Seeder
                     Name = "Necessities",
                     Path = "/assets/icons/necessities.png",
                     IconType = IconType.Asset,
-                    IsSystem = true,
                 },
                 new Icon()
                 {
@@ -30,7 +29,6 @@ namespace Core.Infrastructure.Seeder
                     Name = "Long Term Saving",
                     Path = "/assets/icons/long-term-saving.png",
                     IconType = IconType.Asset,
-                    IsSystem = true,
                 },
                 new Icon()
                 {
@@ -38,7 +36,6 @@ namespace Core.Infrastructure.Seeder
                     Name = "Wants",
                     Path = "/assets/icons/wants.png",
                     IconType = IconType.Asset,
-                    IsSystem = true,
                 },
                 new Icon()
                 {
@@ -46,16 +43,13 @@ namespace Core.Infrastructure.Seeder
                     Name = "Education",
                     Path = "/assets/icons/education.png",
                     IconType = IconType.Asset,
-                    IsSystem = true,
                 },
                 new Icon()
                 {
                     Id = Guid.Parse("0A55E9F4-ED2A-4AE5-8249-2AA9368EFE88"),
                     Name = "Financial Freedom",
                     Path = "/assets/icons/financial-freedom.png",
-                    IconType = IconType.Asset,
-                    IsSystem = true,
-                }
+                    IconType = IconType.Asset,                }
             };
 
             // Categories
@@ -65,7 +59,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Grocery",
                 Path = "/assets/icons/grocery.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -73,7 +66,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Clothes",
                 Path = "/assets/icons/clothes.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -82,7 +74,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Eat Out",
                 Path = "/assets/icons/eat-out.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -90,7 +81,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Transport",
                 Path = "/assets/icons/transport.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -98,7 +88,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Utilities",
                 Path = "/assets/icons/utilities.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -106,7 +95,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Medicines",
                 Path = "/assets/icons/medicine.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -114,7 +102,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Investment",
                 Path = "/assets/icons/investment.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -122,7 +109,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Family",
                 Path = "/assets/icons/family.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -130,7 +116,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Furniture",
                 Path = "/assets/icons/furniture.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -138,7 +123,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Petro",
                 Path = "/assets/icons/petro.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             icons.Add(new Icon()
             {
@@ -146,7 +130,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Car",
                 Path = "/assets/icons/car.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -155,7 +138,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Insurance",
                 Path = "/assets/icons/insurance.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
             
             icons.Add(new Icon()
@@ -164,7 +146,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Toys",
                 Path = "/assets/icons/toy.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -173,7 +154,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Donate",
                 Path = "/assets/icons/donate.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -182,7 +162,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Households",
                 Path = "/assets/icons/household-items.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -191,7 +170,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Gardens",
                 Path = "/assets/icons/garden.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             // Custom
@@ -201,7 +179,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Baby",
                 Path = "/assets/icons/baby.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -210,7 +187,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Travel",
                 Path = "/assets/icons/travel.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -219,7 +195,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Holiday",
                 Path = "/assets/icons/holiday.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -228,7 +203,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Vaccation",
                 Path = "/assets/icons/vaccation.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -237,7 +211,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Saving",
                 Path = "/assets/icons/Saving.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -246,7 +219,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Honey Moon",
                 Path = "/assets/icons/honeymoon.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -255,7 +227,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Bakery",
                 Path = "/assets/icons/bakery.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -264,7 +235,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Marry",
                 Path = "/assets/icons/marry.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -273,7 +243,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Gas",
                 Path = "/assets/icons/gas.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -282,7 +251,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Electricity",
                 Path = "/assets/icons/electricity.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -291,7 +259,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Gift",
                 Path = "/assets/icons/gift.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -300,7 +267,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Shirt",
                 Path = "/assets/icons/shirt.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -309,7 +275,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Jeans",
                 Path = "/assets/icons/jeans.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -318,7 +283,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Tools",
                 Path = "/assets/icons/tools.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             icons.Add(new Icon()
@@ -327,7 +291,6 @@ namespace Core.Infrastructure.Seeder
                 Name = "Others",
                 Path = "/assets/icons/others.png",
                 IconType = IconType.Asset,
-                IsSystem = true,
             });
 
             builder.HasData(icons);

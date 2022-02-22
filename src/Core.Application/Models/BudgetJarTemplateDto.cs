@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Models
 {
-    public class BudgetJarTemplateDto
+    public class BudgetJarTemplateDto : EntityDto<Guid>
     {
-        public Guid Id { get; set; }
         public Guid UserId { get; set; }
 
         public string Name { get; set; }

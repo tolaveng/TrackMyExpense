@@ -1,19 +1,24 @@
 ﻿using Core.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FluentValidation;
 
 namespace Core.Application.Models
 {
-    public class IconDto
+    public class IconDto : EntityDto<Guid>
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Path { get; set; }
         public IconType IconType { get; set; }
         public bool IsHidden { get; set; }
-        public bool IsSystem { get; set; }
+
+        public string IconUrl { get; set; } 
+    }
+
+    public class IconValidator : AbstractValidator<IconDto>
+    {
+        public IconValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty().MaximumLength(128);
+            RuleFor(x => x.Path).NotEmpty().When(x => x.IconType != IconType.Upload).MaximumLength(256);
+        }
     }
 }

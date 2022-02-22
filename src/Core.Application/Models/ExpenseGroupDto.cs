@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Models
 {
-    public class ExpenseGroupDto
+    public class ExpenseGroupDto : EntityDto<Guid>
     {
-        public Guid Id { get; set; }
         public Guid UserId { get; set; }
 
         [MaxLength(128)]

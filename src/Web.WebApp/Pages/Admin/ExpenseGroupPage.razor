@@ -27,7 +27,7 @@
                 <RowTemplate>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="IconName">
-                        <img src=".@context.Icon.Path" height="24" width="24" class="mr-2" />
+                        <img src=".@context.Icon.IconUrl" height="24" width="24" class="mr-2" />
                         @context.Icon.Name
                     </MudTd>
                     <MudTd>
@@ -44,7 +44,7 @@
                             @foreach(var icon in iconAssets)
                             {
                              <MudSelectItem Value="@(icon.Id)">
-                                <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
+                                <img src=".@icon.IconUrl" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
                             }
                         </MudSelect>
                     </MudTd>
@@ -58,7 +58,7 @@
                             @foreach(var icon in iconAssets)
                             {
                              <MudSelectItem Value="@icon.Id">
-                                <img src=".@icon.Path" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
+                                <img src=".@icon.IconUrl" height="24" width="24" class="mr-2" />@icon.Name</MudSelectItem>
                             }
                         </MudSelect>
                     </MudTd>
@@ -167,7 +167,7 @@
             Snackbar.Add("Expense Group saved successfully", Severity.Success);
             return true;
         }
-        catch(Exception ex)
+        catch(Exception)
         {
             Snackbar.Add("Something went wrong, please try again later", Severity.Error);
             return false;

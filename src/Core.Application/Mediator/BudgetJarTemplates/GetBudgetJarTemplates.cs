@@ -2,13 +2,8 @@
 using Core.Application.IRepositories;
 using Core.Application.Models;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Core.Application.Mediator.BudgetJars
+namespace Core.Application.Mediator.BudgetJarTemplates
 {
     public class GetBudgetJarTemplatesQuery : IRequest<List<BudgetJarTemplateDto>>
     {
