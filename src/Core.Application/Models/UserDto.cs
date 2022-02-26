@@ -19,5 +19,6 @@ namespace Core.Application.Models
         public IEnumerable<Subscription> Subscriptions { get; set; }
         public bool IsDisabled { get; set; }
         public bool TwoFactorEnabled { get; set; }
+        public string Currency { get; set; }
     }
 }

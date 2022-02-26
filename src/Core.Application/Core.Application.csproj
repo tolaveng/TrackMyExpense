@@ -26,6 +26,14 @@
   <ItemGroup>
     <Folder Include="Expenses\Commands\" />
     <Folder Include="Expenses\Queries\" />
+    <Folder Include="Properties\" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Include="$(SolutionDir)src\Assets\**"
+			  CopyToOutputDirectory="PreserveNewest"
+			  CopyToPublishDirectory="PreserveNewest"
+			  LinkBase="Assets\" />
+	</ItemGroup>
+	
 </Project>

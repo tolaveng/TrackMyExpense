@@ -11,6 +11,20 @@ namespace Core.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Currencies",
+                columns: table => new
+                {
+                    Code = table.Column<string>(type: "text", nullable: false),
+                    UnicodeDecimal = table.Column<string>(type: "text", nullable: true),
+                    UnicodeHex = table.Column<string>(type: "text", nullable: true),
+                    Text = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Currencies", x => x.Code);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Icons",
                 columns: table => new
                 {
@@ -92,6 +106,7 @@ namespace Core.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FullName = table.Column<string>(type: "text", nullable: true),
                     IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
+                    Currency = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -334,7 +349,6 @@ namespace Core.Infrastructure.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Currency = table.Column<string>(type: "text", nullable: true),
                     PaidDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Ref = table.Column<string>(type: "text", nullable: true),
                     Payee = table.Column<string>(type: "text", nullable: true),
@@ -428,6 +442,126 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Currencies",
+                columns: new[] { "Code", "Text", "UnicodeDecimal", "UnicodeHex" },
+                values: new object[,]
+                {
+                    { "AFN", "Afghanistan Afghani", "1547", "60b" },
+                    { "ALL", "Albania Lek", "76, 101, 107", "4c, 65, 6b" },
+                    { "ANG", "Netherlands Antilles Guilder", "402", "192" },
+                    { "ARS", "Argentina Peso", "36", "24" },
+                    { "AUD", "Australia Dollar", "36", "24" },
+                    { "AWG", "Aruba Guilder", "402", "192" },
+                    { "AZN", "Azerbaijan New Manat", "1084, 1072, 1085", "43c, 430, 43d" },
+                    { "BAM", "Bosnia and Herzegovina Convertible Marka", "75, 77", "4b, 4d" },
+                    { "BBD", "Barbados Dollar", "36", "24" },
+                    { "BGN", "Bulgaria Lev", "1083, 1074", "43b, 432" },
+                    { "BMD", "Bermuda Dollar", "36", "24" },
+                    { "BND", "Brunei Darussalam Dollar", "36", "24" },
+                    { "BOB", "Bolivia Boliviano", "36, 98", "24, 62" },
+                    { "BRL", "Brazil Real", "82, 36", "52, 24" },
+                    { "BSD", "Bahamas Dollar", "36", "24" },
+                    { "BWP", "Botswana Pula", "80", "50" },
+                    { "BYR", "Belarus Ruble", "112, 46", "70, 2e" },
+                    { "BZD", "Belize Dollar", "66, 90, 36", "42, 5a, 24" },
+                    { "CAD", "Canada Dollar", "36", "24" },
+                    { "CHF", "Switzerland Franc", "67, 72, 70", "43, 48, 46" },
+                    { "CLP", "Chile Peso", "36", "24" },
+                    { "CNY", "China Yuan Renminbi", "165", "a5" },
+                    { "COP", "Colombia Peso", "36", "24" },
+                    { "CRC", "Costa Rica Colon", "8353", "20a1" },
+                    { "CUP", "Cuba Peso", "8369", "20b1" },
+                    { "CZK", "Czech Republic Koruna", "75, 269", "4b, 10d" },
+                    { "DKK", "Denmark Krone", "107, 114", "6b, 72" },
+                    { "DOP", "Dominican Republic Peso", "82, 68, 36", "52, 44, 24" },
+                    { "EEK", "Estonia Kroon", "107, 114", "6b, 72" },
+                    { "EGP", "Egypt Pound", "163", "a3" },
+                    { "EUR", "Euro Member Countries", "8364", "20ac" },
+                    { "FJD", "Fiji Dollar", "36", "24" },
+                    { "FKP", "Falkland Islands (Malvinas) Pound", "163", "a3" },
+                    { "GBP", "United Kingdom Pound", "163", "a3" },
+                    { "GGP", "Guernsey Pound", "163", "a3" },
+                    { "GHC", "Ghana Cedis", "162", "a2" },
+                    { "GIP", "Gibraltar Pound", "163", "a3" },
+                    { "GTQ", "Guatemala Quetzal", "81", "51" },
+                    { "GYD", "Guyana Dollar", "36", "24" },
+                    { "HKD", "Hong Kong Dollar", "36", "24" },
+                    { "HNL", "Honduras Lempira", "76", "4c" },
+                    { "HRK", "Croatia Kuna", "107, 110", "6b, 6e" },
+                    { "HUF", "Hungary Forint", "70, 116", "46, 74" },
+                    { "IDR", "Indonesia Rupiah", "82, 112", "52, 70" },
+                    { "ILS", "Israel Shekel", "8362", "20aa" },
+                    { "IMP", "Isle of Man Pound", "163", "a3" },
+                    { "INR", "India Rupee", "", "" },
+                    { "IRR", "Iran Rial", "65020", "fdfc" },
+                    { "ISK", "Iceland Krona", "107, 114", "6b, 72" },
+                    { "JEP", "Jersey Pound", "163", "a3" },
+                    { "JMD", "Jamaica Dollar", "74, 36", "4a, 24" },
+                    { "JPY", "Japan Yen", "165", "a5" },
+                    { "KGS", "Kyrgyzstan Som", "1083, 1074", "43b, 432" },
+                    { "KHR", "Cambodia Riel", "6107", "17db" },
+                    { "KPW", "Korea (North) Won", "8361", "20a9" },
+                    { "KRW", "Korea (South) Won", "8361", "20a9" },
+                    { "KYD", "Cayman Islands Dollar", "36", "24" },
+                    { "KZT", "Kazakhstan Tenge", "1083, 1074", "43b, 432" },
+                    { "LAK", "Laos Kip", "8365", "20ad" },
+                    { "LBP", "Lebanon Pound", "163", "a3" },
+                    { "LKR", "Sri Lanka Rupee", "8360", "20a8" },
+                    { "LRD", "Liberia Dollar", "36", "24" },
+                    { "LTL", "Lithuania Litas", "76, 116", "4c, 74" },
+                    { "LVL", "Latvia Lat", "76, 115", "4c, 73" },
+                    { "MKD", "Macedonia Denar", "1076, 1077, 1085", "434, 435, 43d" },
+                    { "MNT", "Mongolia Tughrik", "8366", "20ae" },
+                    { "MUR", "Mauritius Rupee", "8360", "20a8" },
+                    { "MXN", "Mexico Peso", "36", "24" },
+                    { "MYR", "Malaysia Ringgit", "82, 77", "52, 4d" },
+                    { "MZN", "Mozambique Metical", "77, 84", "4d, 54" },
+                    { "NAD", "Namibia Dollar", "36", "24" },
+                    { "NGN", "Nigeria Naira", "8358", "20a6" },
+                    { "NIO", "Nicaragua Cordoba", "67, 36", "43, 24" },
+                    { "NOK", "Norway Krone", "107, 114", "6b, 72" },
+                    { "NPR", "Nepal Rupee", "8360", "20a8" },
+                    { "NZD", "New Zealand Dollar", "36", "24" },
+                    { "OMR", "Oman Rial", "65020", "fdfc" },
+                    { "PAB", "Panama Balboa", "66, 47, 46", "42, 2f, 2e" },
+                    { "PEN", "Peru Nuevo Sol", "83, 47, 46", "53, 2f, 2e" },
+                    { "PHP", "Philippines Peso", "8369", "20b1" },
+                    { "PKR", "Pakistan Rupee", "8360", "20a8" },
+                    { "PLN", "Poland Zloty", "122, 322", "7a, 142" },
+                    { "PYG", "Paraguay Guarani", "71, 115", "47, 73" },
+                    { "QAR", "Qatar Riyal", "65020", "fdfc" },
+                    { "RON", "Romania New Leu", "108, 101, 105", "6c, 65, 69" },
+                    { "RSD", "Serbia Dinar", "1044, 1080, 1085, 46", "414, 438, 43d, 2e" },
+                    { "RUB", "Russia Ruble", "1088, 1091, 1073", "440, 443, 431" },
+                    { "SAR", "Saudi Arabia Riyal", "65020", "fdfc" },
+                    { "SBD", "Solomon Islands Dollar", "36", "24" },
+                    { "SCR", "Seychelles Rupee", "8360", "20a8" },
+                    { "SEK", "Sweden Krona", "107, 114", "6b, 72" },
+                    { "SGD", "Singapore Dollar", "36", "24" },
+                    { "SHP", "Saint Helena Pound", "163", "a3" },
+                    { "SOS", "Somalia Shilling", "83", "53" },
+                    { "SRD", "Suriname Dollar", "36", "24" },
+                    { "SVC", "El Salvador Colon", "36", "24" },
+                    { "SYP", "Syria Pound", "163", "a3" },
+                    { "THB", "Thailand Baht", "3647", "e3f" },
+                    { "TRL", "Turkey Lira", "8356", "20a4" },
+                    { "TRY", "Turkey Lira", "", "" },
+                    { "TTD", "Trinidad and Tobago Dollar", "84, 84, 36", "54, 54, 24" },
+                    { "TVD", "Tuvalu Dollar", "36", "24" },
+                    { "TWD", "Taiwan New Dollar", "78, 84, 36", "4e, 54, 24" },
+                    { "UAH", "Ukraine Hryvna", "8372", "20b4" },
+                    { "USD", "United States Dollar", "36", "24" },
+                    { "UYU", "Uruguay Peso", "36, 85", "24, 55" },
+                    { "UZS", "Uzbekistan Som", "1083, 1074", "43b, 432" },
+                    { "VEF", "Venezuela Bolivar", "66, 115", "42, 73" },
+                    { "VND", "Viet Nam Dong", "8363", "20ab" },
+                    { "XCD", "East Caribbean Dollar", "36", "24" },
+                    { "YER", "Yemen Rial", "65020", "fdfc" },
+                    { "ZAR", "South Africa Rand", "82", "52" },
+                    { "ZWD", "Zimbabwe Dollar", "90, 36", "5a, 24" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Icons",
                 columns: new[] { "Id", "Archived", "IconType", "IsHidden", "Name", "Path" },
                 values: new object[,]
@@ -448,6 +582,7 @@ namespace Core.Infrastructure.Migrations
                     { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, 0, false, "Medicines", "/assets/icons/medicine.png" },
                     { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, 0, false, "Petro", "/assets/icons/petro.png" },
                     { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, 0, false, "Others", "/assets/icons/others.png" },
+                    { new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), false, 0, false, "Sports", "/assets/icons/sports.png" },
                     { new Guid("79cf43bd-c6d4-4834-b677-52c9b359473e"), false, 0, false, "Honey Moon", "/assets/icons/honeymoon.png" },
                     { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, 0, false, "Investment", "/assets/icons/investment.png" },
                     { new Guid("8470c1bc-d85c-4f94-9133-b1ba2945f7f2"), false, 0, false, "Jeans", "/assets/icons/jeans.png" },
@@ -475,8 +610,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "90d2f472-66aa-41ef-a0f2-5c885a237c4a", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "4ee07722-ca82-4a71-abfc-ccc18f72c37c", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "9e55630e-755c-47d5-936e-34693dc04a79", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "dc97d136-bab6-4e68-8111-9f25e7f0a016", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -505,6 +640,7 @@ namespace Core.Infrastructure.Migrations
                     { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, new Guid("6550b905-6763-4e97-9038-50ec50d68853"), true, "Medicines", new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), true, "Petro", new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), false, new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), true, "Sports", new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), true, "Investment", new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), false, new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), true, "Grocery", new Guid("00000000-0000-0000-0000-000000000000") },
                     { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), false, new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), true, "Furniture", new Guid("00000000-0000-0000-0000-000000000000") },
@@ -623,6 +759,9 @@ namespace Core.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "BudgetJarTemplates");
+
+            migrationBuilder.DropTable(
+                name: "Currencies");
 
             migrationBuilder.DropTable(
                 name: "PageHtmls");

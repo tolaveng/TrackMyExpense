@@ -19,6 +19,7 @@ namespace Core.Infrastructure.Repository
         private IGenericRepository<Expense> _expenseRepository;
         private IGenericRepository<ExpenseGroup> _expenseGroupRepository;
         private IGenericRepository<Icon> _iconRepository;
+        private IGenericRepository<Currency> _currencyRepository;
 
         public UnitOfWork(IDbContextFactory<AppDbContext> dbContextFactory)
         {
@@ -33,6 +34,8 @@ namespace Core.Infrastructure.Repository
         public IGenericRepository<Expense> ExpenseRepository => _expenseRepository ??= new GenericRepository<Expense>(_context);
         public IGenericRepository<ExpenseGroup> ExpenseGroupRepository => _expenseGroupRepository ??= new GenericRepository<ExpenseGroup>(_context);
         public IGenericRepository<Icon> IconRepository => _iconRepository ??= new GenericRepository<Icon>(_context);
+
+        public IGenericRepository<Currency> CurrencyRepository => _currencyRepository ??= new GenericRepository<Currency>(_context);
 
         private bool disposed = false;
 

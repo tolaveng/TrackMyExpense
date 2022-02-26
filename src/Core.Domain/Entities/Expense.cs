@@ -11,7 +11,6 @@ namespace Core.Domain.Entities
         public Guid UserId { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
-        public string Currency { get; set; }
         public DateTime PaidDate { get; set; }
         public string Ref { get; set; }
         public string Payee { get; set; }

@@ -13,6 +13,7 @@ namespace Core.Infrastructure.Database.Identity
     {
         public string FullName { get; set; }
         public bool IsDisabled { get; set; }
+        public string Currency { get; set; }
         public virtual ICollection<Subscription> Subscriptions { get; set; }
     }
 }

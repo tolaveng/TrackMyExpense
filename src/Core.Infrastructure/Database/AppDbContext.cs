@@ -27,6 +27,7 @@ namespace Core.Infrastructure.Database
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<RecurrentExpense> RecurrentExpenses { get; set; }
         public DbSet<Icon> Icons { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +67,7 @@ namespace Core.Infrastructure.Database
             modelBuilder.ApplyConfiguration(new IconConfig());
             modelBuilder.ApplyConfiguration(new BudgetJarTemplateConfig());
             modelBuilder.ApplyConfiguration(new ExpenseGroupConfig());
+            modelBuilder.ApplyConfiguration(new CurrencyConfig());
         }
     }
 }

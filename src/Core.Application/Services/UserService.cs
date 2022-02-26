@@ -29,6 +29,12 @@ namespace Core.Application.Services
         public async Task<GenericResponse<Guid>> CreateUserAsync(UserDto userDto)
         {
             var user = _mapper.Map<AppUser>(userDto);
+
+            if (string.IsNullOrWhiteSpace(user.Currency))
+            {
+                user.Currency = "USD";
+            }
+
             return await _userRepository.CreateUserAsync(user);
         }
 

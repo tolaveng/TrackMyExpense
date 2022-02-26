@@ -136,6 +136,13 @@ namespace Core.Infrastructure.Seeder
                 },
                 new ExpenseGroup()
                 {
+                    Id = Guid.Parse("70D3E625-CF3B-4ECA-A773-F1FB5E340C64"),
+                    Name = "Sports",
+                    IsSystem = true,
+                    IconId = Guid.Parse("70D3E625-CF3B-4ECA-A773-F1FB5E340C64"),
+                },
+                new ExpenseGroup()
+                {
                     Id = Guid.Parse("6B7C5AD3-82C5-4AFC-AD66-A2A895A4BF7B"),
                     Name = "Others",
                     IsSystem = true,

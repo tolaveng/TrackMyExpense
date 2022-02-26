@@ -100,11 +100,13 @@ namespace Web.WebApp
 
             services.AddSingleton<IFileDirectoryProvider, FileDirectoryProvider>();
             services.AddSingleton<IEmailService, EmailService>();
+            services.AddSingleton<ICurrencyProvider, CurrencyProvider>();
 
             services.AddScoped<ISysAttributeService, SysAttributeService>();
             services.AddScoped<IPageHtmlService, PageHtmlService > ();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IFileUploadFactory, FileUploadFactory>();
             services.AddTransient<FileUploadLocalService>()

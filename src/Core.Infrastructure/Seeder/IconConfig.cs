@@ -172,6 +172,14 @@ namespace Core.Infrastructure.Seeder
                 IconType = IconType.Asset,
             });
 
+            icons.Add(new Icon()
+            {
+                Id = Guid.Parse("70D3E625-CF3B-4ECA-A773-F1FB5E340C64"),
+                Name = "Sports",
+                Path = "/assets/icons/sports.png",
+                IconType = IconType.Asset,
+            });
+
             // Custom
             icons.Add(new Icon()
             {

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220220024843_InitDataTables")]
+    [Migration("20220226102037_InitDataTables")]
     partial class InitDataTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -185,6 +185,818 @@ namespace Core.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UnicodeDecimal")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UnicodeHex")
+                        .HasColumnType("text");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("Currencies");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "ALL",
+                            Text = "Albania Lek",
+                            UnicodeDecimal = "76, 101, 107",
+                            UnicodeHex = "4c, 65, 6b"
+                        },
+                        new
+                        {
+                            Code = "AFN",
+                            Text = "Afghanistan Afghani",
+                            UnicodeDecimal = "1547",
+                            UnicodeHex = "60b"
+                        },
+                        new
+                        {
+                            Code = "ARS",
+                            Text = "Argentina Peso",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "AWG",
+                            Text = "Aruba Guilder",
+                            UnicodeDecimal = "402",
+                            UnicodeHex = "192"
+                        },
+                        new
+                        {
+                            Code = "AUD",
+                            Text = "Australia Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "AZN",
+                            Text = "Azerbaijan New Manat",
+                            UnicodeDecimal = "1084, 1072, 1085",
+                            UnicodeHex = "43c, 430, 43d"
+                        },
+                        new
+                        {
+                            Code = "BSD",
+                            Text = "Bahamas Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "BBD",
+                            Text = "Barbados Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "BYR",
+                            Text = "Belarus Ruble",
+                            UnicodeDecimal = "112, 46",
+                            UnicodeHex = "70, 2e"
+                        },
+                        new
+                        {
+                            Code = "BZD",
+                            Text = "Belize Dollar",
+                            UnicodeDecimal = "66, 90, 36",
+                            UnicodeHex = "42, 5a, 24"
+                        },
+                        new
+                        {
+                            Code = "BMD",
+                            Text = "Bermuda Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "BOB",
+                            Text = "Bolivia Boliviano",
+                            UnicodeDecimal = "36, 98",
+                            UnicodeHex = "24, 62"
+                        },
+                        new
+                        {
+                            Code = "BAM",
+                            Text = "Bosnia and Herzegovina Convertible Marka",
+                            UnicodeDecimal = "75, 77",
+                            UnicodeHex = "4b, 4d"
+                        },
+                        new
+                        {
+                            Code = "BWP",
+                            Text = "Botswana Pula",
+                            UnicodeDecimal = "80",
+                            UnicodeHex = "50"
+                        },
+                        new
+                        {
+                            Code = "BGN",
+                            Text = "Bulgaria Lev",
+                            UnicodeDecimal = "1083, 1074",
+                            UnicodeHex = "43b, 432"
+                        },
+                        new
+                        {
+                            Code = "BRL",
+                            Text = "Brazil Real",
+                            UnicodeDecimal = "82, 36",
+                            UnicodeHex = "52, 24"
+                        },
+                        new
+                        {
+                            Code = "BND",
+                            Text = "Brunei Darussalam Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "KHR",
+                            Text = "Cambodia Riel",
+                            UnicodeDecimal = "6107",
+                            UnicodeHex = "17db"
+                        },
+                        new
+                        {
+                            Code = "CAD",
+                            Text = "Canada Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "KYD",
+                            Text = "Cayman Islands Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "CLP",
+                            Text = "Chile Peso",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "CNY",
+                            Text = "China Yuan Renminbi",
+                            UnicodeDecimal = "165",
+                            UnicodeHex = "a5"
+                        },
+                        new
+                        {
+                            Code = "COP",
+                            Text = "Colombia Peso",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "CRC",
+                            Text = "Costa Rica Colon",
+                            UnicodeDecimal = "8353",
+                            UnicodeHex = "20a1"
+                        },
+                        new
+                        {
+                            Code = "HRK",
+                            Text = "Croatia Kuna",
+                            UnicodeDecimal = "107, 110",
+                            UnicodeHex = "6b, 6e"
+                        },
+                        new
+                        {
+                            Code = "CUP",
+                            Text = "Cuba Peso",
+                            UnicodeDecimal = "8369",
+                            UnicodeHex = "20b1"
+                        },
+                        new
+                        {
+                            Code = "CZK",
+                            Text = "Czech Republic Koruna",
+                            UnicodeDecimal = "75, 269",
+                            UnicodeHex = "4b, 10d"
+                        },
+                        new
+                        {
+                            Code = "DKK",
+                            Text = "Denmark Krone",
+                            UnicodeDecimal = "107, 114",
+                            UnicodeHex = "6b, 72"
+                        },
+                        new
+                        {
+                            Code = "DOP",
+                            Text = "Dominican Republic Peso",
+                            UnicodeDecimal = "82, 68, 36",
+                            UnicodeHex = "52, 44, 24"
+                        },
+                        new
+                        {
+                            Code = "XCD",
+                            Text = "East Caribbean Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "EGP",
+                            Text = "Egypt Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "SVC",
+                            Text = "El Salvador Colon",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "EEK",
+                            Text = "Estonia Kroon",
+                            UnicodeDecimal = "107, 114",
+                            UnicodeHex = "6b, 72"
+                        },
+                        new
+                        {
+                            Code = "EUR",
+                            Text = "Euro Member Countries",
+                            UnicodeDecimal = "8364",
+                            UnicodeHex = "20ac"
+                        },
+                        new
+                        {
+                            Code = "FKP",
+                            Text = "Falkland Islands (Malvinas) Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "FJD",
+                            Text = "Fiji Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "GHC",
+                            Text = "Ghana Cedis",
+                            UnicodeDecimal = "162",
+                            UnicodeHex = "a2"
+                        },
+                        new
+                        {
+                            Code = "GIP",
+                            Text = "Gibraltar Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "GTQ",
+                            Text = "Guatemala Quetzal",
+                            UnicodeDecimal = "81",
+                            UnicodeHex = "51"
+                        },
+                        new
+                        {
+                            Code = "GGP",
+                            Text = "Guernsey Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "GYD",
+                            Text = "Guyana Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "HNL",
+                            Text = "Honduras Lempira",
+                            UnicodeDecimal = "76",
+                            UnicodeHex = "4c"
+                        },
+                        new
+                        {
+                            Code = "HKD",
+                            Text = "Hong Kong Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "HUF",
+                            Text = "Hungary Forint",
+                            UnicodeDecimal = "70, 116",
+                            UnicodeHex = "46, 74"
+                        },
+                        new
+                        {
+                            Code = "ISK",
+                            Text = "Iceland Krona",
+                            UnicodeDecimal = "107, 114",
+                            UnicodeHex = "6b, 72"
+                        },
+                        new
+                        {
+                            Code = "INR",
+                            Text = "India Rupee",
+                            UnicodeDecimal = "",
+                            UnicodeHex = ""
+                        },
+                        new
+                        {
+                            Code = "IDR",
+                            Text = "Indonesia Rupiah",
+                            UnicodeDecimal = "82, 112",
+                            UnicodeHex = "52, 70"
+                        },
+                        new
+                        {
+                            Code = "IRR",
+                            Text = "Iran Rial",
+                            UnicodeDecimal = "65020",
+                            UnicodeHex = "fdfc"
+                        },
+                        new
+                        {
+                            Code = "IMP",
+                            Text = "Isle of Man Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "ILS",
+                            Text = "Israel Shekel",
+                            UnicodeDecimal = "8362",
+                            UnicodeHex = "20aa"
+                        },
+                        new
+                        {
+                            Code = "JMD",
+                            Text = "Jamaica Dollar",
+                            UnicodeDecimal = "74, 36",
+                            UnicodeHex = "4a, 24"
+                        },
+                        new
+                        {
+                            Code = "JPY",
+                            Text = "Japan Yen",
+                            UnicodeDecimal = "165",
+                            UnicodeHex = "a5"
+                        },
+                        new
+                        {
+                            Code = "JEP",
+                            Text = "Jersey Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "KZT",
+                            Text = "Kazakhstan Tenge",
+                            UnicodeDecimal = "1083, 1074",
+                            UnicodeHex = "43b, 432"
+                        },
+                        new
+                        {
+                            Code = "KPW",
+                            Text = "Korea (North) Won",
+                            UnicodeDecimal = "8361",
+                            UnicodeHex = "20a9"
+                        },
+                        new
+                        {
+                            Code = "KGS",
+                            Text = "Kyrgyzstan Som",
+                            UnicodeDecimal = "1083, 1074",
+                            UnicodeHex = "43b, 432"
+                        },
+                        new
+                        {
+                            Code = "LAK",
+                            Text = "Laos Kip",
+                            UnicodeDecimal = "8365",
+                            UnicodeHex = "20ad"
+                        },
+                        new
+                        {
+                            Code = "LVL",
+                            Text = "Latvia Lat",
+                            UnicodeDecimal = "76, 115",
+                            UnicodeHex = "4c, 73"
+                        },
+                        new
+                        {
+                            Code = "LBP",
+                            Text = "Lebanon Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "LRD",
+                            Text = "Liberia Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "LTL",
+                            Text = "Lithuania Litas",
+                            UnicodeDecimal = "76, 116",
+                            UnicodeHex = "4c, 74"
+                        },
+                        new
+                        {
+                            Code = "MKD",
+                            Text = "Macedonia Denar",
+                            UnicodeDecimal = "1076, 1077, 1085",
+                            UnicodeHex = "434, 435, 43d"
+                        },
+                        new
+                        {
+                            Code = "MYR",
+                            Text = "Malaysia Ringgit",
+                            UnicodeDecimal = "82, 77",
+                            UnicodeHex = "52, 4d"
+                        },
+                        new
+                        {
+                            Code = "MUR",
+                            Text = "Mauritius Rupee",
+                            UnicodeDecimal = "8360",
+                            UnicodeHex = "20a8"
+                        },
+                        new
+                        {
+                            Code = "MXN",
+                            Text = "Mexico Peso",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "MNT",
+                            Text = "Mongolia Tughrik",
+                            UnicodeDecimal = "8366",
+                            UnicodeHex = "20ae"
+                        },
+                        new
+                        {
+                            Code = "MZN",
+                            Text = "Mozambique Metical",
+                            UnicodeDecimal = "77, 84",
+                            UnicodeHex = "4d, 54"
+                        },
+                        new
+                        {
+                            Code = "NAD",
+                            Text = "Namibia Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "NPR",
+                            Text = "Nepal Rupee",
+                            UnicodeDecimal = "8360",
+                            UnicodeHex = "20a8"
+                        },
+                        new
+                        {
+                            Code = "ANG",
+                            Text = "Netherlands Antilles Guilder",
+                            UnicodeDecimal = "402",
+                            UnicodeHex = "192"
+                        },
+                        new
+                        {
+                            Code = "NZD",
+                            Text = "New Zealand Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "NIO",
+                            Text = "Nicaragua Cordoba",
+                            UnicodeDecimal = "67, 36",
+                            UnicodeHex = "43, 24"
+                        },
+                        new
+                        {
+                            Code = "NGN",
+                            Text = "Nigeria Naira",
+                            UnicodeDecimal = "8358",
+                            UnicodeHex = "20a6"
+                        },
+                        new
+                        {
+                            Code = "NOK",
+                            Text = "Norway Krone",
+                            UnicodeDecimal = "107, 114",
+                            UnicodeHex = "6b, 72"
+                        },
+                        new
+                        {
+                            Code = "OMR",
+                            Text = "Oman Rial",
+                            UnicodeDecimal = "65020",
+                            UnicodeHex = "fdfc"
+                        },
+                        new
+                        {
+                            Code = "PKR",
+                            Text = "Pakistan Rupee",
+                            UnicodeDecimal = "8360",
+                            UnicodeHex = "20a8"
+                        },
+                        new
+                        {
+                            Code = "PAB",
+                            Text = "Panama Balboa",
+                            UnicodeDecimal = "66, 47, 46",
+                            UnicodeHex = "42, 2f, 2e"
+                        },
+                        new
+                        {
+                            Code = "PYG",
+                            Text = "Paraguay Guarani",
+                            UnicodeDecimal = "71, 115",
+                            UnicodeHex = "47, 73"
+                        },
+                        new
+                        {
+                            Code = "PEN",
+                            Text = "Peru Nuevo Sol",
+                            UnicodeDecimal = "83, 47, 46",
+                            UnicodeHex = "53, 2f, 2e"
+                        },
+                        new
+                        {
+                            Code = "PHP",
+                            Text = "Philippines Peso",
+                            UnicodeDecimal = "8369",
+                            UnicodeHex = "20b1"
+                        },
+                        new
+                        {
+                            Code = "PLN",
+                            Text = "Poland Zloty",
+                            UnicodeDecimal = "122, 322",
+                            UnicodeHex = "7a, 142"
+                        },
+                        new
+                        {
+                            Code = "QAR",
+                            Text = "Qatar Riyal",
+                            UnicodeDecimal = "65020",
+                            UnicodeHex = "fdfc"
+                        },
+                        new
+                        {
+                            Code = "RON",
+                            Text = "Romania New Leu",
+                            UnicodeDecimal = "108, 101, 105",
+                            UnicodeHex = "6c, 65, 69"
+                        },
+                        new
+                        {
+                            Code = "RUB",
+                            Text = "Russia Ruble",
+                            UnicodeDecimal = "1088, 1091, 1073",
+                            UnicodeHex = "440, 443, 431"
+                        },
+                        new
+                        {
+                            Code = "SHP",
+                            Text = "Saint Helena Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "SAR",
+                            Text = "Saudi Arabia Riyal",
+                            UnicodeDecimal = "65020",
+                            UnicodeHex = "fdfc"
+                        },
+                        new
+                        {
+                            Code = "RSD",
+                            Text = "Serbia Dinar",
+                            UnicodeDecimal = "1044, 1080, 1085, 46",
+                            UnicodeHex = "414, 438, 43d, 2e"
+                        },
+                        new
+                        {
+                            Code = "SCR",
+                            Text = "Seychelles Rupee",
+                            UnicodeDecimal = "8360",
+                            UnicodeHex = "20a8"
+                        },
+                        new
+                        {
+                            Code = "SGD",
+                            Text = "Singapore Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "SBD",
+                            Text = "Solomon Islands Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "SOS",
+                            Text = "Somalia Shilling",
+                            UnicodeDecimal = "83",
+                            UnicodeHex = "53"
+                        },
+                        new
+                        {
+                            Code = "ZAR",
+                            Text = "South Africa Rand",
+                            UnicodeDecimal = "82",
+                            UnicodeHex = "52"
+                        },
+                        new
+                        {
+                            Code = "KRW",
+                            Text = "Korea (South) Won",
+                            UnicodeDecimal = "8361",
+                            UnicodeHex = "20a9"
+                        },
+                        new
+                        {
+                            Code = "LKR",
+                            Text = "Sri Lanka Rupee",
+                            UnicodeDecimal = "8360",
+                            UnicodeHex = "20a8"
+                        },
+                        new
+                        {
+                            Code = "SEK",
+                            Text = "Sweden Krona",
+                            UnicodeDecimal = "107, 114",
+                            UnicodeHex = "6b, 72"
+                        },
+                        new
+                        {
+                            Code = "CHF",
+                            Text = "Switzerland Franc",
+                            UnicodeDecimal = "67, 72, 70",
+                            UnicodeHex = "43, 48, 46"
+                        },
+                        new
+                        {
+                            Code = "SRD",
+                            Text = "Suriname Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "SYP",
+                            Text = "Syria Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "TWD",
+                            Text = "Taiwan New Dollar",
+                            UnicodeDecimal = "78, 84, 36",
+                            UnicodeHex = "4e, 54, 24"
+                        },
+                        new
+                        {
+                            Code = "THB",
+                            Text = "Thailand Baht",
+                            UnicodeDecimal = "3647",
+                            UnicodeHex = "e3f"
+                        },
+                        new
+                        {
+                            Code = "TTD",
+                            Text = "Trinidad and Tobago Dollar",
+                            UnicodeDecimal = "84, 84, 36",
+                            UnicodeHex = "54, 54, 24"
+                        },
+                        new
+                        {
+                            Code = "TRY",
+                            Text = "Turkey Lira",
+                            UnicodeDecimal = "",
+                            UnicodeHex = ""
+                        },
+                        new
+                        {
+                            Code = "TRL",
+                            Text = "Turkey Lira",
+                            UnicodeDecimal = "8356",
+                            UnicodeHex = "20a4"
+                        },
+                        new
+                        {
+                            Code = "TVD",
+                            Text = "Tuvalu Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "UAH",
+                            Text = "Ukraine Hryvna",
+                            UnicodeDecimal = "8372",
+                            UnicodeHex = "20b4"
+                        },
+                        new
+                        {
+                            Code = "GBP",
+                            Text = "United Kingdom Pound",
+                            UnicodeDecimal = "163",
+                            UnicodeHex = "a3"
+                        },
+                        new
+                        {
+                            Code = "USD",
+                            Text = "United States Dollar",
+                            UnicodeDecimal = "36",
+                            UnicodeHex = "24"
+                        },
+                        new
+                        {
+                            Code = "UYU",
+                            Text = "Uruguay Peso",
+                            UnicodeDecimal = "36, 85",
+                            UnicodeHex = "24, 55"
+                        },
+                        new
+                        {
+                            Code = "UZS",
+                            Text = "Uzbekistan Som",
+                            UnicodeDecimal = "1083, 1074",
+                            UnicodeHex = "43b, 432"
+                        },
+                        new
+                        {
+                            Code = "VEF",
+                            Text = "Venezuela Bolivar",
+                            UnicodeDecimal = "66, 115",
+                            UnicodeHex = "42, 73"
+                        },
+                        new
+                        {
+                            Code = "VND",
+                            Text = "Viet Nam Dong",
+                            UnicodeDecimal = "8363",
+                            UnicodeHex = "20ab"
+                        },
+                        new
+                        {
+                            Code = "YER",
+                            Text = "Yemen Rial",
+                            UnicodeDecimal = "65020",
+                            UnicodeHex = "fdfc"
+                        },
+                        new
+                        {
+                            Code = "ZWD",
+                            Text = "Zimbabwe Dollar",
+                            UnicodeDecimal = "90, 36",
+                            UnicodeHex = "5a, 24"
+                        });
+                });
+
             modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
                 {
                     b.Property<Guid>("Id")
@@ -205,9 +1017,6 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Currency")
-                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -433,6 +1242,15 @@ namespace Core.Infrastructure.Migrations
                             IconId = new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"),
                             IsSystem = true,
                             Name = "Gardens",
+                            UserId = new Guid("00000000-0000-0000-0000-000000000000")
+                        },
+                        new
+                        {
+                            Id = new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"),
+                            Archived = false,
+                            IconId = new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"),
+                            IsSystem = true,
+                            Name = "Sports",
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         },
                         new
@@ -663,6 +1481,15 @@ namespace Core.Infrastructure.Migrations
                             IsHidden = false,
                             Name = "Gardens",
                             Path = "/assets/icons/garden.png"
+                        },
+                        new
+                        {
+                            Id = new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"),
+                            Archived = false,
+                            IconType = 0,
+                            IsHidden = false,
+                            Name = "Sports",
+                            Path = "/assets/icons/sports.png"
                         },
                         new
                         {
@@ -1026,14 +1853,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "4ee07722-ca82-4a71-abfc-ccc18f72c37c",
+                            ConcurrencyStamp = "dc97d136-bab6-4e68-8111-9f25e7f0a016",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "90d2f472-66aa-41ef-a0f2-5c885a237c4a",
+                            ConcurrencyStamp = "9e55630e-755c-47d5-936e-34693dc04a79",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -1050,6 +1877,9 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Currency")
                         .HasColumnType("text");
 
                     b.Property<string>("Email")

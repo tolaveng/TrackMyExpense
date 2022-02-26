@@ -37,7 +37,8 @@ namespace Core.Infrastructure.Seeder
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
                     LockoutEnabled = false,
-                    SecurityStamp = Guid.NewGuid().ToString()
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    Currency = "AUD"
                 };
 
                 if (!context.Users.Any(u => u.UserName == adminUser.UserName))
