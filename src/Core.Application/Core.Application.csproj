@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,10 +31,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)src\Assets\**"
-			  CopyToOutputDirectory="PreserveNewest"
-			  CopyToPublishDirectory="PreserveNewest"
-			  LinkBase="Assets\" />
+		<None Include="$(SolutionDir)src\Assets\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" LinkBase="Assets\" />
 	</ItemGroup>
 	
 </Project>

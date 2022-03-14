@@ -20,5 +20,11 @@ namespace Core.Application.Models
         public bool IsDisabled { get; set; }
         public bool TwoFactorEnabled { get; set; }
         public string Currency { get; set; }
+        public string ProfileImage { get; set; }
+
+        // resolve in mapper
+        public string ProfileImageUrl { get; set; }
+        public string ProfileImageThumbnailUrl { get; set; }
+
     }
 }

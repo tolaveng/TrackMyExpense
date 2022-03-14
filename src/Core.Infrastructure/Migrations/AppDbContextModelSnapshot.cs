@@ -1851,14 +1851,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "dc97d136-bab6-4e68-8111-9f25e7f0a016",
+                            ConcurrencyStamp = "5eeae8e4-cb98-4af4-aa3d-94f672a74115",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "9e55630e-755c-47d5-936e-34693dc04a79",
+                            ConcurrencyStamp = "c307faf9-83db-4733-9bcc-b2d3a5c22bb0",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -1915,6 +1915,9 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("ProfileImage")
+                        .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");

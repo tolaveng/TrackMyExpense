@@ -1,0 +1,180 @@
+﻿@page "/profile"
+@using Core.Application.Mediator.Users
+@using Core.Application.Models
+@using Core.Application.Providers.IProviders
+@using Core.Domain.Constants
+@using MediatR
+
+<SetPageTitle Value=@($"{DefaultConstants.PageTitle} - Profile") />
+
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumbs>
+        <BreadcrumbsItem Title="Profile"  Icon="@Icons.Filled.ManageAccounts" />
+    </Breadcrumbs>
+    
+    <MudCard Outlined="true" Class="p-3" Style="position: relative;">
+        <MudCardContent>
+            <MudContainer MaxWidth="@MaxWidth.Medium">
+            <EditForm Model="@UserInputForm" OnValidSubmit="@UpdateProfile">
+                <MudGrid>
+                    <MudItem xs="12" sm="2">
+                        <span style="font-weight: bold">Account Setting</span>
+                    </MudItem>
+                    <MudHidden Breakpoint="Breakpoint.Xs">
+                        <MudItem xs="12" sm="10"><!-- empty --></MudItem>
+                    </MudHidden>
+
+                    <MudItem xs="12" sm="2">
+                        <div style="text-align: center">
+                            @if (string.IsNullOrWhiteSpace(imageThumbnailUrl))
+                            {
+                                <a class="profile-image" href="" @onclick="@UploadProfileImage" @onclick:preventDefault title="Edit profile image">
+                                    <span class="text-edit">Edit</span>
+                                    <MudIcon Icon="@Icons.Filled.AccountCircle" />
+                                </a>
+                            } else
+                            {
+                                <a class="profile-image" href="" @onclick="@UploadProfileImage" @onclick:preventDefault title="Edit profile image">
+                                    <span class="text-edit">Edit</span>
+                                    <img src ="@imageThumbnailUrl" />
+                                </a>
+                            }
+                            </div>
+                    </MudItem>
+                    <MudItem xs="12" sm="10">
+                        <MudTextField Label="Full Name" @bind-Value="@UserInputForm.FullName" For="@(() => UserInputForm.FullName)" Class="mb-3" />
+                        <MudTextField Label="Email" @bind-Value="@UserInputForm.Email" For="@(() => UserInputForm.Email)" Class="mb-3" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="2">
+                        <span style="font-weight: bold">Update Password</span>
+                    </MudItem>
+                    <MudItem xs="12" sm="10">
+                        <MudTextField Label="Current Password" @bind-Value="@UserInputForm.CurrentPassword" For="@(() => UserInputForm.CurrentPassword)" InputType="InputType.Password" Class="mb-3"/>
+                        <MudTextField Label="New Password" @bind-Value="@UserInputForm.NewPassword" For="@(() => UserInputForm.NewPassword)" InputType="InputType.Password" Class="mb-3" Disabled=@(string.IsNullOrWhiteSpace(@UserInputForm.CurrentPassword))/>
+                        <MudTextField Label="Confirm Password" @bind-Value="@UserInputForm.ConfirmPassword" For="@(() => UserInputForm.ConfirmPassword)" InputType="InputType.Password"  Disabled=@(string.IsNullOrWhiteSpace(@UserInputForm.CurrentPassword)) Class="mb-3"/>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="2">
+                        <span style="font-weight: bold">Subscription</span>
+                    </MudItem>
+                    <MudItem xs="12" sm="10">
+                        Membership : No membership | Get Premium Account | Try Premium Account For Free
+                    </MudItem>
+                </MudGrid>
+                <DataAnnotationsValidator/>
+                </EditForm>
+            </MudContainer>
+        </MudCardContent>
+         <MudOverlay Visible="@isLoading" DarkBackground="true" Absolute="true" AutoClose="false">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true"/> <br/> Loading...
+        </MudOverlay>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] IDialogService Dialog { get; set; }
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    [Inject] IFileDirectoryProvider FileDirectoryProvider { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
+
+    private UserInputModel UserInputForm { get; set; } = new UserInputModel();
+
+    private bool isLoading = true;
+    private string imageName;
+    private string imageUrl;
+    private string imageThumbnailUrl;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (AuthUser == null) return;
+        UserInputForm = new UserInputModel(AuthUser);
+
+        if (!string.IsNullOrEmpty(AuthUser.ProfileImage))
+        {
+            imageName = AuthUser.ProfileImage;
+
+            var baseUri = NavigationManager.BaseUri;
+            imageUrl = FileDirectoryProvider.ResolveProfileImageUrl(AuthUser.ProfileImage, baseUri);
+            imageThumbnailUrl = FileDirectoryProvider.ResolveProfileImageThumbnailUrl(AuthUser.ProfileImage, baseUri);
+        }
+
+        isLoading = false;
+    }
+
+    public async Task UpdateProfile()
+    {
+
+    }
+
+    private async Task UploadProfileImage()
+    {
+        var parameters = new DialogParameters {
+            ["UserId"] = AuthUser.Id,
+            ["imageName"] = imageName,
+            ["ImageUrl"] = imageUrl,
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = Dialog.Show<ProfileImageDialog>("Upload Profile Image", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is string fileName)
+            {
+                imageName = fileName;
+                // Save to db
+                await Mediator.Send(new UpdateProfileImageRequest(AuthUser.Id, imageName));
+
+                // preview
+                var baseUri = NavigationManager.BaseUri;
+                imageUrl = FileDirectoryProvider.ResolveProfileImageUrl(fileName, baseUri);
+                imageThumbnailUrl = FileDirectoryProvider.ResolveProfileImageThumbnailUrl(fileName, baseUri);
+            }
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("loadJSScript", @"/Croppie/croppie.min.js");
+            await JSRuntime.InvokeVoidAsync("loadJSScript", @"/js/profile-image-croppie.js");
+        }
+    }
+
+    private class UserInputModel
+    {
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string FullName { get; set; } 
+        public string Email { get; set; }
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
+        public string ConfirmPassword { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Subscription { get; set; }
+        public string Currency { get; set; }
+        public string ProfileImage { get; set; }
+
+        public UserInputModel(){}
+
+        public UserInputModel(UserDto user)
+        {
+            Id = user.Id;
+            Username = user.Username;
+            FullName = user.FullName;
+            Email = user.Email;
+            PhoneNumber = user.PhoneNumber;
+            Subscription = user.Subscriptions.OrderBy(x => x.ValidFrom).LastOrDefault()?.SubscriptionType.ToString();
+            Currency = user.Currency;
+            ProfileImage = user.ProfileImage;
+        }
+    }
+}

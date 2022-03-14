@@ -1,0 +1,223 @@
+﻿@using Core.Application.Common.Files
+@using Core.Application.Services.IServices
+@using MediatR
+@using System.IO
+@using System.Threading
+@implements IAsyncDisposable
+
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="@FileInputForm">
+            <div id="profile-image-drop-zone" @ref="dropZoneElement" >
+                <span>Drag and drop an image here or </span><label for="select-file">Select an image</label> to upload <br />
+                <InputFile id="select-file" @ref="inputFile" OnChange="@InputFileHandler" hidden/>
+                <span id="error-message"></span>
+                <div style="visibility: @(imageVisibility)">
+                    <hr />
+                    <div id="profile-image-cropper-wrapper">
+                        <div id="profile-image-cropper"></div>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnCloseClicked">Close</MudButton>
+        <MudButton Color="@Color.Primary" Variant="Variant.Filled" Disabled="@(!isSaveEnabled)"
+            OnClick="OnSaveClicked">
+            Save <MudProgressCircular Size="Size.Small" Color="Color.Tertiary" Indeterminate="true" hidden="@{!isLoading}" />
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IFileUploadFactory FileUploadFactory { get; set; }
+    [Inject] IHttpClientFactory ClientFactory { get; set; }
+
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public Guid UserId { get; set; } = Guid.Empty;
+    [Parameter] public string imageName { get; set; }
+    [Parameter] public string ImageUrl { get; set; }
+
+    private FileInputModel FileInputForm { get; set; } = new FileInputModel();
+
+    private ElementReference dropZoneElement;
+    private InputFile inputFile;
+    private IJSObjectReference dropZoneInstance;
+
+    private IBrowserFile browserFile = null;
+    private long maxFileSize = 5 * 1024 * 1024;
+    private string maxFikeSizeText = "5MB";
+    private string[] allowExtensions = new []{".png", ".jpg", ".jpeg" };
+
+    private bool isLoading = false;
+    private bool isSaveEnabled = false;
+    private CancellationTokenSource cts = new();
+    private string imageVisibility = "hidden";
+
+    protected override Task OnInitializedAsync()
+    {
+        isSaveEnabled = !string.IsNullOrEmpty(ImageUrl);
+        imageVisibility = isSaveEnabled ? "visible" : "hidden";
+        return base.OnInitializedAsync();
+    }
+
+    private void OnCloseClicked() => MudDialog.Cancel();
+    private async Task OnSaveClicked()
+    {
+        if (UserId == Guid.Empty)
+        {
+            throw new InvalidOperationException("Invalid user");
+        }
+
+        if (browserFile == null && string.IsNullOrEmpty(ImageUrl))
+        {
+            throw new InvalidOperationException("Unexpected error: There is no image.");
+        }
+
+        var fileName = string.Empty;
+        var fileUploadService = FileUploadFactory.GetFileUploadService();
+        fileUploadService.AllowExtensions = allowExtensions;
+        fileUploadService.MaxFileSize = maxFileSize;
+        //fileUploadService.UploadProgress += updateProgress;
+
+        try
+        {
+            isLoading = true;
+            isSaveEnabled = false;
+            StateHasChanged();
+
+            // Upload new image
+            if (browserFile != null)
+            {
+                var ext = Path.GetExtension(browserFile.Name).ToLowerInvariant();
+                fileName = $"{UserId}{ext}";
+
+                // Remove old image
+                if (!string.IsNullOrEmpty(imageName) && !imageName.Equals(fileName))
+                {
+                    await fileUploadService.DeleteProfileImageAsync(imageName);
+                }
+
+                using (var fileStream = browserFile.OpenReadStream(fileUploadService.MaxFileSize)) {
+                    var fileUpload = new FileUploadRequest(fileStream, browserFile.Name);
+                    await fileUploadService.SaveProfileImageAsync(fileUpload, fileName, cts.Token);    
+                }
+            }
+
+            // Get cropped image and save as thumnail
+            var dataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getProfileImageAsByteArray");
+            if (dataReference.Length > maxFileSize)
+            {
+                Snackbar.Add($"Support an image's size less than {maxFikeSizeText}.", Severity.Error);
+                return;
+            }
+
+            // Save cropped image
+            var thumbFileName = fileName;
+            if (string.IsNullOrEmpty(thumbFileName) && !string.IsNullOrEmpty(imageName))
+            {
+                var ext = Path.GetExtension(imageName.ToLowerInvariant());
+                thumbFileName = $"{UserId}{ext}";
+            }
+
+            // Remove old thumbnail
+            if (!string.IsNullOrEmpty(imageName) && !imageName.Equals(thumbFileName))
+            {
+                await fileUploadService.DeleteProfileImageThumbnailAsync(imageName);
+            }
+
+            using var dataReferenceStream = await dataReference.OpenReadStreamAsync(maxAllowedSize: maxFileSize);
+            var fileUploadCropped = new FileUploadRequest(dataReferenceStream, thumbFileName);
+            var result = await fileUploadService.SaveProfileImageThumbnailAsync(fileUploadCropped, thumbFileName, cts.Token);
+
+            if (!result.Succeeded)
+            {
+                Snackbar.Add("Something went wrong. Please tray again later.", Severity.Error);
+                MudDialog.Close(DialogResult.Ok(false));
+                return;
+            }
+            MudDialog.Close(DialogResult.Ok(thumbFileName));
+        }
+        catch(Exception e)
+        {
+            Snackbar.Add("Something went wrong. Please tray again later.", Severity.Error);
+            isLoading = false;
+            MudDialog.Close(DialogResult.Ok(false));
+            return;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) {
+            // Initialize the drop zone
+            dropZoneInstance = await JSRuntime.InvokeAsync<IJSObjectReference>("createProfileImageDropZone",
+                dropZoneElement, inputFile.Element);
+
+            await JSRuntime.InvokeVoidAsync("renderProfileImageCropper", ImageUrl);
+
+            // preview image to crop
+            //if (!string.IsNullOrEmpty(ImageUrl))
+            //{
+            //    var client = ClientFactory.CreateClient();
+            //    var imageStream = await client.GetStreamAsync(ImageUrl, cts.Token);
+            //    var dotnetImageStream = new DotNetStreamReference(imageStream);
+            //    await JSRuntime.InvokeVoidAsync("previewProfileImage", dotnetImageStream);
+            //}
+        }
+    }
+
+    private async Task InputFileHandler(InputFileChangeEventArgs e)
+    {
+        browserFile = null;
+        var file = e.File;
+        if (file.Size > maxFileSize)
+        {
+            Snackbar.Add($"Support an image's size less than {maxFikeSizeText}.", Severity.Error);
+            return;
+        }
+
+        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+        if (string.IsNullOrEmpty(ext) || !allowExtensions.Contains(ext))
+        {
+            Snackbar.Add($"Image file must be ({string.Join(", ", allowExtensions)})", Severity.Error);
+            return;
+        }
+
+        // set selected file
+        browserFile = file;
+        isSaveEnabled = true;
+
+        // preview image to crop
+        var jsImageStream = file.OpenReadStream(file.Size);
+        var dotnetImageStream = new DotNetStreamReference(jsImageStream);
+        await JSRuntime.InvokeVoidAsync("previewProfileImage", dotnetImageStream);
+        imageVisibility = "visiable";
+    }
+
+
+    public class FileInputModel
+    {
+        public IBrowserFile File { get; set; }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (dropZoneInstance != null)
+        {
+            await dropZoneInstance.InvokeVoidAsync("dispose");
+            await dropZoneInstance.DisposeAsync();
+        }
+
+        if (!cts.IsCancellationRequested)
+        {
+            cts.Cancel();
+            cts.Dispose();   
+        }
+    }
+}

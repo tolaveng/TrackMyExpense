@@ -12,6 +12,7 @@ namespace Core.Application.Mapper
             CreateMap<UserDto, AppUser>();
             CreateMap<AppUser, UserDto>()
                 .ForMember(x => x.Password, x => x.MapFrom(z => string.Empty))
+                .AfterMap<SetProfileImageWebUrl>()
                 ;
 
             CreateMap<SysAttribute, SysAttributeDto>().ReverseMap();
@@ -38,6 +39,21 @@ namespace Core.Application.Mapper
         public void Process(Icon source, IconDto destination, ResolutionContext context)
         {
             destination.IconUrl = _fileDirectoryProvider.ResolveIconUrl(destination.IconType, destination.Path);
+        }
+    }
+
+    // Resove Profile Image
+    public class SetProfileImageWebUrl : IMappingAction<AppUser, UserDto>
+    {
+        private readonly IFileDirectoryProvider _fileDirectoryProvider;
+        public SetProfileImageWebUrl(IFileDirectoryProvider fileDirectoryProvider)
+        {
+            _fileDirectoryProvider = fileDirectoryProvider;
+        }
+        public void Process(AppUser source, UserDto destination, ResolutionContext context)
+        {
+            destination.ProfileImageUrl = _fileDirectoryProvider.ResolveProfileImageUrl(source.ProfileImage, string.Empty);
+            destination.ProfileImageThumbnailUrl = _fileDirectoryProvider.ResolveProfileImageThumbnailUrl(source.ProfileImage, string.Empty);
         }
     }
 }

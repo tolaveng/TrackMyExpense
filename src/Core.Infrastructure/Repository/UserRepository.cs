@@ -161,17 +161,34 @@ namespace Core.Infrastructure.Repository
 
         public async Task<GenericResponse<bool>> UpdateUserAsync(AppUser appUser)
         {
-            var user = _userManager.Users.SingleOrDefault(x => x.Id == appUser.Id);
-            if (user != null)
+            var identityUser = _userManager.Users.SingleOrDefault(x => x.Id == appUser.Id);
+            if (identityUser == null) return GenericResponse<bool>.Failure("User not found");
+
+            identityUser.FullName = appUser.FullName;
+            identityUser.PhoneNumber = appUser.PhoneNumber;
+            identityUser.Email = appUser.Email;
+            identityUser.Currency = appUser.Currency;
+            identityUser.ProfileImage = appUser.ProfileImage;
+            identityUser.IsDisabled = appUser.IsDisabled;
+
+            if (!string.IsNullOrEmpty(appUser.Password))
             {
-                user.FullName = appUser.FullName;
-                //user.Email = appUser.Email;
-                user.PhoneNumber = appUser.PhoneNumber;
-                user.IsDisabled = appUser.IsDisabled;
-                await _userManager.UpdateAsync(user);
-                return GenericResponse<bool>.Success();
+                var validator = _userManager.PasswordValidators.FirstOrDefault();
+                if (validator != null)
+                {
+                    var validateResult = await validator.ValidateAsync(_userManager, identityUser, appUser.Password);
+                    if (!validateResult.Succeeded)
+                    {
+                        return GenericResponse<bool>.Failure("Invalid Password");
+                    }
+                }
+                
+                identityUser.PasswordHash = _userManager.PasswordHasher
+                    .HashPassword(identityUser, appUser.Password);
             }
-            return GenericResponse<bool>.Failure("User not found");
+
+            await _userManager.UpdateAsync(identityUser);
+            return GenericResponse<bool>.Success();
         }
 
         public async Task<string> GenerateEmailConfirmationTokenAsync(Guid userId)

@@ -114,8 +114,11 @@
 
     public void Dispose()
     {
-        cts.Cancel();
-        cts.Dispose();
+        if (!cts.IsCancellationRequested)
+        {
+            cts.Cancel();
+            cts.Dispose();   
+        }
     }
 
     private void InputFileChanged(InputFileChangeEventArgs e)
@@ -200,11 +203,10 @@
         isUploading = true;
         try
         {
-            var fileUpload = new FileUploadRequest(
-                browserFile.OpenReadStream(fileUploadService.MaxFileSize),
-                browserFile.Name, browserFile.Size);
+            using var fileStream = browserFile.OpenReadStream(fileUploadService.MaxFileSize);
+            var fileUpload = new FileUploadRequest(fileStream, browserFile.Name);
 
-            var result = await fileUploadService.UploadIconFileAsync(fileUpload, fileName, cts.Token);
+            var result = await fileUploadService.SaveIconFileAsync(fileUpload, fileName, cts.Token);
             if (result.Succeeded)
             {
                 uploadProgress = 100;

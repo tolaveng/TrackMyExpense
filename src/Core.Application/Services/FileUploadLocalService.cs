@@ -1,4 +1,5 @@
 ﻿using Core.Application.Common.Files;
+using Core.Application.Helpers;
 using Core.Application.Providers.IProviders;
 using Core.Application.Services.IServices;
 using Core.Domain.Enums;
@@ -19,27 +20,59 @@ namespace Core.Application.Services
             FileDirectoryProvider = fileDirectoryProvider;
         }
 
-        public async Task<FileUploadResponse> UploadIconFileAsync(FileUploadRequest file, string saveFileName, CancellationToken ct)
+        public async Task<FileUploadResponse> SaveIconFileAsync(FileUploadRequest file, string saveFileName, CancellationToken ct)
         {
+            return await SaveFileAsync(file, FileDirectoryProvider.GetIconDirectory(), saveFileName, ct);
+        }
+
+        public async Task<FileUploadResponse> SaveProfileImageAsync(FileUploadRequest file, string saveFileName, CancellationToken ct)
+        {
+            var profileImageDir = FileDirectoryProvider.GetProfileImageDirectory();
+            var result = await SaveFileAsync(file, profileImageDir, saveFileName, ct);
+            if (result.Succeeded)
+            {
+                ImageSharpHelper.ResizeAndSave(Path.Combine(profileImageDir, saveFileName));
+            }
+            return result;
+        }
+        public async Task<FileUploadResponse> SaveProfileImageThumbnailAsync(FileUploadRequest file, string saveFileName, CancellationToken ct)
+        {
+            return await SaveFileAsync(file, FileDirectoryProvider.GetProfileImageThumbnailsDirectory(), saveFileName, ct);
+        }
+
+        /// <summary>
+        /// Save file to disk in directory path, invoke upload progress percentage
+        /// </summary>
+        /// <param name="file">File request stream</param>
+        /// <param name="saveDirectoryPath">Path to save the file</param>
+        /// <param name="saveFileName">File name</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>File Upload Response</returns>
+        public async Task<FileUploadResponse> SaveFileAsync(FileUploadRequest file,
+            string saveDirectoryPath,
+            string saveFileName,
+            CancellationToken ct)
+        {
+            if (file.Stream == null || file.Stream.Length == 0)
+            {
+                return FileUploadResponse.Fail("File is invalid");
+            }
             if (string.IsNullOrEmpty(file.Extension) || !AllowExtensions.Contains(file.Extension))
             {
                 return FileUploadResponse.Fail($"File type must be ({string.Join(", ", AllowExtensions)})");
             }
-            if (file.Size > MaxFileSize)
+            if (file.Stream.Length > MaxFileSize)
             {
                 return FileUploadResponse.Fail($"File size must be less than {Math.Abs(MaxFileSize / 1024)} KB");
             }
-            if (file.Size == 0 || file.Stream == null)
-            {
-                return FileUploadResponse.Fail("File is invalid");
-            }
+            
 
             if (string.IsNullOrEmpty(Path.GetExtension(saveFileName)))
             {
                 saveFileName = $"{saveFileName}{file.Extension}";
             }
-            
-            var saveFilePath = Path.Combine(FileDirectoryProvider.GetIconDirectory(), $"{saveFileName}.uploading");
+
+            var saveFilePath = Path.Combine(saveDirectoryPath, $"{saveFileName}.uploading");
             try
             {
                 await using FileStream writeStream = new(saveFilePath, FileMode.Create);
@@ -56,11 +89,12 @@ namespace Core.Application.Services
 
                     await writeStream.WriteAsync(buffer, 0, bytesRead);
 
-                    var progress = Math.Ceiling(Decimal.Divide(totalRead, file.Size) * 100);
+                    var progress = Math.Ceiling(Decimal.Divide(totalRead, file.Stream.Length) * 100);
                     OnUploadProgress((int)progress);
                 }
                 writeStream.Close();
-                if (ct.IsCancellationRequested) {
+                if (ct.IsCancellationRequested)
+                {
                     if (File.Exists(saveFilePath)) File.Delete(saveFilePath);
                     OnUploadProgress(0);
                     return FileUploadResponse.Fail("Fild upload have been cancelled");
@@ -70,7 +104,8 @@ namespace Core.Application.Services
                 OnUploadProgress(100);
                 return FileUploadResponse.Success(saveFileName);
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 OnUploadProgress(0);
                 if (File.Exists(saveFilePath)) File.Delete(saveFilePath);
@@ -78,7 +113,7 @@ namespace Core.Application.Services
             }
         }
 
-        
+
         protected virtual void OnUploadProgress(int progress)
         {
             UploadProgress?.Invoke(this, progress);
@@ -99,5 +134,28 @@ namespace Core.Application.Services
             
             return false;
         }
+
+        public async Task<bool> DeleteProfileImageAsync(string imageName)
+        {
+            var profileImage = Path.Combine(FileDirectoryProvider.GetProfileImageDirectory(), imageName);
+            if (File.Exists(profileImage))
+            {
+                File.Delete(profileImage);
+            }
+            return await Task.FromResult(true);
+        }
+
+        public async Task<bool> DeleteProfileImageThumbnailAsync(string imageName)
+        {
+            var thumbnailImage = Path.Combine(FileDirectoryProvider.GetProfileImageThumbnailsDirectory(), imageName);
+            if (File.Exists(thumbnailImage))
+            {
+                File.Delete(thumbnailImage);
+            }
+
+            return await Task.FromResult(true);
+        }
+
+
     }
 }

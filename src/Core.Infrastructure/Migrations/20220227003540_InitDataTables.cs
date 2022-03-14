@@ -107,6 +107,7 @@ namespace Core.Infrastructure.Migrations
                     FullName = table.Column<string>(type: "text", nullable: true),
                     IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: true),
+                    ProfileImage = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -610,8 +611,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "9e55630e-755c-47d5-936e-34693dc04a79", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "dc97d136-bab6-4e68-8111-9f25e7f0a016", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "c307faf9-83db-4733-9bcc-b2d3a5c22bb0", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "5eeae8e4-cb98-4af4-aa3d-94f672a74115", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(

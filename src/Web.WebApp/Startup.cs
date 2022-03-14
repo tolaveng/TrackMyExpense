@@ -27,12 +27,15 @@ using Microsoft.EntityFrameworkCore;
 using Core.Application.Providers.IProviders;
 using Core.Application.Providers;
 using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace Web.WebApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        public Startup(IConfiguration configuration,
+            IWebHostEnvironment environment
+            )
         {
             Configuration = configuration;
             Environment = environment;
@@ -146,12 +149,20 @@ namespace Web.WebApp
                 config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
             });
 
+            services.AddHttpClient();
+
             services.AddRazorPages();
             services.AddControllers()
                 .AddNewtonsoftJson(opt =>
                     opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
                 );
-            services.AddServerSideBlazor();
+            //services.AddSignalR(opt =>
+            //{
+            //    opt.EnableDetailedErrors = true;
+            //    opt.MaximumReceiveMessageSize = long.MaxValue;
+            //});
+            services.AddServerSideBlazor()
+                .AddHubOptions(options => options.MaximumReceiveMessageSize = 5 * 1024 * 1024); //5MB
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -172,13 +183,19 @@ namespace Web.WebApp
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            // Serve local upload file
-            var fileUploadSetting = Configuration.GetSection("FileUploadSetting").Get<FileUploadSetting>();
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(fileUploadSetting.UploadDir),
-                RequestPath = new PathString(fileUploadSetting.UploadWebUrl)
-            });
+            if (env.IsDevelopment()) {
+                // Serve local upload file
+                var fileUploadSetting = Configuration.GetSection("FileUploadSetting").Get<FileUploadSetting>();
+                if (!Directory.Exists(fileUploadSetting.UploadDir))
+                {
+                    Directory.CreateDirectory(fileUploadSetting.UploadDir);
+                }
+                app.UseStaticFiles(new StaticFileOptions()
+                {
+                    FileProvider = new PhysicalFileProvider(fileUploadSetting.UploadDir),
+                    RequestPath = new PathString(fileUploadSetting.UploadWebUrl)
+                });
+            }
 
             app.UseRouting();
             app.UseCookiePolicy();

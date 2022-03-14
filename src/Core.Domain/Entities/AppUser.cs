@@ -32,6 +32,7 @@ namespace Core.Domain.Entities
         public DateTimeOffset LockoutEnd { get; set; }
         public bool LockoutEnabled { get; set; }
 
+        public string ProfileImage { get; set; }
         public string Currency { get; set; }
     }
 }

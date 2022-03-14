@@ -18,20 +18,56 @@ namespace Core.Application.Providers
         {
             FileUploadSetting = options.Value;
         }
+
+        public string GetUploadDirectory(string[] subDirectories)
+        {
+            var dirPath = FileUploadSetting.UploadDir;
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+
+            foreach(var subDirectory in subDirectories)
+            {
+                dirPath = Path.Combine(dirPath, subDirectory);
+                if (!Directory.Exists(dirPath))
+                {
+                    Directory.CreateDirectory(dirPath);
+                }
+            }
+            
+            return dirPath;
+        }
+
         public string GetIconDirectory()
         {
-            if (!Directory.Exists(FileUploadSetting.UploadDir))
+            return GetUploadDirectory(new string[] { "Icons" });
+        }
+
+        public string GetProfileImageDirectory()
+        {
+            return GetUploadDirectory(new string[] { "ProfileImages" });
+        }
+
+        public string GetProfileImageThumbnailsDirectory()
+        {
+            return GetUploadDirectory(new string[] { "ProfileImages", "Thumbnails" });
+        }
+
+        public string ResolveDirectoryUrl(string[] subDirectories, string baseUri)
+        {
+            var url = FileUploadSetting.UploadWebUrl;
+            if (!string.IsNullOrEmpty(baseUri))
             {
-                Directory.CreateDirectory(FileUploadSetting.UploadDir);
+                url = $"{baseUri.TrimEnd('/')}{url}";
+            }
+            foreach (var subDirectory in subDirectories)
+            {
+                if (string.IsNullOrEmpty(subDirectory)) continue;
+                url = $"{url}/{subDirectory}";
             }
 
-            var iconDir = Path.Combine(FileUploadSetting.UploadDir, "Icons");
-            if (!Directory.Exists(iconDir))
-            {
-                Directory.CreateDirectory(iconDir);
-            }
-
-            return iconDir;
+            return $"{url}/";
         }
 
         public string ResolveIconUrl(IconType iconType, string path)
@@ -40,9 +76,24 @@ namespace Core.Application.Providers
 
             return iconType switch
             {
-                IconType.Upload => $"{FileUploadSetting.UploadWebUrl}/icons/{path}",
+                IconType.Upload => $"{ResolveDirectoryUrl(new[] { "icons" }, string.Empty)}{path}",
                 _ => path,
             };
+        }
+
+        public string ResolveProfileImageUrl(string fileName, string baseUri)
+        {
+            if (string.IsNullOrEmpty(fileName)) return string.Empty;
+
+            fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
+            return $"{ResolveDirectoryUrl(new[] { "profileimages" }, baseUri)}{fileName}";
+        }
+        public string ResolveProfileImageThumbnailUrl(string fileName, string baseUri)
+        {
+            if (string.IsNullOrEmpty(fileName)) return string.Empty;
+
+            fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
+            return $"{ResolveDirectoryUrl(new[] { "profileimages", "thumbnails" }, baseUri)}{fileName}";
         }
     }
 }

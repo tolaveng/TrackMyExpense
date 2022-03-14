@@ -1,4 +1,5 @@
-﻿<MudAppBar Elevation="1">
+﻿@using Core.Application.Models
+<MudAppBar Elevation="1">
     @if (ShowToggleIcon)
     {
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Primary" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
@@ -8,14 +9,36 @@
     <MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex justify-end pr-5">
         <AuthorizeView>
             <Authorized>
-                <MudAvatar Color="Color.Primary">@context.User.Identity.Name.ToUpper()[0]</MudAvatar>
-                <MudText Color="Color.Primary">@context.User.Identity.Name</MudText>
-                <MudLink Href="/account/logout"><span class="oi oi-power-standby" aria-hidden="true"></span> Log Out</MudLink>
+                @if(AuthUser == null)
+                {
+                    <MudIcon Icon="@Icons.Filled.NoAccounts" />
+                } else
+                {
+                    <MudMenu AnchorOrigin="@Origin.BottomRight" TransformOrigin="@Origin.TopRight">
+                        <ActivatorContent>
+                            @if (!string.IsNullOrEmpty(AvatarImage))
+                            {
+                                <MudAvatar Color="Color.Primary" Image="@AvatarImage" Size="Size.Medium" />
+                            } else {
+                                <MudAvatar Color="Color.Primary" Size="Size.Medium">@AvatarName</MudAvatar>
+                            }
+                        </ActivatorContent>
+                         <ChildContent>
+                             <MudMenuItem Link="/profile" ForceLoad="true">
+                                 <MudIcon Icon="@Icons.Filled.ManageAccounts" Color="@Color.Primary" /> Profile
+                             </MudMenuItem>
+                             <MudMenuItem Link="/account/logout" ForceLoad="true">
+                                 <MudIcon Icon="@Icons.Filled.Logout" Color="@Color.Primary" /> Log out
+                             </MudMenuItem>
+                         </ChildContent>   
+                    </MudMenu>
+                }
             </Authorized>
             <NotAuthorized>
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Link="/account/login">Log In <MudIcon Icon="@Icons.Filled.Login"/></MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Link="/account/register">Create an account <MudIcon Icon="@Icons.Filled.AccountCircle"/></MudButton>
                 <span class="px-2" />
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Link="/account/register">Get Free Account <MudIcon Icon="@Icons.Filled.AccountCircle"/></MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Link="/account/login">Log in <MudIcon Icon="@Icons.Filled.Login"/></MudButton>
+                <span class="px-2" />
             </NotAuthorized>
         </AuthorizeView>
     </MudContainer>
@@ -31,9 +54,31 @@
     [Parameter]
     public EventCallback<bool> OnDrawerToggle { get; set; }
 
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
+
+    private string AvatarImage;
+    private string AvatarName;
+
     public async Task DrawerToggle()
     {
         DrawerOpen = !DrawerOpen;
         await OnDrawerToggle.InvokeAsync(DrawerOpen);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (AuthUser == null) return;
+
+        if (!string.IsNullOrEmpty(AuthUser.ProfileImageThumbnailUrl))
+        {
+            AvatarImage = AuthUser.ProfileImageThumbnailUrl;
+        }
+        else
+        {
+            AvatarName = AuthUser.FullName.ToUpper().Substring(0, 1);
+        }
     }
 }

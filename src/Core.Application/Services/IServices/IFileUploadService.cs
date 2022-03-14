@@ -14,9 +14,15 @@ namespace Core.Application.Services.IServices
         long MaxFileSize { get; set; }
 
         public event EventHandler<int> UploadProgress;
-        Task<FileUploadResponse> UploadIconFileAsync(FileUploadRequest fileUploadRequest,
+        Task<FileUploadResponse> SaveIconFileAsync(FileUploadRequest fileUploadRequest,
+            string saveFileName, CancellationToken ct);
+        Task<FileUploadResponse> SaveProfileImageAsync(FileUploadRequest fileUploadRequest,
+            string saveFileName, CancellationToken ct);
+        Task<FileUploadResponse> SaveProfileImageThumbnailAsync(FileUploadRequest fileUploadRequest,
             string saveFileName, CancellationToken ct);
 
         Task<bool> DeleteIconFileAsync(string filePath);
+        Task<bool> DeleteProfileImageAsync(string imageName);
+        Task<bool> DeleteProfileImageThumbnailAsync(string imageName);
     }
 }

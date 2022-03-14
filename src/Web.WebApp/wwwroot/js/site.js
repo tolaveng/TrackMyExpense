@@ -31,6 +31,34 @@ window.loadJSScript = function(scriptUrl, isAsync, isDefer) {
 	});
 }
 
+CssLoaded = [];
+window.loadCss = function (cssUrl) {
+	if (CssLoaded[cssUrl]) return;
+
+	if (cssUrl.Length == 0) {
+		console.error("Invalid source URL");
+		return;
+	}
+
+	return new Promise(function (resolve, reject) {
+		var cssEl = document.createElement('link');
+		cssEl.setAttribute("rel", "stylesheet");
+		cssEl.setAttribute("type", "text/css");
+		cssEl.setAttribute("href", cssUrl);
+
+		cssEl.onload = function () {
+			resolve(cssUrl);
+		}
+
+		cssEl.onerror = function () {
+			reject(cssUrl);
+		}
+
+		document.getElementsByTagName("head")[0].appendChild(cssEl);
+		CssLoaded[cssUrl] = true;
+	});
+}
+
 window.redirectToPage = function(redirectUrl, second) {
 	var delay = second ? second * 1000 : 0;
 	setTimeout(function () {
