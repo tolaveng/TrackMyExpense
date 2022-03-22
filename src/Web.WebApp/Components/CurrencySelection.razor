@@ -1,0 +1,32 @@
+﻿@using Core.Application.Models
+@using Core.Application.Providers.IProviders
+@using System.Linq.Expressions
+
+<MudSelect T="string" Label="@Label" Class="@Class" Value="@Value" For="@For"
+ValueChanged="ValueChanged"  AnchorOrigin="Origin.BottomCenter"
+>
+    @if (currencies != null)
+    {
+        foreach(var currency in currencies)
+        {
+            <MudSelectItem Value="@currency.Code">@currency.Text (@currency.Code)</MudSelectItem>
+        }
+    }
+</MudSelect>
+
+@code {
+    [Inject] ICurrencyProvider CurrencyProvider { get; set; }
+
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string Class { get; set; }
+    [Parameter] public string Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public Expression<Func<string>> For { get; set; }
+
+    private IEnumerable<CurrencyDto> currencies;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currencies = await CurrencyProvider.GetAll("Text");
+    }
+}

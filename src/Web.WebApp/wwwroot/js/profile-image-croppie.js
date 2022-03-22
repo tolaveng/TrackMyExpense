@@ -10,7 +10,7 @@ window.renderProfileImageCropper = function (imageUrl) {
         }
         profileImageCroppie = new Croppie(profileImageCropper, {
             viewport: { width: 320, height: 320, type: 'circle' },
-            boundary: { width: 380, height: 380 },
+            boundary: { width: 360, height: 360 },
             showZoomer: true,
             enableResize: false, // no fix aspect ratio
             mouseWheelZoom: false,

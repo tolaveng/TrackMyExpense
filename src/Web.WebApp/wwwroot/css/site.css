@@ -139,15 +139,6 @@ a, .btn-link {
     box-shadow: 0 6px 4px -4px #cccccc;
 }
 
-/* overrid bootstrap 4 floating label */
-.has-float-label label {
-    background: #ffffff;
-    font-size: 100%;
-}
-.has-float-label .form-control:placeholder-shown:not(:focus) + label {
-    font-size: 100% !important;
-    top: 0.7em !important;
-}
 
 .page-logo {
     transition: visibility 0s, opacity 0.5s linear;
@@ -190,8 +181,12 @@ a, .btn-link {
 }
 
 .mud-dialog-content {
-    max-height: 640px;
+    max-height: 520px;
     overflow-y: scroll;
+}
+
+.mud-dialog-actions {
+    padding: 16px 24px !important;
 }
 
 .profile-image {
@@ -265,7 +260,6 @@ a, .btn-link {
 }
 
 #profile-image-cropper-wrapper {
-    height: 450px;
-    min-height: 450px;
+    min-height: 420px;
     margin: 0 auto;
 }

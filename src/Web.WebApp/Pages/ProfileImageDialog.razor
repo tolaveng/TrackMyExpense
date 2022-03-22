@@ -22,8 +22,11 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="OnCloseClicked">Close</MudButton>
-        <MudButton Color="@Color.Primary" Variant="Variant.Filled" Disabled="@(!isSaveEnabled)"
+        <MudButton Color="Color.Error"  Variant="Variant.Outlined" OnClick="OnDeleteClicked"
+        Disabled="@(string.IsNullOrEmpty(ImageName))" StartIcon="@Icons.Filled.DeleteForever" >Delete</MudButton>
+        <MudSpacer />
+        <MudButton OnClick="OnCloseClicked" Variant="Variant.Outlined" StartIcon="@Icons.Filled.Close">Close</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="@(!isSaveEnabled)" StartIcon="@Icons.Filled.Save"
             OnClick="OnSaveClicked">
             Save <MudProgressCircular Size="Size.Small" Color="Color.Tertiary" Indeterminate="true" hidden="@{!isLoading}" />
         </MudButton>
@@ -40,7 +43,7 @@
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [Parameter] public Guid UserId { get; set; } = Guid.Empty;
-    [Parameter] public string imageName { get; set; }
+    [Parameter] public string ImageName { get; set; }
     [Parameter] public string ImageUrl { get; set; }
 
     private FileInputModel FileInputForm { get; set; } = new FileInputModel();
@@ -52,7 +55,7 @@
     private IBrowserFile browserFile = null;
     private long maxFileSize = 5 * 1024 * 1024;
     private string maxFikeSizeText = "5MB";
-    private string[] allowExtensions = new []{".png", ".jpg", ".jpeg" };
+    private string[] allowExtensions = new[] { ".png", ".jpg", ".jpeg" };
 
     private bool isLoading = false;
     private bool isSaveEnabled = false;
@@ -64,6 +67,16 @@
         isSaveEnabled = !string.IsNullOrEmpty(ImageUrl);
         imageVisibility = isSaveEnabled ? "visible" : "hidden";
         return base.OnInitializedAsync();
+    }
+
+    private async Task OnDeleteClicked() {
+        isLoading = true;
+        StateHasChanged();
+        var fileUploadService = FileUploadFactory.GetFileUploadService();
+        await fileUploadService.DeleteProfileImageAsync(ImageName);
+        await fileUploadService.DeleteProfileImageThumbnailAsync(ImageName);
+        ImageName = "";
+        MudDialog.Close(DialogResult.Ok("deleted"));
     }
 
     private void OnCloseClicked() => MudDialog.Cancel();
@@ -98,9 +111,9 @@
                 fileName = $"{UserId}{ext}";
 
                 // Remove old image
-                if (!string.IsNullOrEmpty(imageName) && !imageName.Equals(fileName))
+                if (!string.IsNullOrEmpty(ImageName) && !ImageName.Equals(fileName))
                 {
-                    await fileUploadService.DeleteProfileImageAsync(imageName);
+                    await fileUploadService.DeleteProfileImageAsync(ImageName);
                 }
 
                 using (var fileStream = browserFile.OpenReadStream(fileUploadService.MaxFileSize)) {
@@ -119,16 +132,16 @@
 
             // Save cropped image
             var thumbFileName = fileName;
-            if (string.IsNullOrEmpty(thumbFileName) && !string.IsNullOrEmpty(imageName))
+            if (string.IsNullOrEmpty(thumbFileName) && !string.IsNullOrEmpty(ImageName))
             {
-                var ext = Path.GetExtension(imageName.ToLowerInvariant());
+                var ext = Path.GetExtension(ImageName.ToLowerInvariant());
                 thumbFileName = $"{UserId}{ext}";
             }
 
             // Remove old thumbnail
-            if (!string.IsNullOrEmpty(imageName) && !imageName.Equals(thumbFileName))
+            if (!string.IsNullOrEmpty(ImageName) && !ImageName.Equals(thumbFileName))
             {
-                await fileUploadService.DeleteProfileImageThumbnailAsync(imageName);
+                await fileUploadService.DeleteProfileImageThumbnailAsync(ImageName);
             }
 
             using var dataReferenceStream = await dataReference.OpenReadStreamAsync(maxAllowedSize: maxFileSize);

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Core.Application.Common;
 using Core.Application.IRepositories;
 using Core.Application.Models;
@@ -93,6 +92,10 @@ namespace Core.Application.Services
             return await _userRepository.GeneratePasswordResetTokenAsync(userId);
         }
 
+        public async Task<bool> CheckPasswordAsync(Guid userId, string password)
+        {
+            return await _userRepository.CheckPasswordAsync(userId, password);
+        }
         public async Task<bool> ResetPasswordAsync(Guid userId, string token, string password)
         {
             return await _userRepository.ResetPasswordAsync(userId, token, password);
@@ -120,6 +123,11 @@ namespace Core.Application.Services
         {
             var appUser = _mapper.Map<AppUser>(userDto);
             return await _userRepository.UpdateUserAsync(appUser);
+        }
+
+        public async Task<bool> UpdatePasswordAsync(Guid userId, string currentPassword, string newPassword)
+        {
+            return await _userRepository.UpdatePasswordAsync(userId, currentPassword, newPassword);
         }
     }
 }

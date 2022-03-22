@@ -8,10 +8,10 @@ namespace Core.Application.Models
 {
     public class CurrencyDto
     {
-        public string Code { get; set; }
-        public string UnicodeDecimal { get; set; }
-        public string UnicodeHex { get; set; }
-        public string Text { get; set; }
+        public string Code { get; set; } = String.Empty;
+        public string UnicodeDecimal { get; set; } = String.Empty;
+        public string UnicodeHex { get; set; } = String.Empty;
+        public string Text { get; set; } = String.Empty;
 
     }
 }

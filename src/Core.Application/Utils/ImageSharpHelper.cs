@@ -1,12 +1,7 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Core.Application.Helpers
+namespace Core.Application.Utils
 {
     public static class ImageSharpHelper
     {

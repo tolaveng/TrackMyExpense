@@ -2,11 +2,8 @@
 using Core.Application.IRepositories;
 using Core.Application.Models;
 using Core.Application.Providers.IProviders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Core.Domain.Entities;
+
 
 namespace Core.Application.Providers
 {
@@ -19,9 +16,18 @@ namespace Core.Application.Providers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<CurrencyDto>> GetAll()
+        public async Task<IEnumerable<CurrencyDto>> GetAll(string? orderBy = null)
         {
-            var currencies = await _unitOfWork.CurrencyRepository.GetAllAsync(null, x => x.OrderBy(z => z.Code));
+            Func<IQueryable<Currency>, IOrderedQueryable<Currency>> ordered = (order) =>
+            {
+                if (orderBy != null && orderBy.Equals("Text", StringComparison.OrdinalIgnoreCase))
+                {
+                    return order.OrderBy(x => x.Text);
+                }
+                return order.OrderBy(x => x.Code);
+            };
+
+            var currencies = await _unitOfWork.CurrencyRepository.GetAllAsync(null, ordered);
             
             return _mapper.Map<IEnumerable<CurrencyDto>>(currencies);
         }

@@ -2,8 +2,12 @@
 @using Core.Application.Mediator.Users
 @using Core.Application.Models
 @using Core.Application.Providers.IProviders
+@using Core.Application.Utils
 @using Core.Domain.Constants
+@using FluentValidation
 @using MediatR
+@using Web.WebApp.Components
+@using Web.WebApp.Components.Dialogs
 
 <SetPageTitle Value=@($"{DefaultConstants.PageTitle} - Profile") />
 
@@ -15,16 +19,19 @@
     <MudCard Outlined="true" Class="p-3" Style="position: relative;">
         <MudCardContent>
             <MudContainer MaxWidth="@MaxWidth.Medium">
-            <EditForm Model="@UserInputForm" OnValidSubmit="@UpdateProfile">
+            <EditForm Model="@profileInputForm" Context="formContext" OnValidSubmit="@UpdateProfileDetails">
+                <DataAnnotationsValidator/>
+                <FluentValidationValidator T="ProfileInputModel" TValidator="ProfileInputValidator" />
                 <MudGrid>
-                    <MudItem xs="12" sm="2">
+                    <MudItem xs="12" sm="3">
                         <span style="font-weight: bold">Account Setting</span>
                     </MudItem>
                     <MudHidden Breakpoint="Breakpoint.Xs">
-                        <MudItem xs="12" sm="10"><!-- empty --></MudItem>
+                        <MudItem xs="12" sm="9"><!-- empty --></MudItem>
                     </MudHidden>
 
-                    <MudItem xs="12" sm="2">
+                    <!-- -->
+                    <MudItem xs="12" sm="3">
                         <div style="text-align: center">
                             @if (string.IsNullOrWhiteSpace(imageThumbnailUrl))
                             {
@@ -41,29 +48,49 @@
                             }
                             </div>
                     </MudItem>
-                    <MudItem xs="12" sm="10">
-                        <MudTextField Label="Full Name" @bind-Value="@UserInputForm.FullName" For="@(() => UserInputForm.FullName)" Class="mb-3" />
-                        <MudTextField Label="Email" @bind-Value="@UserInputForm.Email" For="@(() => UserInputForm.Email)" Class="mb-3" />
+                    <MudItem xs="12" sm="9">
+                        <MudTextField Label="Full Name" @bind-Value="@profileInputForm.FullName" Immediate="true" For="@(() => profileInputForm.FullName)" Class="mb-3" />
+                        <MudTextField Label="Email" @bind-Value="@profileInputForm.Email" Immediate="true" For="@(() => profileInputForm.Email)" Class="mb-3" />
+                        <MudTextField Label="Phone Number" @bind-Value="@profileInputForm.PhoneNumber" Immediate="true" For="@(() => profileInputForm.PhoneNumber)" Class="mb-3" />
+                        <CurrencySelection Label="Currency" @bind-Value="@profileInputForm.Currency" For="@(() => profileInputForm.Currency)" Class="mb-3" />
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Style="text-transform:none"
+                        Color="Color.Primary" Disabled="@(!formContext.IsModified() || !formContext.Validate())">
+                            Save Change
+                        </MudButton>
                     </MudItem>
+                    <MudItem xs="12" sm="12"></MudItem>
+                </MudGrid>
+            </EditForm>
 
-                    <MudItem xs="12" sm="2">
+            <EditForm Model="@passwordInputForm" Context="formContext" OnValidSubmit="@UpdatePassword">
+                <DataAnnotationsValidator/>
+                <FluentValidationValidator T="PasswordInputModel" TValidator="PasswordInputValidator" />
+                <MudGrid>
+                    <MudItem xs="12" sm="3">
                         <span style="font-weight: bold">Update Password</span>
                     </MudItem>
-                    <MudItem xs="12" sm="10">
-                        <MudTextField Label="Current Password" @bind-Value="@UserInputForm.CurrentPassword" For="@(() => UserInputForm.CurrentPassword)" InputType="InputType.Password" Class="mb-3"/>
-                        <MudTextField Label="New Password" @bind-Value="@UserInputForm.NewPassword" For="@(() => UserInputForm.NewPassword)" InputType="InputType.Password" Class="mb-3" Disabled=@(string.IsNullOrWhiteSpace(@UserInputForm.CurrentPassword))/>
-                        <MudTextField Label="Confirm Password" @bind-Value="@UserInputForm.ConfirmPassword" For="@(() => UserInputForm.ConfirmPassword)" InputType="InputType.Password"  Disabled=@(string.IsNullOrWhiteSpace(@UserInputForm.CurrentPassword)) Class="mb-3"/>
+                    <MudItem xs="12" sm="9">
+                        <MudTextField Label="Current Password" @bind-Value="@passwordInputForm.CurrentPassword" For="@(() => passwordInputForm.CurrentPassword)" InputType="InputType.Password" Class="mb-3"/>
+                        <MudTextField Label="New Password" @bind-Value="@passwordInputForm.NewPassword" For="@(() => passwordInputForm.NewPassword)" InputType="InputType.Password" Disabled=@(string.IsNullOrWhiteSpace(@passwordInputForm.CurrentPassword)) Class="mb-3"/>
+                        <MudTextField Label="Confirm Password" @bind-Value="@passwordInputForm.ConfirmPassword" For="@(() => passwordInputForm.ConfirmPassword)" InputType="InputType.Password"  Disabled=@(string.IsNullOrWhiteSpace(@passwordInputForm.CurrentPassword)) Immediate="true" Class="mb-3"/>
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Style="text-transform:none"
+                        Color="Color.Primary" Disabled="@(!formContext.IsModified() || !formContext.Validate())">
+                            Update Password
+                        </MudButton>
                     </MudItem>
+                    <MudItem xs="12" sm="12"></MudItem>
+                </MudGrid>
+            </EditForm>
 
-                    <MudItem xs="12" sm="2">
+            <MudGrid>
+                    <!-- -->
+                    <MudItem xs="12" sm="3">
                         <span style="font-weight: bold">Subscription</span>
                     </MudItem>
-                    <MudItem xs="12" sm="10">
+                    <MudItem xs="12" sm="9">
                         Membership : No membership | Get Premium Account | Try Premium Account For Free
                     </MudItem>
-                </MudGrid>
-                <DataAnnotationsValidator/>
-                </EditForm>
+            </MudGrid>
             </MudContainer>
         </MudCardContent>
          <MudOverlay Visible="@isLoading" DarkBackground="true" Absolute="true" AutoClose="false">
@@ -78,11 +105,13 @@
     [Inject] IJSRuntime JSRuntime { get; set; }
     [Inject] IFileDirectoryProvider FileDirectoryProvider { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
 
     [CascadingParameter]
     public UserDto AuthUser { get; set; } = default;
 
-    private UserInputModel UserInputForm { get; set; } = new UserInputModel();
+    private ProfileInputModel profileInputForm = new ProfileInputModel();
+    private PasswordInputModel passwordInputForm = new PasswordInputModel();
 
     private bool isLoading = true;
     private string imageName;
@@ -94,7 +123,7 @@
         base.OnInitialized();
 
         if (AuthUser == null) return;
-        UserInputForm = new UserInputModel(AuthUser);
+        profileInputForm = new ProfileInputModel(AuthUser);
 
         if (!string.IsNullOrEmpty(AuthUser.ProfileImage))
         {
@@ -108,16 +137,82 @@
         isLoading = false;
     }
 
-    public async Task UpdateProfile()
+    public async Task UpdateProfileDetails()
     {
+        if (string.IsNullOrWhiteSpace(profileInputForm.Email))
+        {
+            Snackbar.Add("Email is required", MudBlazor.Severity.Error);
+            return;
+        }
 
+
+        if (!profileInputForm.Email.Trim().Equals(AuthUser.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            var newEmail = profileInputForm.Email.Trim().ToLower();
+            var parameters = new DialogParameters
+                {
+                    ["UserId"] = AuthUser.Id,
+                    ["Message"] = $"Warning ! You are about to change your login email to <b>{newEmail}</b>" +
+                                    "<br/>If you wish to continue, please type your password below.",
+                    ["PrimaryButtonText"] = "Change",
+                    ["Color"] = Color.Error,
+                };
+            var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = false };
+            var dialog = Dialog.Show<ConfirmWithPasswordDialog>("Email Changed !", parameters, options);
+            var passwordConfirmed = await dialog.Result;
+            if (passwordConfirmed.Cancelled)
+            {
+                return;
+            }
+            if (!(bool)passwordConfirmed.Data)
+            {
+                Snackbar.Add("Incorrect Password!", MudBlazor.Severity.Error);
+                return;
+            }
+
+            // set login username to the new email
+            profileInputForm.Username = newEmail;
+            profileInputForm.Email = newEmail;
+        }
+
+
+        var result = await Mediator.Send(new UpdateUserProfileRequest(profileInputForm.ToUserDto()));
+        if (result.Succeeded)
+        {
+            Snackbar.Clear();
+            Snackbar.Add("Profile has been saved successfully", MudBlazor.Severity.Success);
+            return;
+        }
+        Snackbar.Add("Something went wrong, cannot save profile. Please try again later.", MudBlazor.Severity.Error);
+    }
+
+    public async Task UpdatePassword()
+    {
+        if (string.IsNullOrWhiteSpace(passwordInputForm.CurrentPassword) ||
+        string.IsNullOrWhiteSpace(passwordInputForm.NewPassword))
+        {
+            throw new ArgumentNullException("Invalid Passwords");
+        }
+
+        var isUpdated = await Mediator.Send(new UpdateUserPasswordRequest(AuthUser.Id,
+            passwordInputForm.CurrentPassword, passwordInputForm.NewPassword));
+
+        if (isUpdated)
+        {
+            passwordInputForm = new PasswordInputModel();
+            Snackbar.Clear();
+            Snackbar.Add("Password has been updated successfully", MudBlazor.Severity.Success);
+            return;
+        }
+
+        Snackbar.Add("We're sorry, password reset fails. Please try again later.", MudBlazor.Severity.Error);
     }
 
     private async Task UploadProfileImage()
     {
         var parameters = new DialogParameters {
             ["UserId"] = AuthUser.Id,
-            ["imageName"] = imageName,
+            ["ImageName"] = imageName,
             ["ImageUrl"] = imageUrl,
         };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
@@ -125,16 +220,24 @@
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
-            if (result.Data is string fileName)
+            if (result.Data is string response)
             {
-                imageName = fileName;
+                if (response == "deleted")
+                {
+                    imageName = "";
+                } else
+                {
+                    imageName = response;                    
+                }
+
                 // Save to db
                 await Mediator.Send(new UpdateProfileImageRequest(AuthUser.Id, imageName));
 
                 // preview
+                profileInputForm.ProfileImage = imageName;
                 var baseUri = NavigationManager.BaseUri;
-                imageUrl = FileDirectoryProvider.ResolveProfileImageUrl(fileName, baseUri);
-                imageThumbnailUrl = FileDirectoryProvider.ResolveProfileImageThumbnailUrl(fileName, baseUri);
+                imageUrl = FileDirectoryProvider.ResolveProfileImageUrl(imageName, baseUri);
+                imageThumbnailUrl = FileDirectoryProvider.ResolveProfileImageThumbnailUrl(imageName, baseUri);
             }
         }
     }
@@ -149,32 +252,100 @@
         }
     }
 
-    private class UserInputModel
+    public class ProfileInputModel
     {
         public Guid Id { get; set; }
         public string Username { get; set; }
         public string FullName { get; set; } 
         public string Email { get; set; }
-        public string CurrentPassword { get; set; }
-        public string NewPassword { get; set; }
-        public string ConfirmPassword { get; set; }
+        public bool EmailConfirmed { get; set; }
         public string PhoneNumber { get; set; }
-        public string Subscription { get; set; }
+        public bool PhoneNumberConfirmed { get; set; }
         public string Currency { get; set; }
         public string ProfileImage { get; set; }
 
-        public UserInputModel(){}
+        public ProfileInputModel(){}
 
-        public UserInputModel(UserDto user)
+        public ProfileInputModel(UserDto user)
         {
             Id = user.Id;
             Username = user.Username;
             FullName = user.FullName;
             Email = user.Email;
             PhoneNumber = user.PhoneNumber;
-            Subscription = user.Subscriptions.OrderBy(x => x.ValidFrom).LastOrDefault()?.SubscriptionType.ToString();
             Currency = user.Currency;
             ProfileImage = user.ProfileImage;
+        }
+
+        public UserDto ToUserDto()
+        {
+            return new UserDto()
+                {
+                    Id = Id,
+                    Username = Username,
+                    FullName = FullName,
+                    Email = Email,
+                    PhoneNumber = PhoneNumber,
+                    Currency = Currency,
+                    ProfileImage = ProfileImage
+                };
+        }
+    }
+
+    public class PasswordInputModel
+    {
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
+        public string ConfirmPassword { get; set; }
+        
+        public PasswordInputModel(){}
+
+        public UserDto ToUserDto()
+        {
+            return new UserDto()
+                {
+                    Id = Id,
+                    Username = Username,
+                    Password = NewPassword
+                };
+        }
+    }
+
+    public class ProfileInputValidator : AbstractValidator<ProfileInputModel>
+    {
+        public ProfileInputValidator()
+        {
+            RuleFor(x => x.FullName).NotEmpty().WithMessage("Full Name is required");
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required")
+            .EmailAddress().WithMessage("Invalid email address");
+        }
+    }
+
+    public class PasswordInputValidator : AbstractValidator<PasswordInputModel>
+    {
+        public PasswordInputValidator()
+        {
+            RuleFor(x => x.CurrentPassword)
+            .NotEmpty().WithMessage("Current Password is required");
+
+            RuleFor(x => x.NewPassword)
+            .NotEmpty().WithMessage("New Password is required")
+            .MinimumLength(8).WithMessage("Password is too short")
+            .MaximumLength(24).WithMessage("Password is too long")
+            //.Matches(@"[A-Z]+").WithMessage("Password must contain at least one uppercase letter.")
+            .Matches(@"[a-z]+").WithMessage("Password must contain at least one lowercase letter.")
+            //.Matches(@"[0-9]+").WithMessage("Password must contain at least one number.")
+            //.Matches(@"[\!\?\@\*\.]+").WithMessage("Password must contain at least one (!?@ *.).")
+            ;
+
+            RuleFor(x => x.ConfirmPassword)
+            .NotEmpty().WithMessage("Confirm Password is required")
+            .When(x => !string.IsNullOrWhiteSpace(x.NewPassword))
+            .WithMessage("Confirm Password is required")
+            .Equal(x => x.NewPassword)
+            .WithMessage("Confirm Password is not match the New Password");
         }
     }
 }

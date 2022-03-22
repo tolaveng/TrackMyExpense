@@ -16,6 +16,7 @@ namespace Core.Application.Mapper
                 ;
 
             CreateMap<SysAttribute, SysAttributeDto>().ReverseMap();
+            CreateMap<Currency, CurrencyDto>().ReverseMap();
             CreateMap<PageHtml, PageHtmlDto>().ReverseMap();
             CreateMap<Subscription, SubscriptionDto>().ReverseMap();
 

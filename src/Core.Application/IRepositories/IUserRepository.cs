@@ -20,6 +20,8 @@ namespace Core.Application.IRepositories
         Task<string> GenerateEmailConfirmationTokenAsync(Guid userId);
         Task<string> GeneratePasswordResetTokenAsync(Guid userId);
         Task<bool> ConfirmEmailTokenAsync(Guid userId, string token);
+        Task<bool> CheckPasswordAsync(Guid userId, string password);
+        Task<bool> UpdatePasswordAsync(Guid userId, string currentPassword, string newPassword);
         Task<bool> ResetPasswordAsync(Guid userId, string token, string password);
         bool IsEmailConfirmed(Guid userId);
 

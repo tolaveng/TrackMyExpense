@@ -171,21 +171,27 @@ namespace Core.Infrastructure.Repository
             identityUser.ProfileImage = appUser.ProfileImage;
             identityUser.IsDisabled = appUser.IsDisabled;
 
-            if (!string.IsNullOrEmpty(appUser.Password))
+            if (!string.IsNullOrEmpty(appUser.Username) && !identityUser.UserName.Equals(appUser.Username))
             {
-                var validator = _userManager.PasswordValidators.FirstOrDefault();
-                if (validator != null)
-                {
-                    var validateResult = await validator.ValidateAsync(_userManager, identityUser, appUser.Password);
-                    if (!validateResult.Succeeded)
-                    {
-                        return GenericResponse<bool>.Failure("Invalid Password");
-                    }
-                }
-                
-                identityUser.PasswordHash = _userManager.PasswordHasher
-                    .HashPassword(identityUser, appUser.Password);
+                identityUser.UserName = appUser.Username;
             }
+
+            // NOTE: use UpdatePasswordAsync
+            //if (!string.IsNullOrEmpty(appUser.Password))
+            //{
+            //    var validator = _userManager.PasswordValidators.FirstOrDefault();
+            //    if (validator != null)
+            //    {
+            //        var validateResult = await validator.ValidateAsync(_userManager, identityUser, appUser.Password);
+            //        if (!validateResult.Succeeded)
+            //        {
+            //            return GenericResponse<bool>.Failure("Invalid Password");
+            //        }
+            //    }
+                
+            //    identityUser.PasswordHash = _userManager.PasswordHasher
+            //        .HashPassword(identityUser, appUser.Password);
+            //}
 
             await _userManager.UpdateAsync(identityUser);
             return GenericResponse<bool>.Success();
@@ -304,6 +310,16 @@ namespace Core.Infrastructure.Repository
             return false;
         }
 
+        public async Task<bool> CheckPasswordAsync(Guid userId, string password)
+        {
+            var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
+            if (user != null && user.EmailConfirmed)
+            {
+                return await _userManager.CheckPasswordAsync(user, password);
+            }
+            return false;
+        }
+
         public PagedResponse<AppUser> GetUsers(string search, Pagination pagination)
         {
             var userQuery = _userManager.Users;
@@ -338,6 +354,25 @@ namespace Core.Infrastructure.Repository
         public int GetCount()
         {
             return _userManager.Users.Count();
+        }
+
+        public async Task<bool> UpdatePasswordAsync(Guid userId, string currentPassword, string newPassword)
+        {
+            var user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
+            if (user == null) return false;
+
+            var isValidPassword = await _userManager.CheckPasswordAsync(user, currentPassword);
+            if (!isValidPassword) return false;
+
+            var validator = _userManager.PasswordValidators.FirstOrDefault();
+            if (validator != null)
+            {
+                var validateResult = await validator.ValidateAsync(_userManager, user, newPassword);
+                if (!validateResult.Succeeded) return false;
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            return result.Succeeded;
         }
     }
 }
