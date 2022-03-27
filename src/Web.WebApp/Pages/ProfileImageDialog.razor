@@ -22,14 +22,11 @@
         </EditForm>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Error"  Variant="Variant.Outlined" OnClick="OnDeleteClicked"
-        Disabled="@(string.IsNullOrEmpty(ImageName))" StartIcon="@Icons.Filled.DeleteForever" >Delete</MudButton>
+        <AppButton Color="Color.Error"  OnClick="OnDeleteClicked" IsOutline="true"
+            IsDisabled="@(string.IsNullOrEmpty(ImageName))" Icon="@Icons.Filled.DeleteForever" Text="Delete" />
         <MudSpacer />
-        <MudButton OnClick="OnCloseClicked" Variant="Variant.Outlined" StartIcon="@Icons.Filled.Close">Close</MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="@(!isSaveEnabled)" StartIcon="@Icons.Filled.Save"
-            OnClick="OnSaveClicked">
-            Save <MudProgressCircular Size="Size.Small" Color="Color.Tertiary" Indeterminate="true" hidden="@{!isLoading}" />
-        </MudButton>
+        <AppButton OnClick="OnCloseClicked" IsOutline="true" Icon="@Icons.Filled.Close" Text="Close" />
+        <AppButton OnClick="OnSaveClicked" Text="Save" IsLoading="@isLoading" Color="Color.Primary" IsDisabled="@(!isSaveEnabled)" Icon="@Icons.Filled.Save"/>
     </DialogActions>
 </MudDialog>
 

@@ -6,8 +6,7 @@ namespace Core.Domain.Enums
     public enum SubscriptionType
     {
         Free,
-        Monthly,
+        Premium,
         Unlimited,
-        Yearly,
     }
 }

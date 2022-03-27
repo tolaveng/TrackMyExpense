@@ -34,9 +34,9 @@ namespace Core.Application.Mediator.Subscriptions
             {
                 subscription.PaidDate = DateTime.SpecifyKind(subscription.PaidDate.Value, DateTimeKind.Utc);
             }
-            if (subscription.ValidFrom.HasValue && subscription.ValidFrom.Value.Kind != DateTimeKind.Utc)
+            if (subscription.ValidFrom.Kind != DateTimeKind.Utc)
             {
-                subscription.ValidFrom = DateTime.SpecifyKind(subscription.ValidFrom.Value, DateTimeKind.Utc);
+                subscription.ValidFrom = DateTime.SpecifyKind(subscription.ValidFrom, DateTimeKind.Utc);
             }
             if (subscription.ValidTo.HasValue && subscription.ValidTo.Value.Kind != DateTimeKind.Utc)
             {

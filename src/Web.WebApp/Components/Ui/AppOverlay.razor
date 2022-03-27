@@ -1,0 +1,11 @@
+﻿<MudOverlay Visible="@IsLoading" DarkBackground="true" Absolute="true" AutoClose="false">
+    <div style="text-align:center; padding: 16px; border-radius: 8px; background: #ffffff">
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true"/><br/>
+        <MudText>@Text</MudText>
+    </div>
+</MudOverlay>
+
+@code {
+    [Parameter] public bool IsLoading { get; set; }
+    [Parameter] public string Text { get; set; } = "Loading...";
+}

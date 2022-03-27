@@ -53,10 +53,8 @@
                         <MudTextField Label="Email" @bind-Value="@profileInputForm.Email" Immediate="true" For="@(() => profileInputForm.Email)" Class="mb-3" />
                         <MudTextField Label="Phone Number" @bind-Value="@profileInputForm.PhoneNumber" Immediate="true" For="@(() => profileInputForm.PhoneNumber)" Class="mb-3" />
                         <CurrencySelection Label="Currency" @bind-Value="@profileInputForm.Currency" For="@(() => profileInputForm.Currency)" Class="mb-3" />
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Style="text-transform:none"
-                        Color="Color.Primary" Disabled="@(!formContext.IsModified() || !formContext.Validate())">
-                            Save Change
-                        </MudButton>
+                        <AppButton Type="submit" Text="Save Change" Color="@Color.Primary" IsLoading="@isSubmitting"
+                            IsDisabled="@(!formContext.IsModified() || !formContext.Validate())" />
                     </MudItem>
                     <MudItem xs="12" sm="12"></MudItem>
                 </MudGrid>
@@ -73,10 +71,8 @@
                         <MudTextField Label="Current Password" @bind-Value="@passwordInputForm.CurrentPassword" For="@(() => passwordInputForm.CurrentPassword)" InputType="InputType.Password" Class="mb-3"/>
                         <MudTextField Label="New Password" @bind-Value="@passwordInputForm.NewPassword" For="@(() => passwordInputForm.NewPassword)" InputType="InputType.Password" Disabled=@(string.IsNullOrWhiteSpace(@passwordInputForm.CurrentPassword)) Class="mb-3"/>
                         <MudTextField Label="Confirm Password" @bind-Value="@passwordInputForm.ConfirmPassword" For="@(() => passwordInputForm.ConfirmPassword)" InputType="InputType.Password"  Disabled=@(string.IsNullOrWhiteSpace(@passwordInputForm.CurrentPassword)) Immediate="true" Class="mb-3"/>
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Style="text-transform:none"
-                        Color="Color.Primary" Disabled="@(!formContext.IsModified() || !formContext.Validate())">
-                            Update Password
-                        </MudButton>
+                        <AppButton Type="submit" Text="Update Password" Color="Color.Primary"  IsLoading="@isSubmitting"
+                            IsDisabled="@(!formContext.IsModified() || !formContext.Validate())" />
                     </MudItem>
                     <MudItem xs="12" sm="12"></MudItem>
                 </MudGrid>
@@ -88,14 +84,29 @@
                         <span style="font-weight: bold">Subscription</span>
                     </MudItem>
                     <MudItem xs="12" sm="9">
-                        Membership : No membership | Get Premium Account | Try Premium Account For Free
+                        @if(subscription != null)
+                        {
+                            if (subscription.SubscriptionType == Core.Domain.Enums.SubscriptionType.Free)
+                            {
+                                <MudText>Free membership |
+                                    <MudLink Href="/subscription">Try Premium Account 3 months Free</MudLink>
+                                </MudText>
+                            }
+                            else
+                            {
+                                <MudText>
+                                    @subscription.SubscriptionType.ToString()
+                                    @(subscription.ValidTo.HasValue
+                                    ? $", Valid to: {subscription.ValidTo.Value.ToString("dd/MM/yyyy")}"
+                                    : "")
+                                </MudText>
+                            }
+                        }
                     </MudItem>
             </MudGrid>
             </MudContainer>
         </MudCardContent>
-         <MudOverlay Visible="@isLoading" DarkBackground="true" Absolute="true" AutoClose="false">
-            <MudProgressCircular Color="Color.Primary" Indeterminate="true"/> <br/> Loading...
-        </MudOverlay>
+        <AppOverlay IsLoading="@isLoading" />
     </MudCard>
 </MudContainer>
 
@@ -114,9 +125,11 @@
     private PasswordInputModel passwordInputForm = new PasswordInputModel();
 
     private bool isLoading = true;
+    private bool isSubmitting = false;
     private string imageName;
     private string imageUrl;
     private string imageThumbnailUrl;
+    private SubscriptionDto subscription;
 
     protected override void OnInitialized()
     {
@@ -132,6 +145,11 @@
             var baseUri = NavigationManager.BaseUri;
             imageUrl = FileDirectoryProvider.ResolveProfileImageUrl(AuthUser.ProfileImage, baseUri);
             imageThumbnailUrl = FileDirectoryProvider.ResolveProfileImageThumbnailUrl(AuthUser.ProfileImage, baseUri);
+        }
+
+        if (AuthUser.Subscriptions != null)
+        {
+            subscription = AuthUser.Subscriptions.OrderBy(x => x.ValidFrom).LastOrDefault();
         }
 
         isLoading = false;
@@ -175,15 +193,17 @@
             profileInputForm.Email = newEmail;
         }
 
-
+        isSubmitting = true;
         var result = await Mediator.Send(new UpdateUserProfileRequest(profileInputForm.ToUserDto()));
         if (result.Succeeded)
         {
             Snackbar.Clear();
             Snackbar.Add("Profile has been saved successfully", MudBlazor.Severity.Success);
+            isSubmitting = false;
             return;
         }
         Snackbar.Add("Something went wrong, cannot save profile. Please try again later.", MudBlazor.Severity.Error);
+        isSubmitting = false;
     }
 
     public async Task UpdatePassword()
@@ -194,6 +214,7 @@
             throw new ArgumentNullException("Invalid Passwords");
         }
 
+        isSubmitting = true;
         var isUpdated = await Mediator.Send(new UpdateUserPasswordRequest(AuthUser.Id,
             passwordInputForm.CurrentPassword, passwordInputForm.NewPassword));
 
@@ -202,10 +223,12 @@
             passwordInputForm = new PasswordInputModel();
             Snackbar.Clear();
             Snackbar.Add("Password has been updated successfully", MudBlazor.Severity.Success);
+            isSubmitting = false;
             return;
         }
 
-        Snackbar.Add("We're sorry, password reset fails. Please try again later.", MudBlazor.Severity.Error);
+        Snackbar.Add("We're sorry, password reset fails. Please make sure your current password is correct.", MudBlazor.Severity.Error);
+        isSubmitting = false;
     }
 
     private async Task UploadProfileImage()

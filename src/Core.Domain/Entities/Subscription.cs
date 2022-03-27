@@ -15,7 +15,7 @@ namespace Core.Domain.Entities
         public string PaidRef { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public string Currency { get; set; }
-        public DateTime? ValidFrom { get; set; }
+        public DateTime ValidFrom { get; set; }
         public DateTime? ValidTo { get; set; }
         public bool IsCanceled { get; set; }
     }

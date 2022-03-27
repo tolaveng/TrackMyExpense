@@ -16,7 +16,7 @@ namespace Core.Application.Models
         public string Password { get; set; }
         public string PhoneNumber { get; set; }
         public bool PhoneNumberConfirmed { get; set; }
-        public IEnumerable<Subscription> Subscriptions { get; set; }
+        public IEnumerable<SubscriptionDto> Subscriptions { get; set; }
         public bool IsDisabled { get; set; }
         public bool TwoFactorEnabled { get; set; }
         public string Currency { get; set; }

@@ -1,10 +1,5 @@
 ﻿using Core.Domain.Enums;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Application.Models
 {
@@ -28,15 +23,15 @@ namespace Core.Application.Models
         public SubscriptionValidator()
         {
             RuleFor(x => x.PaidAmount)
-                .NotEmpty().When(x => x.SubscriptionType == SubscriptionType.Monthly || x.SubscriptionType == SubscriptionType.Yearly)
+                .NotEmpty().When(x => x.SubscriptionType == SubscriptionType.Premium)
                 .WithMessage("Paid Amount cannot be empty or 0.")
                 .GreaterThan(0)
-                .When(x => x.SubscriptionType == SubscriptionType.Monthly || x.SubscriptionType == SubscriptionType.Yearly)
+                .When(x => x.SubscriptionType == SubscriptionType.Premium)
                 .WithMessage("Paid Amount must be greater than 0.");
-
-            RuleFor(x => x.ValidTo.Value).GreaterThanOrEqualTo(x => x.ValidFrom.Value)
-                .When(x => x.ValidFrom.HasValue && x.ValidTo.HasValue)
-                .WithMessage("Valid To must be after or equal to the valid from.");
+            RuleFor(x => x.ValidFrom).NotEmpty().WithMessage("Valid From cannot be empty");
+            RuleFor(x => x.ValidTo.Value).GreaterThanOrEqualTo(x => x.ValidFrom)
+                .When(x => x.ValidTo.HasValue)
+                .WithMessage("Valid To must be after the valid from.");
         }
     }
 }

@@ -129,7 +129,9 @@ namespace Core.Infrastructure.Repository
 
         public async Task<AppUser> GetByEmailAsync(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            //var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.Users.Include(x => x.Subscriptions)
+                .FirstOrDefaultAsync(x => x.Email.Equals(email.Trim(),StringComparison.OrdinalIgnoreCase));
             if (user != null)
             {
                 return _mapper.Map<AppUser>(user);
@@ -139,7 +141,9 @@ namespace Core.Infrastructure.Repository
         
         public async Task<GenericResponse<AppUser>> GetByUsername(string email)
         {
-            var user = await _userManager.FindByNameAsync(email);
+            //var user = await _userManager.FindByNameAsync(email);
+            var user = await _userManager.Users.Include(x => x.Subscriptions)
+                .FirstOrDefaultAsync(x => x.UserName.Equals(email.Trim(),StringComparison.OrdinalIgnoreCase));
             if (user != null)
             {
                 var appUser = _mapper.Map<AppUser>(user);
@@ -150,7 +154,8 @@ namespace Core.Infrastructure.Repository
 
         public AppUser GetById(Guid userId)
         {
-            var user = _userManager.Users.SingleOrDefault(x => x.Id == userId);
+            var user = _userManager.Users.Include(x => x.Subscriptions)
+                .SingleOrDefault(x => x.Id == userId);
             if (user != null)
             {
                 return _mapper.Map<AppUser>(user);
