@@ -14,9 +14,10 @@ namespace Core.Domain.Entities
         public string PaidGateway { get; set; }
         public string PaidRef { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+        public PaymentCycle PaymentCycle { get; set; }
         public string Currency { get; set; }
-        public DateTime ValidFrom { get; set; }
-        public DateTime? ValidTo { get; set; }
+        public DateTime Begin { get; set; }
+        public DateTime? End { get; set; }
         public bool IsCanceled { get; set; }
     }
 }

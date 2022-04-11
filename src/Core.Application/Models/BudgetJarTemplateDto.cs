@@ -11,7 +11,7 @@ namespace Core.Application.Models
     {
         public Guid UserId { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int Percentage { get; set; }
         public bool IsSystem { get; set; }
         public Guid IconId { get; set; }

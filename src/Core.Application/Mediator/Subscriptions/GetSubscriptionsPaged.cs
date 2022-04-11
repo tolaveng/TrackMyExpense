@@ -50,16 +50,16 @@ namespace Core.Application.Mediator.Subscriptions
                     : orderBy = x => x.OrderByDescending(z => z.PaidDate);
                     break;
 
-                case "ValidFrom":
+                case "Begin":
                     orderBy = pagination.SortDirection == Pagination.Ascending
-                    ? orderBy = x => x.OrderBy(z => z.ValidFrom)
-                    : orderBy = x => x.OrderByDescending(z => z.ValidFrom);
+                    ? orderBy = x => x.OrderBy(z => z.Begin)
+                    : orderBy = x => x.OrderByDescending(z => z.Begin);
                     break;
 
-                case "ValidTo":
+                case "End":
                     orderBy = pagination.SortDirection == Pagination.Ascending
-                    ? orderBy = x => x.OrderBy(z => z.ValidTo)
-                    : orderBy = x => x.OrderByDescending(z => z.ValidTo);
+                    ? orderBy = x => x.OrderBy(z => z.End)
+                    : orderBy = x => x.OrderByDescending(z => z.End);
                     break;
 
                 case "IsCanceled":

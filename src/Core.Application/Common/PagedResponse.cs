@@ -13,7 +13,8 @@ namespace Core.Application.Common
 
         public PagedResponse()
         {
-
+            Data = new List<T>();
+            TotalCount = 0;
         }
 
         public PagedResponse(IEnumerable<T> data, int totalCount)

@@ -23,6 +23,9 @@ namespace Core.Application.Mapper
             CreateMap<BudgetJar, BudgetJarDto>().ReverseMap();
             CreateMap<BudgetJarTemplate, BudgetJarTemplateDto>().ReverseMap();
             CreateMap<ExpenseGroup, ExpenseGroupDto>().ReverseMap();
+            CreateMap<Income, IncomeDto>().ReverseMap();
+            CreateMap<Expense, ExpenseDto>().ReverseMap();
+            CreateMap<Attachment, AttachmentDto>().ReverseMap();
 
             CreateMap<Icon, IconDto>().AfterMap<SetIconWebUrl>().ReverseMap();
             //CreateMap<IconDto, Icon>();

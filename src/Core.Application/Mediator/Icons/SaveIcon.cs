@@ -36,7 +36,7 @@ namespace Core.Application.Mediator.Icons
         public async Task<Guid> Handle(SaveIconCommand request, CancellationToken cancellationToken)
         {
             var icon = _mapper.Map<Icon>(request.IconDto);
-            if (icon.Id == Guid.Empty || icon.Id == null) throw new ArgumentException("Id cannot be empty");
+            if (icon.Id == Guid.Empty) throw new ArgumentException("Id cannot be empty");
             
             if (request.IsNew)
             {

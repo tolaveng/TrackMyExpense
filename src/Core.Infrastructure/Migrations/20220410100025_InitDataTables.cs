@@ -47,8 +47,8 @@ namespace Core.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    PeriodFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PeriodTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Begin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    End = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -236,9 +236,10 @@ namespace Core.Infrastructure.Migrations
                     PaidGateway = table.Column<string>(type: "text", nullable: true),
                     PaidRef = table.Column<string>(type: "text", nullable: true),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
+                    PaymentCycle = table.Column<int>(type: "integer", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: true),
-                    ValidFrom = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Begin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    End = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsCanceled = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
@@ -611,8 +612,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "c307faf9-83db-4733-9bcc-b2d3a5c22bb0", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "5eeae8e4-cb98-4af4-aa3d-94f672a74115", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "3a886feb-eb7a-4e72-a163-5d6e91d21af1", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "0085a704-0a93-468b-a2ef-3b5eb5aad696", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(

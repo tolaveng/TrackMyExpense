@@ -1638,10 +1638,10 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("PeriodFrom")
+                    b.Property<DateTime>("Begin")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("PeriodTo")
+                    b.Property<DateTime>("End")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -1748,6 +1748,9 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("Begin")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1756,6 +1759,9 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<string>("Currency")
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("End")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsCanceled")
                         .HasColumnType("boolean");
@@ -1778,6 +1784,9 @@ namespace Core.Infrastructure.Migrations
                     b.Property<string>("PaidRef")
                         .HasColumnType("text");
 
+                    b.Property<int>("PaymentCycle")
+                        .HasColumnType("integer");
+
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("integer");
 
@@ -1786,12 +1795,6 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("ValidFrom")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ValidTo")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1851,14 +1854,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "5eeae8e4-cb98-4af4-aa3d-94f672a74115",
+                            ConcurrencyStamp = "0085a704-0a93-468b-a2ef-3b5eb5aad696",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "c307faf9-83db-4733-9bcc-b2d3a5c22bb0",
+                            ConcurrencyStamp = "3a886feb-eb7a-4e72-a163-5d6e91d21af1",
                             Name = "user",
                             NormalizedName = "USER"
                         });

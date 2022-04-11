@@ -7,7 +7,7 @@ namespace Core.Application.Models
         public Guid UserId { get; set; }
         public Guid? IncomeId { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public int Percentage { get; set; }
         public Decimal Amount { get; set; }
         public Guid IconId { get; set; }

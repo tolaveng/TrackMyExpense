@@ -11,7 +11,7 @@ namespace Core.Application.Services
         public string[] AllowExtensions { get; set; } = { ".png", ".jpg", ".jpeg"};
         public long MaxFileSize { get; set; } = 100 * 1024; // 100 K
 
-        public event EventHandler<int> UploadProgress;
+        public event EventHandler<int>? UploadProgress;
 
         private readonly IFileDirectoryProvider FileDirectoryProvider;
 

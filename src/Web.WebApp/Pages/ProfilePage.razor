@@ -96,8 +96,8 @@
                             {
                                 <MudText>
                                     @subscription.SubscriptionType.ToString()
-                                    @(subscription.ValidTo.HasValue
-                                    ? $", Valid to: {subscription.ValidTo.Value.ToString("dd/MM/yyyy")}"
+                                    @(subscription.End.HasValue
+                                    ? $", Valid to: {subscription.End.Value.ToString("dd/MM/yyyy")}"
                                     : "")
                                 </MudText>
                             }
@@ -149,7 +149,7 @@
 
         if (AuthUser.Subscriptions != null)
         {
-            subscription = AuthUser.Subscriptions.OrderBy(x => x.ValidFrom).LastOrDefault();
+            subscription = AuthUser.Subscriptions.OrderBy(x => x.Begin).LastOrDefault();
         }
 
         isLoading = false;

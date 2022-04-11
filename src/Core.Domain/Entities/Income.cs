@@ -13,8 +13,8 @@ namespace Core.Domain.Entities
     {
         public Guid UserId  { get; set; }
         public decimal Amount { get; set; }
-        public DateTime PeriodFrom { get; set; }
-        public DateTime PeriodTo { get; set; }
+        public DateTime Begin { get; set; }
+        public DateTime End { get; set; }
         public virtual ICollection<BudgetJar> BudgetJars { get; set; }
     }
 }

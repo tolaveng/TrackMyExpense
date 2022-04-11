@@ -37,8 +37,8 @@
             <MudTh><MudTableSortLabel SortLabel="SubscriptionType" T="SubscriptionDto">Subscription</MudTableSortLabel></MudTh>
             <MudTh>Amount</MudTh>
             <MudTh><MudTableSortLabel SortLabel="PaidDate" T="SubscriptionDto">Paid Date</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortLabel="ValidFrom" T="SubscriptionDto">Valid From</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortLabel="ValidTo" T="SubscriptionDto">Valid To</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="Begin" T="SubscriptionDto">Begin</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="End" T="SubscriptionDto">End</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="IsCanceled" T="SubscriptionDto">Canceled</MudTableSortLabel></MudTh>
             <MudTh>Actions</MudTh>
         </HeaderContent>
@@ -46,8 +46,8 @@
             <MudTd DataLabel="Subscription Type">@context.SubscriptionType</MudTd>
             <MudTd DataLabel="Amount">@context.PaidAmount</MudTd>
             <MudTd DataLabel="Paid Date" HideSmall="@true">@context.PaidDate?.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd DataLabel="Valid From" HideSmall="@true">@context.ValidFrom?.ToString("dd/MM/yyyy")</MudTd>
-            <MudTd DataLabel="Valid To" HideSmall="@true">@context.ValidTo?.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="Begin" HideSmall="@true">@context.Begin?.ToString("dd/MM/yyyy")</MudTd>
+            <MudTd DataLabel="End" HideSmall="@true">@context.End?.ToString("dd/MM/yyyy")</MudTd>
             <MudTd DataLabel="Canceled" HideSmall="@true">
                 @if(@context.IsCanceled)
                 {

@@ -44,8 +44,8 @@ namespace Core.Application.Services
         private class CaptchaResponse
         {
             public bool success { get; set; }
-            public string challenge_ts { get; set; }
-            public string hostname { get; set; }
+            public string challenge_ts { get; set; } = string.Empty;
+            public string hostname { get; set; } = string.Empty;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Core.Application.Mediator.Subscriptions
 {
     public class SaveSubscriptionCommand : IRequest<Guid>
     {
-        public SubscriptionDto SubscriptionDto { get; set; }
+        public SubscriptionDto SubscriptionDto { get; set; } = new SubscriptionDto();
     }
 
     public class SaveSubscriptionHandler : IRequestHandler<SaveSubscriptionCommand, Guid>
@@ -34,13 +34,13 @@ namespace Core.Application.Mediator.Subscriptions
             {
                 subscription.PaidDate = DateTime.SpecifyKind(subscription.PaidDate.Value, DateTimeKind.Utc);
             }
-            if (subscription.ValidFrom.Kind != DateTimeKind.Utc)
+            if (subscription.Begin.Kind != DateTimeKind.Utc)
             {
-                subscription.ValidFrom = DateTime.SpecifyKind(subscription.ValidFrom, DateTimeKind.Utc);
+                subscription.Begin = DateTime.SpecifyKind(subscription.Begin, DateTimeKind.Utc);
             }
-            if (subscription.ValidTo.HasValue && subscription.ValidTo.Value.Kind != DateTimeKind.Utc)
+            if (subscription.End.HasValue && subscription.End.Value.Kind != DateTimeKind.Utc)
             {
-                subscription.ValidTo = DateTime.SpecifyKind(subscription.ValidTo.Value, DateTimeKind.Utc);
+                subscription.End = DateTime.SpecifyKind(subscription.End.Value, DateTimeKind.Utc);
             }
 
             if (subscription.Id == Guid.Empty)

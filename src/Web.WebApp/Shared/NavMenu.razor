@@ -1,13 +1,38 @@
 ﻿@using Core.Domain.Constants
 
 <MudNavMenu Class="drawer">
+    <AuthorizeView>
+        <Authorized>
+            <MudNavGroup Title="Expenses" Expanded="true">
+                <MudNavLink Href="/expenses" IconColor="@Color.Primary" Icon="@Icons.Filled.Paid">
+                    My Expenses
+                </MudNavLink>
+                <MudNavLink Href="/expensegroups" IconColor="@Color.Primary" Icon="@Icons.Filled.Category">
+                    Expense Groups
+                </MudNavLink>
+            </MudNavGroup>
+
+            <MudNavGroup Title="Incomes" Expanded="true">
+                <MudNavLink Href="/incomes" IconColor="@Color.Primary" Icon="@Icons.Filled.AttachMoney">
+                    My Incomes
+                </MudNavLink>
+                <MudNavLink Href="/budgetjars" IconColor="@Color.Primary" Icon="@Icons.Filled.AccountTree">
+                    Budget Jars
+                </MudNavLink>
+            </MudNavGroup>
+
+            <MudNavLink Href="/account/logout" IconColor="@Color.Error" Icon="@Icons.Filled.Logout" Class="drawer-item-bottom">
+                <MudText Color="@Color.Error">Log Out</MudText>
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
     <AuthorizeView Roles=@UserBaseRole.Admin>
         <Authorized>
-            <MudNavGroup Title="Administrator" Expanded="true" IconColor="@Color.Primary" Icon="@Icons.Filled.AdminPanelSettings">
+            <MudNavGroup Title="Administrator" Expanded="true">
                 <MudNavLink Href="/admin/users" IconColor="@Color.Primary" Icon="@Icons.Filled.People">
                     Users
                 </MudNavLink>
-                <MudNavLink Href="/admin/budgetjartemplates" IconColor="@Color.Primary" Icon="@Icons.Filled.Paid">
+                <MudNavLink Href="/admin/budgetjartemplates" IconColor="@Color.Primary" Icon="@Icons.Filled.AccountTree">
                     Budget Jars
                 </MudNavLink>
                 <MudNavLink Href="/admin/expense-groups" IconColor="@Color.Primary" Icon="@Icons.Filled.Category">
@@ -23,13 +48,6 @@
                     Privacy
                 </MudNavLink>
             </MudNavGroup>
-        </Authorized>
-    </AuthorizeView>
-    <AuthorizeView>
-        <Authorized>
-            <MudNavLink Href="/account/logout" IconColor="@Color.Error" Icon="@Icons.Filled.Logout" Class="drawer-item-bottom">
-                <MudText Color="@Color.Error">Log Out</MudText>
-            </MudNavLink>
         </Authorized>
     </AuthorizeView>
 </MudNavMenu>

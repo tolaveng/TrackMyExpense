@@ -13,11 +13,11 @@ namespace Core.Application.Models
         public Guid UserId { get; set; }
 
         [MaxLength(128)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public bool IsSystem { get; set; }
 
         public Guid IconId { get; set; }
-        public IconDto Icon { get; set; }
+        public IconDto? Icon { get; set; }
 
         public static ExpenseGroupDto Clone(ExpenseGroupDto expenseGroupDto)
         {
