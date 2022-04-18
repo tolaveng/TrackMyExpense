@@ -27,6 +27,19 @@ namespace Core.Application.Models
                 Icon = budgetJar.Icon,
             };
         }
+
+        public static BudgetJarDto FromTemplate(BudgetJarTemplateDto template)
+        {
+            return new BudgetJarDto()
+            {
+                Id = Guid.NewGuid(),
+                UserId = template.UserId,
+                Name = template.Name,
+                Percentage = template.Percentage,
+                IconId = template.IconId,
+                Icon = template.Icon,
+            };
+        }
     }
 
     public class BudgetJarValidator : BasicValidator<BudgetJarDto>

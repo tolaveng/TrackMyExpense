@@ -38,7 +38,8 @@ namespace Core.Infrastructure.Seeder
                     PhoneNumberConfirmed = true,
                     LockoutEnabled = false,
                     SecurityStamp = Guid.NewGuid().ToString(),
-                    Currency = "AUD"
+                    Currency = "AUD",
+                    TimeZone = "Australia/Sydney",
                 };
 
                 if (!context.Users.Any(u => u.UserName == adminUser.UserName))

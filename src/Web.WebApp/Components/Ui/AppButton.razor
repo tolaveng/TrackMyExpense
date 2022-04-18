@@ -5,6 +5,7 @@
     StartIcon="@Icon"
     OnClick="@OnClicked"
     Style="text-transform:none"
+    Class="@Class"
 >
     <MudText>@Text</MudText>
     @if (IsLoading) {
@@ -21,6 +22,7 @@
     [Parameter] public bool IsDisabled { get; set; }
     [Parameter] public bool IsLoading { get; set; }
     [Parameter] public bool IsOutline { get; set; }
+    [Parameter] public string Class { get; set; }
 
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 

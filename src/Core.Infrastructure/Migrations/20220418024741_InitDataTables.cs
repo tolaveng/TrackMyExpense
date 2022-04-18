@@ -47,6 +47,7 @@ namespace Core.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true),
                     Begin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     End = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
@@ -107,6 +108,7 @@ namespace Core.Infrastructure.Migrations
                     FullName = table.Column<string>(type: "text", nullable: true),
                     IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
                     Currency = table.Column<string>(type: "text", nullable: true),
+                    TimeZone = table.Column<string>(type: "text", nullable: true),
                     ProfileImage = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -612,8 +614,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "3a886feb-eb7a-4e72-a163-5d6e91d21af1", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "0085a704-0a93-468b-a2ef-3b5eb5aad696", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "5ed0b208-63cf-4369-9708-edb213c75cb1", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "0c3c2a9a-e69d-4731-9b59-bfa1a3cd921b", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(

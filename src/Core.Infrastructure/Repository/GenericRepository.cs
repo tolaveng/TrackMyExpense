@@ -65,6 +65,12 @@ namespace Core.Infrastructure.Repository
             return true;
         }
 
+        public async Task<bool> DeleteAsync(Expression<Func<T, bool>> expression)
+        {
+            var entities = await _db.Where(expression).ToListAsync();
+            return DeleteRange(entities);
+        }
+
         public bool DeleteRange(IEnumerable<T> entities)
         {
             _db.RemoveRange(entities);

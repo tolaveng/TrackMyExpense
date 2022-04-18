@@ -1644,6 +1644,9 @@ namespace Core.Infrastructure.Migrations
                     b.Property<DateTime>("End")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -1854,14 +1857,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "0085a704-0a93-468b-a2ef-3b5eb5aad696",
+                            ConcurrencyStamp = "0c3c2a9a-e69d-4731-9b59-bfa1a3cd921b",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "3a886feb-eb7a-4e72-a163-5d6e91d21af1",
+                            ConcurrencyStamp = "5ed0b208-63cf-4369-9708-edb213c75cb1",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -1923,6 +1926,9 @@ namespace Core.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TimeZone")
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")

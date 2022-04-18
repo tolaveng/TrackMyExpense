@@ -9,5 +9,6 @@ namespace Core.Domain.Constants
     public class DefaultConstants
     {
         public const string PageTitle = "Track My Expense";
+        public const string DefaultTimeZone = "Australia/Sydney";
     }
 }

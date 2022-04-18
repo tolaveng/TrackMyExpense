@@ -29,15 +29,20 @@ namespace Core.Application.Mediator.BudgetJarTemplates
         public async Task<Guid> Handle(SaveBudgetJarTemplateCommand request, CancellationToken cancellationToken)
         {
             var budgetJar = _mapper.Map<BudgetJarTemplate>(request.BudgetJarDto);
-            if (budgetJar.Id == Guid.Empty)
+            if (budgetJar.Id != Guid.Empty)
+            {
+                var exist = await _unitOfWork.BudgetJarTemplateRepository.GetAsync(x => x.Id == budgetJar.Id);
+                if (exist == null)
+                {
+                    throw new InvalidOperationException("Budget jar template is not found");
+                }
+                _unitOfWork.BudgetJarTemplateRepository.Update(budgetJar);
+            }
+            else
             {
                 budgetJar.Id = Guid.NewGuid();
                 budgetJar.Icon = null;
                 await _unitOfWork.BudgetJarTemplateRepository.InsertAsync(budgetJar);
-            }
-            else
-            {
-                _unitOfWork.BudgetJarTemplateRepository.Update(budgetJar);
             }
 
             await _unitOfWork.SaveAsync();

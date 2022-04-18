@@ -131,7 +131,7 @@ namespace Core.Infrastructure.Repository
         {
             //var user = await _userManager.FindByEmailAsync(email);
             var user = await _userManager.Users.Include(x => x.Subscriptions)
-                .FirstOrDefaultAsync(x => x.Email.Equals(email.Trim(),StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(x => x.Email.ToLower().Equals(email.Trim().ToLower()));
             if (user != null)
             {
                 return _mapper.Map<AppUser>(user);
@@ -143,7 +143,7 @@ namespace Core.Infrastructure.Repository
         {
             //var user = await _userManager.FindByNameAsync(email);
             var user = await _userManager.Users.Include(x => x.Subscriptions)
-                .FirstOrDefaultAsync(x => x.UserName.Equals(email.Trim(),StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(x => x.UserName.ToLower().Equals(email.Trim().ToLower()));
             if (user != null)
             {
                 var appUser = _mapper.Map<AppUser>(user);

@@ -1,0 +1,64 @@
+﻿@using System.Linq.Expressions
+
+
+<MudSelect T="string" id="timezone-selector" Label="@Label" Class="@Class" Value="@Value" For="@For"
+    ValueChanged="ValueChanged" AnchorOrigin="Origin.BottomCenter"
+>
+    @if (timeZones != null)
+    {
+        foreach(var timeZone in timeZones)
+        {
+            <MudSelectItem Value="@timeZone.Id">@timeZone.Name</MudSelectItem>
+        }
+    }
+</MudSelect>
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string Class { get; set; }
+    [Parameter] public string Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public Expression<Func<string>> For { get; set; }
+
+    [Inject] public IJSRuntime JsRuntime { get; set; }
+
+    private IEnumerable<TimeZoneModel> timeZones;
+
+    // https://devblogs.microsoft.com/dotnet/date-time-and-time-zone-enhancements-in-net-6/#time-zone-conversion-apis
+    // store timezone as IANA format: Australia/Sydney
+    protected override void OnInitialized()
+    {
+        var tzs = TimeZoneInfo.GetSystemTimeZones();
+        timeZones = tzs.Select(tz => new TimeZoneModel()
+        {
+            Id = TimeZoneInfo.TryConvertWindowsIdToIanaId(tz.Id, out var ianaTimeZone) ? ianaTimeZone : tz.Id,
+            Name = tz.DisplayName,
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && string.IsNullOrEmpty(Value))
+        {
+
+            var browserTimeZone = await JsRuntime.InvokeAsync<string>("GetBrowserTimeZone");
+            if (string.IsNullOrEmpty(browserTimeZone)) return;
+            try
+            {
+                TimeZoneInfo.FindSystemTimeZoneById(browserTimeZone);
+                await ValueChanged.InvokeAsync(browserTimeZone);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    public class TimeZoneModel
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+    }
+}

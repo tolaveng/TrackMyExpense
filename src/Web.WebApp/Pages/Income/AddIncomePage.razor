@@ -1,0 +1,183 @@
+﻿@page "/add-income"
+@attribute [Authorize]
+
+@using Core.Application.Mediator.BudgetJarTemplates
+@using Core.Application.Mediator.Incomes
+@using Core.Application.Models
+@using FluentValidation
+@using MediatR
+@using System.Security.Authentication
+@using Web.WebApp.Components
+
+<SetPageTitle Value=@($"{DefaultConstants.PageTitle} - Add Income") />
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumbs>
+        <BreadcrumbsItem Icon="@Icons.Filled.AttachMoney" Title="My Incomes" Href="/incomes"/>
+        <BreadcrumbsItem Title="Add Income" />
+    </Breadcrumbs>
+    <MudCard Outlined="true" Class="p-3" Style="position: relative;">
+        <MudCardContent>
+            <MudContainer MaxWidth="@MaxWidth.Medium">
+                <EditForm Model="@incomeInputForm" Context="formContext" OnValidSubmit="@AddIncome">
+                    <DataAnnotationsValidator/>
+                    <FluentValidationValidator T="IncomeInputModel" TValidator="IncomeInputValidator"/>
+                    <MudGrid>
+                    <MudItem xs="12" sm="12">
+                        <MudText>Add your income that you want to track between begin and end date period.</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="12">
+                        <MudTextField Label="Amount" @bind-Value="@incomeInputForm.Amount"
+                            For="@(() => incomeInputForm.Amount)" Class="mb-3"
+                            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                            Immediate="true" TextChanged="@(x => CalculateBudgetJar(x))"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker Label="Begin date" @bind-Date="@incomeInputForm.Begin"
+                            For="@(() => incomeInputForm.Begin)" Placeholder="dd/mm/yyyy"
+                            DateFormat="dd/MM/yyyy" DisableToolbar="true" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudDatePicker Label="End date" @bind-Date="@incomeInputForm.End"
+                            For="@(() => incomeInputForm.End)" Placeholder="dd/mm/yyyy"
+                            DateFormat="dd/MM/yyyy" DisableToolbar="true"/>
+                    </MudItem>
+                    <MudItem xs="12" sm="12">
+                        <MudTextField Label="Note" Variant="Variant.Outlined" @bind-Value="@incomeInputForm.Note" Lines="3" />
+                    </MudItem>
+                    <MudItem xs="12" sm="12">
+                        <MudText>Sumarry: The income is divided into @(budgetJars.Length) budget jars.</MudText>
+                    </MudItem>
+                    @foreach(var budgetJar in budgetJars)
+                    {
+                       <MudItem xs="6" sm="3">
+                           <MudCard Outlined="true" Style="height: 200px; overflow: visible">
+                               <MudCardHeader Class="justify-center align-center">
+                                   <MudImage Src="@(budgetJar.Icon.IconUrl)" Alt="@(budgetJar.Name)" Elevation="2" Class="rounded-lg"/>
+                               </MudCardHeader>
+                               <MudCardContent Style="padding-top: 0; text-align: center;">
+                                   <MudText Typo="Typo.h5">
+                                       <MudIcon Icon="@Icons.Filled.AttachMoney" />
+                                       @budgetJar.Amount.ToString("##.00")
+                                   </MudText>
+                                   <MudText>@budgetJar.Name (@budgetJar.Percentage%)</MudText>
+                               </MudCardContent>
+                           </MudCard>
+                       </MudItem>
+                    }
+                    </MudGrid>
+                    <AppButton Type="submit" Text="Add Income" Color="@Color.Primary" IsLoading="@isSubmitting"
+                            IsDisabled="@(!formContext.IsModified() || !formContext.Validate())" Class="mt-3 mb-3" />
+                </EditForm>
+            </MudContainer>
+        </MudCardContent>       
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
+
+    private bool isSubmitting;
+    private IncomeInputModel incomeInputForm = new IncomeInputModel();
+    private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthUser == null)
+        {
+            throw new AuthenticationException();
+        }
+
+        incomeInputForm.UserId = AuthUser.Id;
+
+        var budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesQuery(true, AuthUser.Id));
+        if(!budgetJarTemplates.Any())
+        {
+            budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesQuery(true, null));
+        }
+
+        budgetJars = budgetJarTemplates.OrderByDescending(x => x.Percentage).Select(BudgetJarDto.FromTemplate).ToArray();
+
+        base.OnInitialized();
+    }
+
+
+    private async Task AddIncome()
+    {
+        if (incomeInputForm.Amount < 1) return;
+        isSubmitting = true;
+        var income = incomeInputForm.ToIncomeDto();
+        var result = await Mediator.Send(new SaveIncomeRequest(income, budgetJars));
+        if (result == Guid.Empty)
+        {
+            Snackbar.Clear();
+            Snackbar.Add("Something went wrong. Cannot save the income. Please try again later.");
+            isSubmitting = false;
+            return;
+        }
+        NavigationManager.NavigateTo("/incomes");
+    }
+
+    private void CalculateBudgetJar(string amountText)
+    {
+        if (!int.TryParse(amountText, out var amount)) return;
+        if (!budgetJars.Any()) return;
+
+        foreach(var budgetJar in budgetJars)
+        {
+            budgetJar.Amount = Math.Round(amount * decimal.Divide(budgetJar.Percentage, 100), 2, MidpointRounding.AwayFromZero);
+        }
+        budgetJars.Last().Amount = amount - budgetJars.Take(budgetJars.Length - 1).Sum(x => x.Amount);
+    }
+
+    public class IncomeInputModel
+    {
+        public Guid Id { get; set; } = Guid.Empty;
+        public Guid UserId { get; set; }
+        public decimal Amount { get; set; }
+        public string Note { get; set; }
+        public DateTime? Begin { get; set; }
+        public DateTime? End { get; set; }
+
+        public IncomeInputModel()
+        {
+            Amount = 0;
+            var now = DateTime.Now;
+            Begin = new DateTime(now.Year, now.Month, 1);
+            End = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+        }
+
+        public IncomeDto ToIncomeDto()
+        {
+            return new IncomeDto()
+            {
+                Id = Id,
+                UserId = UserId,
+                Amount = Amount,
+                Note = Note,
+                Begin = Begin.Value,
+                End = End.Value
+            };
+        }
+    }
+    public class IncomeInputValidator : AbstractValidator<IncomeInputModel>
+    {
+        public IncomeInputValidator()
+        {
+            RuleFor(x => x.Amount).NotEmpty().WithMessage("Amount is required")
+            //.InclusiveBetween(1, 1000000)
+            .GreaterThanOrEqualTo(1).WithMessage("Amount must be greater than or equal to 1")
+            .LessThan(1000000).WithMessage("Amount must be less than 1000000");
+
+            RuleFor(x => x.Begin).NotEmpty().WithMessage("Begin date is required")
+            .LessThan(x => x.End).When(x => x.End != null).WithMessage("Begin date must be before the end date");
+
+            RuleFor(x => x.End).NotEmpty().WithMessage("End date is required")
+            .GreaterThan(x => x.Begin).When(x => x.Begin != null).WithMessage("End date must be after the start date");
+        }
+    }
+}

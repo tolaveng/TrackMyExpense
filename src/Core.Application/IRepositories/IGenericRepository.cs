@@ -29,6 +29,7 @@ namespace Core.Application.IRepositories
         bool Update(T entity);
         Task<bool> DeleteAsync(int id);
         Task<bool> DeleteAsync(Guid id);
+        Task<bool> DeleteAsync(Expression<Func<T, bool>> expression);
         bool DeleteRange(IEnumerable<T> entities);
     }
 }

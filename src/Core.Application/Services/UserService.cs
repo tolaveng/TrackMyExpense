@@ -3,6 +3,7 @@ using Core.Application.Common;
 using Core.Application.IRepositories;
 using Core.Application.Models;
 using Core.Application.Services.IServices;
+using Core.Domain.Constants;
 using Core.Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -57,7 +58,10 @@ namespace Core.Application.Services
             var user = await _userRepository.GetByEmailAsync(email);
             if (user != null)
             {
-                return _mapper.Map<UserDto>(user);
+                var userDto = _mapper.Map<UserDto>(user);
+                userDto.Password = string.Empty;
+                userDto.TimeZone = !string.IsNullOrWhiteSpace(userDto.TimeZone) ? userDto.TimeZone : DefaultConstants.DefaultTimeZone;
+                return userDto;
             }
             return null;
         }
@@ -116,7 +120,10 @@ namespace Core.Application.Services
         public UserDto GetById(Guid userId)
         {
             var appUser = _userRepository.GetById(userId);
-            return _mapper.Map<UserDto>(appUser);
+            var userDto = _mapper.Map<UserDto>(appUser);
+            userDto.Password = string.Empty;
+            userDto.TimeZone = !string.IsNullOrWhiteSpace(userDto.TimeZone) ? userDto.TimeZone : DefaultConstants.DefaultTimeZone;
+            return userDto;
         }
 
         public async Task<GenericResponse<bool>> UpdateUserAsync(UserDto userDto)

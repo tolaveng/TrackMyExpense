@@ -60,8 +60,14 @@ window.loadCss = function (cssUrl) {
 }
 
 window.redirectToPage = function(redirectUrl, second) {
-	var delay = second ? second * 1000 : 0;
+	const delay = second ? second * 1000 : 0;
 	setTimeout(function () {
 		window.location.replace(redirectUrl);
 	}, delay)
+}
+
+// Get browser time zone to set the timezone value
+window.GetBrowserTimeZone = function () {
+	const currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	return currentTimeZone ? currentTimeZone : '';
 }
