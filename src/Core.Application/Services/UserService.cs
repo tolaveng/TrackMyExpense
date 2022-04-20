@@ -61,6 +61,7 @@ namespace Core.Application.Services
                 var userDto = _mapper.Map<UserDto>(user);
                 userDto.Password = string.Empty;
                 userDto.TimeZone = !string.IsNullOrWhiteSpace(userDto.TimeZone) ? userDto.TimeZone : DefaultConstants.DefaultTimeZone;
+                userDto.CultureInfo = !string.IsNullOrWhiteSpace(userDto.CultureInfo) ? userDto.CultureInfo : DefaultConstants.DefaultCultureInfo;
                 return userDto;
             }
             return null;
@@ -123,6 +124,7 @@ namespace Core.Application.Services
             var userDto = _mapper.Map<UserDto>(appUser);
             userDto.Password = string.Empty;
             userDto.TimeZone = !string.IsNullOrWhiteSpace(userDto.TimeZone) ? userDto.TimeZone : DefaultConstants.DefaultTimeZone;
+            userDto.CultureInfo = !string.IsNullOrWhiteSpace(userDto.CultureInfo) ? userDto.CultureInfo : DefaultConstants.DefaultCultureInfo;
             return userDto;
         }
 

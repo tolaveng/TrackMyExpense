@@ -1,8 +1,31 @@
-﻿namespace Core.Application.Utils
+﻿using Core.Domain.Constants;
+using System.Globalization;
+
+namespace Core.Application.Utils
 {
     public static class DateTimeUtil
     {
         public const string DefaultTimeZoneId = "Australia/Sydney";
+
+        public static string GetDateTimeFormatFromCultureInfo(string cultureInfoString)
+        {
+            if (string.IsNullOrWhiteSpace(cultureInfoString)) return DefaultConstants.DefaultDateTimeFormat;
+
+            var cultureInfo = new CultureInfo(cultureInfoString);
+            return new string(cultureInfo.DateTimeFormat.ShortDatePattern.Where(z => char.IsAscii(z)).ToArray());
+        }
+
+        public static string FormatDateTimeByCultureInfo(DateTime dateTime, string cultureInfoString)
+        {
+            if (string.IsNullOrWhiteSpace(cultureInfoString))
+            {
+                return dateTime.ToString(DefaultConstants.DefaultDateTimeFormat);
+            }
+
+            var cultureInfo = new CultureInfo(cultureInfoString);
+            var shortDate = new string(cultureInfo.DateTimeFormat.ShortDatePattern.Where(z => char.IsAscii(z)).ToArray());
+            return dateTime.ToString(shortDate);
+        }
 
         public static TimeZoneInfo GetTimeZoneInfoOrDefault(string timeZoneId)
         {
@@ -33,9 +56,9 @@
             return TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, GetTimeZoneInfoOrDefault(timeZoneId));
         }
 
-        public static DateTime ToUtc(DateTime timeZoneDateTime)
+        public static DateTime ToUtcDateTime(DateTime timeZoneDateTime, string timeZoneId)
         {
-            return timeZoneDateTime.ToUniversalTime();
+            return TimeZoneInfo.ConvertTimeToUtc(timeZoneDateTime, GetTimeZoneInfoOrDefault(timeZoneId));
         }
     }
 }

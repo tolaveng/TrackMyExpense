@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220418024741_InitDataTables")]
+    [Migration("20220418100601_InitDataTables")]
     partial class InitDataTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1859,14 +1859,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "0c3c2a9a-e69d-4731-9b59-bfa1a3cd921b",
+                            ConcurrencyStamp = "31078185-2475-4513-bcf9-fb94d6729a11",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "5ed0b208-63cf-4369-9708-edb213c75cb1",
+                            ConcurrencyStamp = "996fe5dd-d6b3-46b1-8e8e-6bf239f83b50",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -1883,6 +1883,9 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CultureInfo")
                         .HasColumnType("text");
 
                     b.Property<string>("Currency")

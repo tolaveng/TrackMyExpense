@@ -21,6 +21,7 @@ namespace Core.Application.Models
         public bool TwoFactorEnabled { get; set; }
         public string Currency { get; set; } = string.Empty;
         public string TimeZone { get; set; } = String.Empty;
+        public string CultureInfo { get; set; } = string.Empty;
         public string ProfileImage { get; set; } = string.Empty;
 
         // resolve in mapper

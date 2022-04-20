@@ -40,6 +40,7 @@ namespace Core.Infrastructure.Seeder
                     SecurityStamp = Guid.NewGuid().ToString(),
                     Currency = "AUD",
                     TimeZone = "Australia/Sydney",
+                    CultureInfo = "en-AU",
                 };
 
                 if (!context.Users.Any(u => u.UserName == adminUser.UserName))

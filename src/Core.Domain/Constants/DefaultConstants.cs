@@ -10,5 +10,7 @@ namespace Core.Domain.Constants
     {
         public const string PageTitle = "Track My Expense";
         public const string DefaultTimeZone = "Australia/Sydney";
+        public const string DefaultCultureInfo = "en-AU";
+        public const string DefaultDateTimeFormat = "dd/MM/yyyy";
     }
 }

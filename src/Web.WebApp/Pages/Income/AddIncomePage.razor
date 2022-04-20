@@ -4,6 +4,7 @@
 @using Core.Application.Mediator.BudgetJarTemplates
 @using Core.Application.Mediator.Incomes
 @using Core.Application.Models
+@using Core.Application.Utils
 @using FluentValidation
 @using MediatR
 @using System.Security.Authentication
@@ -33,13 +34,13 @@
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudDatePicker Label="Begin date" @bind-Date="@incomeInputForm.Begin"
-                            For="@(() => incomeInputForm.Begin)" Placeholder="dd/mm/yyyy"
-                            DateFormat="dd/MM/yyyy" DisableToolbar="true" />
+                            For="@(() => incomeInputForm.Begin)" Placeholder="@dateTimeFormat"
+                            DateFormat="@dateTimeFormat" DisableToolbar="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudDatePicker Label="End date" @bind-Date="@incomeInputForm.End"
-                            For="@(() => incomeInputForm.End)" Placeholder="dd/mm/yyyy"
-                            DateFormat="dd/MM/yyyy" DisableToolbar="true"/>
+                            For="@(() => incomeInputForm.End)" Placeholder="@dateTimeFormat"
+                            DateFormat="@dateTimeFormat" DisableToolbar="true"/>
                     </MudItem>
                     <MudItem xs="12" sm="12">
                         <MudTextField Label="Note" Variant="Variant.Outlined" @bind-Value="@incomeInputForm.Note" Lines="3" />
@@ -81,6 +82,8 @@
     [CascadingParameter]
     public UserDto AuthUser { get; set; } = default;
 
+    private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
+    private string cultureInfo = DefaultConstants.DefaultCultureInfo;
     private bool isSubmitting;
     private IncomeInputModel incomeInputForm = new IncomeInputModel();
     private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
@@ -92,7 +95,9 @@
             throw new AuthenticationException();
         }
 
-        incomeInputForm.UserId = AuthUser.Id;
+        incomeInputForm = new IncomeInputModel(AuthUser);
+        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
+        cultureInfo = AuthUser.CultureInfo;
 
         var budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesQuery(true, AuthUser.Id));
         if(!budgetJarTemplates.Any())
@@ -110,7 +115,7 @@
     {
         if (incomeInputForm.Amount < 1) return;
         isSubmitting = true;
-        var income = incomeInputForm.ToIncomeDto();
+        var income = incomeInputForm.ToIncomeDto(AuthUser.TimeZone);
         var result = await Mediator.Send(new SaveIncomeRequest(income, budgetJars));
         if (result == Guid.Empty)
         {
@@ -143,15 +148,18 @@
         public DateTime? Begin { get; set; }
         public DateTime? End { get; set; }
 
-        public IncomeInputModel()
+        public IncomeInputModel(){}
+
+        public IncomeInputModel(UserDto user)
         {
+            UserId = user.Id;
             Amount = 0;
-            var now = DateTime.Now;
+            var now = DateTimeUtil.TimeZoneNow(user.TimeZone);
             Begin = new DateTime(now.Year, now.Month, 1);
             End = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
         }
 
-        public IncomeDto ToIncomeDto()
+        public IncomeDto ToIncomeDto(string timeZone)
         {
             return new IncomeDto()
             {
@@ -159,8 +167,8 @@
                 UserId = UserId,
                 Amount = Amount,
                 Note = Note,
-                Begin = Begin.Value,
-                End = End.Value
+                Begin = DateTimeUtil.ToUtcDateTime(Begin.Value, timeZone),
+                End = DateTimeUtil.ToUtcDateTime(End.Value, timeZone)
             };
         }
     }

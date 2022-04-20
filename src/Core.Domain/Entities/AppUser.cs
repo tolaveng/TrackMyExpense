@@ -35,5 +35,6 @@ namespace Core.Domain.Entities
         public string ProfileImage { get; set; }
         public string Currency { get; set; }
         public string TimeZone { get; set; }
+        public string CultureInfo{ get; set; }
     }
 }
