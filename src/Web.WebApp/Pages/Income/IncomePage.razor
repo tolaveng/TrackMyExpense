@@ -20,38 +20,48 @@
         Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
         Loading="@loading" LoadingProgressColor="Color.Info"
         T= "IncomeDto">
-        <ToolBarContent>
-            <MudSpacer />
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
-                Add Income
-            </MudButton>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh><MudTableSortLabel SortLabel="Begin" T="IncomeDto">Begin</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortLabel="End" T="IncomeDto">End</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortLabel="Amount" T="IncomeDto">Amount</MudTableSortLabel></MudTh>
-            <MudTh>Note</MudTh>
-            <MudTh>Actions</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Begin" HideSmall="@true">@context.Begin.ToString(dateTimeFormat)</MudTd>
-            <MudTd DataLabel="End" HideSmall="@true">@context.End.ToString(dateTimeFormat)</MudTd>
-            <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
-            <MudTd DataLabel="Note" HideSmall="@true">
-                @if(!string.IsNullOrWhiteSpace(context.Note) && context.Note.Length > 64)
-                {
-                    @($"{context.Note.Substring(0, 64)}...")
-                } else {
-                    @context.Note
-                }
-            </MudTd>
-            <MudTd DataLabel="Actions">
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
-                    Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
-                    Title="Delete" OnClick="@(() => DeleteRow(context.Id))" />
-            </MudTd>
-        </RowTemplate>
+            <ToolBarContent>
+                <MudSpacer />
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
+                    Add Income
+                </MudButton>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="Begin" T="IncomeDto">Begin</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="End" T="IncomeDto">End</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Amount" T="IncomeDto">Amount</MudTableSortLabel></MudTh>
+                <MudTh>Note</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Begin" HideSmall="@true">@context.Begin.ToString(dateTimeFormat)</MudTd>
+                <MudTd DataLabel="End" HideSmall="@true">@context.End.ToString(dateTimeFormat)</MudTd>
+                <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
+                <MudTd DataLabel="Note" HideSmall="@true">
+                    @if(!string.IsNullOrWhiteSpace(context.Note) && context.Note.Length > 64)
+                    {
+                        @($"{context.Note.Substring(0, 64)}...")
+                    } else {
+                        @context.Note
+                    }
+                </MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
+                        Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
+                        Title="Delete" OnClick="@(() => DeleteRow(context.Id))" />
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No record found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager HorizontalAlignment="HorizontalAlignment.Left" HideRowsPerPage="false" HidePageNumber="false"
+                    InfoFormat="@($"{TotalItems} records")"/>
+            </PagerContent>
         </MudTable>
         </MudCardContent>
     </MudCard>

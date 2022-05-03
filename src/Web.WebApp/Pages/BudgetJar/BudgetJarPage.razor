@@ -95,12 +95,10 @@
 
     private async Task HandleBudgetJarDeleted(Guid id)
     {
-        if (await Mediator.Send(new DeleteBudgetJarTemplateCommand(id)))
-        {
-            budgetJars = budgetJars.Where(x => x.Id != id).ToList();
-            totalPercentages = budgetJars.Sum(x => x.Percentage);
-            StateHasChanged();
-        }
+        budgetJars = budgetJars.Where(x => x.Id != id).ToList();
+        totalPercentages = budgetJars.Sum(x => x.Percentage);
+        await Mediator.Send(new DeleteBudgetJarTemplateCommand(id));
+        StateHasChanged();
     }
 
     private void AddNewClick()
