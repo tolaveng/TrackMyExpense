@@ -16,7 +16,7 @@ namespace Core.Domain.Entities
 
         [MaxLength(128)]
         public string Name { get; set; }
-        public int Percentage { get; set; }
+        public float Percentage { get; set; }
         public Decimal Amount { get; set; }
         public Guid IconId { get; set; }
         public virtual Icon Icon { get; set; }

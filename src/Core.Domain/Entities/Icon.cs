@@ -14,6 +14,6 @@ namespace Core.Domain.Entities
         public string Path { get; set; }
         public IconType IconType { get; set; }
         public bool IsHidden { get; set; }
-        
+        public bool Archived { get; set; }
     }
 }

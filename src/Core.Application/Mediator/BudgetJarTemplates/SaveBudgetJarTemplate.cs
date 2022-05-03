@@ -9,9 +9,11 @@ namespace Core.Application.Mediator.BudgetJarTemplates
     public class SaveBudgetJarTemplateCommand : IRequest<Guid>
     {
         public BudgetJarTemplateDto BudgetJarDto { get; set; }
-        public SaveBudgetJarTemplateCommand(BudgetJarTemplateDto _budgetJarDto)
+        public bool IsNew { get; set; }
+        public SaveBudgetJarTemplateCommand(BudgetJarTemplateDto _budgetJarDto, bool isNew = false)
         {
             BudgetJarDto = _budgetJarDto;
+            IsNew = isNew;
         }
     }
 
@@ -29,18 +31,22 @@ namespace Core.Application.Mediator.BudgetJarTemplates
         public async Task<Guid> Handle(SaveBudgetJarTemplateCommand request, CancellationToken cancellationToken)
         {
             var budgetJar = _mapper.Map<BudgetJarTemplate>(request.BudgetJarDto);
-            if (budgetJar.Id != Guid.Empty)
+            if (budgetJar.Id != Guid.Empty && !request.IsNew)
             {
                 var exist = await _unitOfWork.BudgetJarTemplateRepository.GetAsync(x => x.Id == budgetJar.Id);
                 if (exist == null)
                 {
                     throw new InvalidOperationException("Budget jar template is not found");
                 }
+                budgetJar.Icon = null;
                 _unitOfWork.BudgetJarTemplateRepository.Update(budgetJar);
             }
             else
             {
-                budgetJar.Id = Guid.NewGuid();
+                if (budgetJar.Id == Guid.Empty)
+                {
+                    budgetJar.Id = Guid.NewGuid();
+                }
                 budgetJar.Icon = null;
                 await _unitOfWork.BudgetJarTemplateRepository.InsertAsync(budgetJar);
             }

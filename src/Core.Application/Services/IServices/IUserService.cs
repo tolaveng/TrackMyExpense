@@ -9,7 +9,7 @@ namespace Core.Application.Services.IServices
     {
         Task<SignInResponse> SignInAsync(string email, string password, bool remember);
         Task SignOutAsync();
-        Task<UserDto> GetUserByEmailAsync(string email);
+        Task<UserDto?> GetUserByEmailAsync(string email);
         UserDto GetById(Guid guid);
         Task<GenericResponse<Guid>> CreateUserAsync(UserDto userDto);
         Task<string> GenerateEmailConfirmationTokenAsync(Guid userId);

@@ -1,0 +1,138 @@
+﻿@page "/incomes"
+@using AutoMapper
+@using Core.Application.Common
+@using Core.Application.Mediator.Incomes
+@using Core.Application.Models
+@using Core.Application.Utils
+@using MediatR
+@using System.Security.Authentication
+@using Web.WebApp.Components.Dialogs
+@attribute [Authorize]
+
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Incomes")" />
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumbs>
+        <BreadcrumbsItem Icon="@Icons.Filled.AttachMoney" Title="My Incomes"/>
+    </Breadcrumbs>
+    <MudCard>
+        <MudCardContent>
+            <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<IncomeDto>>>(ServerReload))"
+        Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
+        Loading="@loading" LoadingProgressColor="Color.Info"
+        T= "IncomeDto">
+        <ToolBarContent>
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
+                Add Income
+            </MudButton>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortLabel="Begin" T="IncomeDto">Begin</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="End" T="IncomeDto">End</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortLabel="Amount" T="IncomeDto">Amount</MudTableSortLabel></MudTh>
+            <MudTh>Note</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Begin" HideSmall="@true">@context.Begin.ToString(dateTimeFormat)</MudTd>
+            <MudTd DataLabel="End" HideSmall="@true">@context.End.ToString(dateTimeFormat)</MudTd>
+            <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
+            <MudTd DataLabel="Note" HideSmall="@true">
+                @if(!string.IsNullOrWhiteSpace(context.Note) && context.Note.Length > 64)
+                {
+                    @($"{context.Note.Substring(0, 64)}...")
+                } else {
+                    @context.Note
+                }
+            </MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
+                    Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
+                    Title="Delete" OnClick="@(() => DeleteRow(context.Id))" />
+            </MudTd>
+        </RowTemplate>
+        </MudTable>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IMapper Mapper { get; set; }
+    [Inject] IDialogService Dialog { get; set; }
+
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
+
+    private string timeZoneId = DefaultConstants.DefaultTimeZone;
+    private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
+    private string cultureInfo = DefaultConstants.DefaultCultureInfo;
+
+    private MudTable<IncomeDto> table;
+    private int TotalItems;
+    private string searchString = null;
+    private bool loading = true;
+
+    protected override void OnInitialized()
+    {
+        timeZoneId = AuthUser.TimeZone;
+        cultureInfo = AuthUser.CultureInfo;
+        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
+
+        base.OnInitialized();
+    }
+
+    private async Task<TableData<IncomeDto>> ServerReload(TableState state)
+    {
+        if (AuthUser == null)
+        {
+            throw new AuthenticationException();
+        }
+
+        loading = true;
+        var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel,
+            state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending);
+
+        var result = await Mediator.Send(new GetIncomesPaged(AuthUser.Id, timeZoneId, pagination));
+        TotalItems = result.TotalCount;
+        loading = false;
+        return new TableData<IncomeDto>() {TotalItems = result.TotalCount, Items = result.Data};
+    }
+
+    private void AddNew()
+    {
+        NavigationManager.NavigateTo("/income/new");
+    }
+
+    private async Task EditRow(Guid incomeId)
+    {
+        NavigationManager.NavigateTo($"/income/{incomeId}");
+    }
+
+    private async Task DeleteRow(Guid incomeId)
+    {
+        var dialogParams = new DialogParameters() {
+            ["Message"] = "Are you sure you want to delete this income?",
+            ["Color"] = Color.Error,
+            ["PrimaryButtonText"] = "Delete"
+        };
+        var dialog = Dialog.Show<ConfirmDialog>("Delete Income", dialogParams);
+        var result = await dialog.Result;
+        if (result.Cancelled) return;
+        try
+        {
+            var deleted = await Mediator.Send(new DeleteIncome(incomeId));
+            if (deleted)
+            {
+                await table.ReloadServerData();
+                Snackbar.Add("Income has been deleted successfully.", Severity.Success);
+            }
+        } catch (Exception)
+        {
+            Snackbar.Add("Sorry, cannot delete the income. Please try again later", Severity.Error);
+        }
+    }
+}

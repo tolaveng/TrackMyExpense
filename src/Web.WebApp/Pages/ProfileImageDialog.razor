@@ -153,7 +153,7 @@
             }
             MudDialog.Close(DialogResult.Ok(thumbFileName));
         }
-        catch(Exception e)
+        catch(Exception)
         {
             Snackbar.Add("Something went wrong. Please tray again later.", Severity.Error);
             isLoading = false;

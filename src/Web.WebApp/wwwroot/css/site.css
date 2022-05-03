@@ -139,6 +139,14 @@ a, .btn-link {
     box-shadow: 0 6px 4px -4px #cccccc;
 }
 
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+    height: 0px;
+    padding: 0;
+    margin: 0;
+}
 
 .page-logo {
     transition: visibility 0s, opacity 0.5s linear;
@@ -262,4 +270,95 @@ a, .btn-link {
 #profile-image-cropper-wrapper {
     min-height: 420px;
     margin: 0 auto;
+}
+
+
+.budgetjar-cards {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.budgetjar-card {
+    height: 230px;
+    width: 200px;
+    margin: 8px;
+    overflow: hidden;
+}
+.budgetjar-card .mud-card-header {
+    padding: 0 0 16px 0 !important;
+}
+
+.budgetjar-card .icons {
+    float: right;
+    right: 0px;
+}
+
+.budgetjar-card .mud-icon-button {
+    padding: 2px !important;
+    margin-right: 2px;
+}
+
+.budgetjar-card .mud-input-text {
+    margin: 0 !important;
+}
+
+.budgetjar-card input[type=text] {
+    padding: 2px 0 !important;
+}
+
+.budgetjar-card-icon {
+    height: 100px;
+    width: 100px;
+    position: relative;
+}
+
+.budgetjar-card-icon > img {
+    height: 100px;
+    width: 100px;
+}
+
+.budgetjar-card-icon > span {
+    color: #ffffff;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, .7);
+    font-size: 12px;
+    font-weight: 200;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100px;
+    padding: 0;
+    text-align: center;
+}
+.budgetjar-card-icon-set {
+    display: flex;
+    width: 380px;
+    height: 240px;
+    padding: 4px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    overflow: auto;
+}
+
+.budgetjar-card-icon-set .icon {
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 4px;
+    width: 64px;
+    height: 64px;
+}
+
+.budgetjar-card-icon-set .icon:hover {
+    background: #CCCCCC;
+}
+
+.budgetjar-card-addnew:hover {
+    border-color: #009688;
+    box-shadow: #009688 0 0 4px;
+}
+
+.budgetjar-card-addnew .icon {
+    height: 100px;
+    width: 100px;
 }

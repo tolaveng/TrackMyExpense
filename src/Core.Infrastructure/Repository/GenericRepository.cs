@@ -148,13 +148,20 @@ namespace Core.Infrastructure.Repository
         public async Task<bool> InsertAsync(T entity)
         {
             var result = await _db.AddAsync(entity);
-            return result.State == EntityState.Added;
+            return await Task.FromResult(result.State == EntityState.Added);
         }
 
         public async Task<bool> InsertRangeAsync(IEnumerable<T> entities)
         {
-            await _db.AddRangeAsync(entities);
-            return true;
+            //await _db.AddRangeAsync(entities); // this will add child objects
+            // https://stackoverflow.com/questions/25441027/how-do-i-stop-entity-framework-from-trying-to-save-insert-child-objects
+            // This won't add child objects
+            foreach (var entity in entities)
+            {
+                _db.Attach(entity);
+                _context.Entry(entity).State = EntityState.Added;
+            }
+            return await Task.FromResult(true);
         }
 
         public bool Update(T entity)

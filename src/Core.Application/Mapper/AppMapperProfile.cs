@@ -42,7 +42,12 @@ namespace Core.Application.Mapper
         }
         public void Process(Icon source, IconDto destination, ResolutionContext context)
         {
-            destination.IconUrl = _fileDirectoryProvider.ResolveIconUrl(destination.IconType, destination.Path);
+            if (string.IsNullOrWhiteSpace(source.Path))
+            {
+                destination.IconUrl = string.Empty;
+                return;
+            }
+            destination.IconUrl = _fileDirectoryProvider.ResolveIconUrl(source.IconType, source.Path);
         }
     }
 

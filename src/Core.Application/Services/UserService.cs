@@ -30,9 +30,9 @@ namespace Core.Application.Services
         {
             var user = _mapper.Map<AppUser>(userDto);
 
-            if (string.IsNullOrWhiteSpace(user.Currency))
+            if (string.IsNullOrWhiteSpace(user.CultureInfo))
             {
-                user.Currency = "USD";
+                user.CultureInfo = DefaultConstants.DefaultCultureInfo;
             }
 
             return await _userRepository.CreateUserAsync(user);
@@ -53,7 +53,7 @@ namespace Core.Application.Services
             return _userRepository.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
         }
 
-        public async Task<UserDto> GetUserByEmailAsync(string email)
+        public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email);
             if (user != null)

@@ -19,7 +19,7 @@ namespace Core.Application.Mediator.Subscriptions
         }
     }
 
-    public class GetSubscriptionHandler : IRequestHandler<GetSubscription, SubscriptionDto>
+    public class GetSubscriptionHandler : IRequestHandler<GetSubscription, SubscriptionDto?>
     {
         private readonly IMapper _mapper;
         public readonly IUnitOfWork _unitOfWork;
@@ -30,7 +30,7 @@ namespace Core.Application.Mediator.Subscriptions
             _mapper = mapper;
         }
 
-        public async Task<SubscriptionDto> Handle(GetSubscription request, CancellationToken cancellationToken)
+        public async Task<SubscriptionDto?> Handle(GetSubscription request, CancellationToken cancellationToken)
         {
             var subscription = await _unitOfWork.SubscriptionRepository.GetAsync(z => z.Id == request.SubscriptionId);
             if (subscription == null) return null;

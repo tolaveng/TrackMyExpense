@@ -28,9 +28,6 @@ namespace Core.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid?>("ExpenseId")
                         .HasColumnType("uuid");
 
@@ -61,9 +58,6 @@ namespace Core.Infrastructure.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid>("IconId")
                         .HasColumnType("uuid");
 
@@ -74,8 +68,8 @@ namespace Core.Infrastructure.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
-                    b.Property<int>("Percentage")
-                        .HasColumnType("integer");
+                    b.Property<float>("Percentage")
+                        .HasColumnType("real");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -108,8 +102,8 @@ namespace Core.Infrastructure.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
-                    b.Property<int>("Percentage")
-                        .HasColumnType("integer");
+                    b.Property<float>("Percentage")
+                        .HasColumnType("real");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -128,7 +122,7 @@ namespace Core.Infrastructure.Migrations
                             IconId = new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"),
                             IsSystem = true,
                             Name = "Necessities",
-                            Percentage = 55,
+                            Percentage = 55f,
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         },
                         new
@@ -138,7 +132,7 @@ namespace Core.Infrastructure.Migrations
                             IconId = new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"),
                             IsSystem = true,
                             Name = "Long Term Saving",
-                            Percentage = 10,
+                            Percentage = 10f,
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         },
                         new
@@ -148,7 +142,7 @@ namespace Core.Infrastructure.Migrations
                             IconId = new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"),
                             IsSystem = true,
                             Name = "Wants",
-                            Percentage = 10,
+                            Percentage = 10f,
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         },
                         new
@@ -158,7 +152,7 @@ namespace Core.Infrastructure.Migrations
                             IconId = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
                             IsSystem = true,
                             Name = "Education",
-                            Percentage = 10,
+                            Percentage = 10f,
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         },
                         new
@@ -168,7 +162,7 @@ namespace Core.Infrastructure.Migrations
                             IconId = new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"),
                             IsSystem = true,
                             Name = "Financial Freedom",
-                            Percentage = 10,
+                            Percentage = 10f,
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         },
                         new
@@ -178,7 +172,7 @@ namespace Core.Infrastructure.Migrations
                             IconId = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
                             IsSystem = true,
                             Name = "Others",
-                            Percentage = 5,
+                            Percentage = 5f,
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         });
                 });
@@ -1066,9 +1060,6 @@ namespace Core.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid>("IconId")
                         .HasColumnType("uuid");
 
@@ -1092,7 +1083,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"),
-                            Archived = false,
                             IconId = new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"),
                             IsSystem = true,
                             Name = "Grocery",
@@ -1101,7 +1091,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("d6552f54-0c69-431e-9907-34147dd2c029"),
-                            Archived = false,
                             IconId = new Guid("d6552f54-0c69-431e-9907-34147dd2c029"),
                             IsSystem = true,
                             Name = "Clothes",
@@ -1110,7 +1099,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
-                            Archived = false,
                             IconId = new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"),
                             IsSystem = true,
                             Name = "Education",
@@ -1119,7 +1107,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"),
-                            Archived = false,
                             IconId = new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"),
                             IsSystem = true,
                             Name = "Eat Out",
@@ -1128,7 +1115,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"),
-                            Archived = false,
                             IconId = new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"),
                             IsSystem = true,
                             Name = "Transport",
@@ -1137,7 +1123,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"),
-                            Archived = false,
                             IconId = new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"),
                             IsSystem = true,
                             Name = "Utilities",
@@ -1146,7 +1131,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("6550b905-6763-4e97-9038-50ec50d68853"),
-                            Archived = false,
                             IconId = new Guid("6550b905-6763-4e97-9038-50ec50d68853"),
                             IsSystem = true,
                             Name = "Medicines",
@@ -1155,7 +1139,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"),
-                            Archived = false,
                             IconId = new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"),
                             IsSystem = true,
                             Name = "Investment",
@@ -1164,7 +1147,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"),
-                            Archived = false,
                             IconId = new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"),
                             IsSystem = true,
                             Name = "Family",
@@ -1173,7 +1155,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"),
-                            Archived = false,
                             IconId = new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"),
                             IsSystem = true,
                             Name = "Furniture",
@@ -1182,7 +1163,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"),
-                            Archived = false,
                             IconId = new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"),
                             IsSystem = true,
                             Name = "Petro",
@@ -1191,7 +1171,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"),
-                            Archived = false,
                             IconId = new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"),
                             IsSystem = true,
                             Name = "Car",
@@ -1200,7 +1179,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"),
-                            Archived = false,
                             IconId = new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"),
                             IsSystem = true,
                             Name = "Insurance",
@@ -1209,7 +1187,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"),
-                            Archived = false,
                             IconId = new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"),
                             IsSystem = true,
                             Name = "Toys",
@@ -1218,7 +1195,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"),
-                            Archived = false,
                             IconId = new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"),
                             IsSystem = true,
                             Name = "Donate",
@@ -1227,7 +1203,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"),
-                            Archived = false,
                             IconId = new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"),
                             IsSystem = true,
                             Name = "Households",
@@ -1236,7 +1211,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"),
-                            Archived = false,
                             IconId = new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"),
                             IsSystem = true,
                             Name = "Gardens",
@@ -1245,7 +1219,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"),
-                            Archived = false,
                             IconId = new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"),
                             IsSystem = true,
                             Name = "Sports",
@@ -1254,7 +1227,6 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
-                            Archived = false,
                             IconId = new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"),
                             IsSystem = true,
                             Name = "Others",
@@ -1661,9 +1633,6 @@ namespace Core.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Content")
                         .HasColumnType("text");
 
@@ -1690,9 +1659,6 @@ namespace Core.Infrastructure.Migrations
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
-
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
 
                     b.Property<Guid>("BudgetJarId")
                         .HasColumnType("uuid");
@@ -1812,9 +1778,6 @@ namespace Core.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Name")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
@@ -1857,14 +1820,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "31078185-2475-4513-bcf9-fb94d6729a11",
+                            ConcurrencyStamp = "ed98686e-55df-42d6-89f2-0cd160397493",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "996fe5dd-d6b3-46b1-8e8e-6bf239f83b50",
+                            ConcurrencyStamp = "e3ea3189-3f74-4c89-bb4e-5f470458dc56",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -1884,9 +1847,6 @@ namespace Core.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("CultureInfo")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Currency")
                         .HasColumnType("text");
 
                     b.Property<string>("Email")

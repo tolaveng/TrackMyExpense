@@ -1,4 +1,6 @@
-﻿using Core.Domain.Enums;
+﻿using Core.Application.Providers.IProviders;
+using Core.Domain.Entities;
+using Core.Domain.Enums;
 using FluentValidation;
 
 namespace Core.Application.Models
@@ -11,6 +13,21 @@ namespace Core.Application.Models
         public bool IsHidden { get; set; }
 
         public string IconUrl { get; set; } = string.Empty;
+
+        public bool Archived { get; set; }
+
+        public static IconDto FromDomain(Icon icon, IFileDirectoryProvider fileDirectoryProvider)
+        {
+            return new IconDto()
+            {
+                Id = icon.Id,
+                Name = icon.Name,
+                Path = icon.Path,
+                IconType = icon.IconType,
+                IsHidden = icon.IsHidden,
+                IconUrl = fileDirectoryProvider.ResolveIconUrl(icon.IconType, icon.Path)
+        };
+        }
     }
 
     public class IconValidator : AbstractValidator<IconDto>

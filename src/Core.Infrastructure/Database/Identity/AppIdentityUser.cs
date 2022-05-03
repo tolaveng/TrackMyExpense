@@ -13,7 +13,6 @@ namespace Core.Infrastructure.Database.Identity
     {
         public string FullName { get; set; }
         public bool IsDisabled { get; set; }
-        public string Currency { get; set; }
         public string TimeZone { get; set; }
         public string CultureInfo { get; set; }
         public string ProfileImage { get; set; }

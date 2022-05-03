@@ -7,5 +7,6 @@
         public string Note { get; set; } = String.Empty;
         public DateTime Begin { get; set; }
         public DateTime End { get; set; }
+        public bool Archived { get; set; }
     }
 }

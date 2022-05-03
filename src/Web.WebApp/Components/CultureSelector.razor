@@ -3,13 +3,12 @@
 <MudSelect T="string" Label="@Label" Class="@Class" Value="@Value" For="@For"
 ValueChanged="ValueChanged"  AnchorOrigin="Origin.BottomCenter"
 >
-@if (dataTimeFormats != null)
+@if (cultures != null)
 {
-    foreach(var dateTimeFormat in dataTimeFormats.Keys)
+    foreach(var culture in cultures)
     {
-        var englishNames = string.Join(", ", dataTimeFormats[dateTimeFormat].Select(x => x.EnglishName));
-        <MudSelectItem Value="@dataTimeFormats[dateTimeFormat].First().Name">
-             @dateTimeFormat (@dateTimeSample.ToString(dateTimeFormat)) - @englishNames
+        <MudSelectItem Value="@culture.Name">@culture.EnglishName - @culture.CurrencySymbol -
+             @culture.DateTimeFormat (@(dateTimeSample.ToString(culture.DateTimeFormat)))
         </MudSelectItem>
     }
 }
@@ -24,7 +23,7 @@ ValueChanged="ValueChanged"  AnchorOrigin="Origin.BottomCenter"
     [Parameter] public DateTime? DateTimeSample { get; set; }
 
     private DateTime dateTimeSample = new DateTime(2000, 12, 31, 13, 00, 00, DateTimeKind.Unspecified);
-    private Dictionary<string, DateTimeFormatModel[]> dataTimeFormats;
+    private CultureModel[] cultures;
 
     protected override void OnInitialized()
     {
@@ -33,40 +32,22 @@ ValueChanged="ValueChanged"  AnchorOrigin="Origin.BottomCenter"
         }
 
         // CultureInfo.GetCultures
-        var cultureInfos = new List<CultureInfo>();
-        cultureInfos.Add(new CultureInfo("en-US"));
-        cultureInfos.Add(new CultureInfo("en-AU"));
-        cultureInfos.Add(new CultureInfo("en-GB"));
-        cultureInfos.Add(new CultureInfo("de-DE"));
-        cultureInfos.Add(new CultureInfo("es-ES"));
-        cultureInfos.Add(new CultureInfo("fr-FR"));
-        cultureInfos.Add(new CultureInfo("ar"));
-        cultureInfos.Add(new CultureInfo("pl-PL"));
-        cultureInfos.Add(new CultureInfo("th-TH"));
-        cultureInfos.Add(new CultureInfo("id-ID"));
-        cultureInfos.Add(new CultureInfo("vi-VN"));
-        cultureInfos.Add(new CultureInfo("sv-SE"));
-        cultureInfos.Add(new CultureInfo("it-IT"));
-        cultureInfos.Add(new CultureInfo("ko-KR"));
-        cultureInfos.Add(new CultureInfo("ro-RO"));
-        cultureInfos.Add(new CultureInfo("zh-CN"));
-        cultureInfos.Add(new CultureInfo("ja-JP"));
-
-        dataTimeFormats = cultureInfos.Select(x => new DateTimeFormatModel()
-        {
-            // remove mark char letter ie. U+200F
-            DateTimeFormat = new string(x.DateTimeFormat.ShortDatePattern.Where(z => char.IsAscii(z)).ToArray()),
-            Name = x.Name,
-            EnglishName = x.EnglishName
-        })
-        .OrderBy(x => x.Name)
-        .GroupBy(x => x.DateTimeFormat)
-        .ToDictionary(x => x.Key, x => x.ToArray());
+        var cultureInfos = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+        cultures = cultureInfos.Select(x => new CultureModel()
+            {
+                // remove mark char letter ie. U+200F
+                DateTimeFormat = new string(x.DateTimeFormat.ShortDatePattern.Where(z => char.IsAscii(z)).ToArray()),
+                CurrencySymbol = new RegionInfo(x.LCID).CurrencySymbol,
+                Name = x.Name,
+                EnglishName = x.EnglishName
+            })
+        .OrderBy(x => x.Name).ToArray();
     }
 
-    public class DateTimeFormatModel
+    public class CultureModel
     {
         public string DateTimeFormat { get; set; }
+        public string CurrencySymbol { get; set; }
         public string Name { get; set; }
         public string EnglishName { get; set; }
     }

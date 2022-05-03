@@ -1,0 +1,221 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Core.Application.Mediator.BudgetJarTemplates
+@using Core.Application.Models
+@using Core.Application.Models.Interfaces
+@using MediatR
+@using Web.WebApp.Components.Dialogs
+
+@typeparam T where T : IBudgetJar
+
+<MudCard Outlined="true" Class="budgetjar-card" @ondblclick="@EditClick">
+    <div class="icons">
+        @if (isSubmitting)
+        {
+            <MudProgressCircular Class="icon" Indeterminate="true" Size="Size.Small" />
+        }
+        else if (!ReadOnly && isEditing)
+        {
+            <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Save" aria-label="Save" title="Save" Color="Color.Primary" OnClick="OnSaveClicked" />
+            <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Cancel" aria-label="Cancel" title="Cancel" OnClick="@CancelClick" />
+        } else if (!ReadOnly)
+        {
+            <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Edit" aria-label="Edit" title="Edit" OnClick="@EditClick" />
+            @if (!DeleteDisabled)
+            {
+                <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Delete" aria-label="Delete" Title="Delete" OnClick="@DeleteClick" />
+            }
+        } else
+        {
+            <div class="m-3"></div>
+        }
+    </div>
+    <div class="clearfix"></div>
+    <MudCardHeader Class="justify-center align-center">
+        <div class="budgetjar-card-icon">
+            <MudImage Src="@inputModel.Icon.IconUrl" @onclick="@ShowIconSelector"
+                Alt="@inputModel.Name" Elevation="1" Class="rounded-lg"/>
+            @if (isEditing)
+            {
+                <span @onclick="@ShowIconSelector">Select</span>
+            }
+        </div>
+        
+        @if (IconSet != null && IconSet.Length > 0)
+        {
+            <MudPopover Open="@isShowIconSelector" OverflowBehavior="OverflowBehavior.FlipAlways"
+            AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" >
+            <div class="d-flex flex-column">
+                <MudIconButton OnClick="@hideIconSelector" Class="ml-auto mb-1 p-0" Color="Color.Error" Icon="@Icons.Material.Filled.Close" />
+                <MudPaper Class="budgetjar-card-icon-set">
+                    @foreach(IconDto icon in IconSet)
+                    {
+                        <MudImage Class="icon" Src="@icon.IconUrl" Atl="@icon.Name" title="@icon.Name"
+                            @onclick="@(() => SetIcon(icon))" />
+                    }
+                </MudPaper>
+            </div>
+            </MudPopover>
+        }
+    </MudCardHeader>
+    <MudCardContent Style="padding-top: 0; text-align: center;">
+        @if (isEditing)
+        {
+            <EditForm EditContext="@editContext">
+                <DataAnnotationsValidator/>
+                <MudTextField @bind-Value="@inputModel.Percentage" Placeholder="Percentage"
+                    Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Percent"
+                    For="@(() => inputModel.Percentage)"/>
+                <MudTextField @bind-Value="@inputModel.Name" Placeholder="Name or description" 
+                    For="@(() => inputModel.Name)" />
+            </EditForm>   
+        } else
+        {
+            <MudText>@inputModel.Percentage%</MudText>
+            <MudText>@inputModel.Name</MudText>
+            @if (!string.IsNullOrWhiteSpace(FormattedAmount))
+            {
+                <MudText Typo="Typo.subtitle2">@FormattedAmount</MudText>
+            }
+        }
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    public T BudgetJar { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool DeleteDisabled { get; set; }
+
+    [Parameter]
+    public float TotalPercentages { get; set; }
+
+    [Parameter]
+    public string FormattedAmount { get; set; }
+
+    [Parameter]
+    public bool IsNew { get; set; }
+
+    [Parameter]
+    public EventCallback<T> OnUpdated { get; set; }
+
+    [Parameter]
+    public EventCallback<Guid> OnDeleted { get; set; }
+
+    [Parameter]
+    public IconDto[] IconSet { get; set; }
+
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] IDialogService Dialog { get; set; }
+
+    private bool isEditing;
+    private bool isSubmitting;
+    private InputModel inputModel = new InputModel();
+    private EditContext editContext;
+
+    private bool isShowIconSelector;
+
+    protected override void OnInitialized()
+    {
+        if (BudgetJar == null)
+        {
+            throw new ArgumentException("Item cannot be null.");
+        }
+        isEditing = IsNew && string.IsNullOrWhiteSpace(BudgetJar.Name);
+        inputModel.Icon = BudgetJar.Icon;
+        inputModel.Name = BudgetJar.Name;
+        inputModel.Percentage = BudgetJar.Percentage;
+        editContext = new EditContext(inputModel);
+    }
+
+    private void EditClick()
+    {
+        isEditing = true;
+    }
+
+    private void CancelClick()
+    {
+        isEditing = false;
+        inputModel.Icon.Id = BudgetJar.IconId;
+        inputModel.Name = BudgetJar.Name;
+        inputModel.Percentage = BudgetJar.Percentage;
+    }
+
+    private async Task OnSaveClicked()
+    {
+        if (!editContext.Validate()) return;
+
+        // validate
+        var total = (TotalPercentages - BudgetJar.Percentage) + inputModel.Percentage;
+        if (total > 100)
+        {
+            Snackbar.Clear();
+            Snackbar.Add("Total of all percentages cannot be greater than 100.", Severity.Error);
+            return;
+        }
+        isSubmitting = true;
+        BudgetJar.IconId = inputModel.Icon.Id;
+        BudgetJar.Name = inputModel.Name;
+        BudgetJar.Percentage = inputModel.Percentage;
+
+        isSubmitting = false;
+        isEditing = false;
+        if (OnUpdated.HasDelegate)
+        {
+            await OnUpdated.InvokeAsync(BudgetJar);
+        }
+    }
+
+    private async Task DeleteClick()
+    {
+        var dialogParams = new DialogParameters() {
+            ["Message"] = "Are you sure you want to delete this budget jar?",
+            ["Color"] = Color.Error,
+            ["PrimaryButtonText"] = "Delete"
+        };
+        var dialog = Dialog.Show<ConfirmDialog>("Delete Budget Jar", dialogParams);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            if (OnDeleted.HasDelegate)
+            {
+                await OnDeleted.InvokeAsync(BudgetJar.Id);
+            }
+        }
+    }
+
+    private void ShowIconSelector()
+    {
+        if (!isEditing) return;
+        isShowIconSelector = true;
+    }
+
+    private void hideIconSelector()
+    {
+        isShowIconSelector = false;
+    }
+
+    private void SetIcon(IconDto icon)
+    {
+        inputModel.Icon = icon;
+        isShowIconSelector = false;
+    }
+
+    public class InputModel
+    {
+        public IconDto Icon { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        [MaxLength(64)]
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        [Range(1, 100, ErrorMessage = "Valid number (1-100)")]
+        public float Percentage { get; set; }
+    }
+
+}

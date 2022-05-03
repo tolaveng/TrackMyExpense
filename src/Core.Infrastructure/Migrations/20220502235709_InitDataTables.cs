@@ -64,8 +64,7 @@ namespace Core.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    Content = table.Column<string>(type: "text", nullable: true),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                    Content = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -92,8 +91,7 @@ namespace Core.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
-                    Value = table.Column<string>(type: "text", nullable: true),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                    Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -107,7 +105,6 @@ namespace Core.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FullName = table.Column<string>(type: "text", nullable: true),
                     IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
-                    Currency = table.Column<string>(type: "text", nullable: true),
                     TimeZone = table.Column<string>(type: "text", nullable: true),
                     CultureInfo = table.Column<string>(type: "text", nullable: true),
                     ProfileImage = table.Column<string>(type: "text", nullable: true),
@@ -138,7 +135,7 @@ namespace Core.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    Percentage = table.Column<int>(type: "integer", nullable: false),
+                    Percentage = table.Column<float>(type: "real", nullable: false),
                     IsSystem = table.Column<bool>(type: "boolean", nullable: false),
                     IconId = table.Column<Guid>(type: "uuid", nullable: false),
                     Archived = table.Column<bool>(type: "boolean", nullable: false)
@@ -162,8 +159,7 @@ namespace Core.Infrastructure.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     IsSystem = table.Column<bool>(type: "boolean", nullable: false),
-                    IconId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                    IconId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -184,10 +180,9 @@ namespace Core.Infrastructure.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     IncomeId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    Percentage = table.Column<int>(type: "integer", nullable: false),
+                    Percentage = table.Column<float>(type: "real", nullable: false),
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    IconId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                    IconId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -404,8 +399,7 @@ namespace Core.Infrastructure.Migrations
                     RepeatDay = table.Column<int>(type: "integer", nullable: false),
                     RepeatDaily = table.Column<string>(type: "text", nullable: true),
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    FinishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                    FinishDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -432,8 +426,7 @@ namespace Core.Infrastructure.Migrations
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Url = table.Column<string>(type: "text", nullable: true),
-                    ExpenseId = table.Column<Guid>(type: "uuid", nullable: true),
-                    Archived = table.Column<bool>(type: "boolean", nullable: false)
+                    ExpenseId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -615,8 +608,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "996fe5dd-d6b3-46b1-8e8e-6bf239f83b50", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "31078185-2475-4513-bcf9-fb94d6729a11", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "e3ea3189-3f74-4c89-bb4e-5f470458dc56", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "ed98686e-55df-42d6-89f2-0cd160397493", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -624,38 +617,38 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "Archived", "IconId", "IsSystem", "Name", "Percentage", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), false, new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), true, "Necessities", 55, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"), false, new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), true, "Long Term Saving", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"), false, new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), true, "Wants", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", 5, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"), false, new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", 10, new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), false, new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), true, "Financial Freedom", 10, new Guid("00000000-0000-0000-0000-000000000000") }
+                    { new Guid("2f32317b-7ce2-469b-91fc-a277d300f667"), false, new Guid("b0445780-db7c-4d1e-9d42-3b125422c1a2"), true, "Necessities", 55f, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("4adc7f4f-d3cd-4188-826c-410b729cfe8c"), false, new Guid("aa618108-0bad-42e9-b80a-b8e904478b99"), true, "Long Term Saving", 10f, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("4ecd52ce-ba4d-45df-bd3b-ce7a412e118d"), false, new Guid("e0822b72-a427-445f-acc0-5dc08c8c3929"), true, "Wants", 10f, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", 5f, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("7e7ad24e-cbf2-4a31-affe-cafa5c1a325c"), false, new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", 10f, new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("eee63caf-e26a-4265-817c-259d47e14aba"), false, new Guid("0a55e9f4-ed2a-4ae5-8249-2aa9368efe88"), true, "Financial Freedom", 10f, new Guid("00000000-0000-0000-0000-000000000000") }
                 });
 
             migrationBuilder.InsertData(
                 table: "ExpenseGroups",
-                columns: new[] { "Id", "Archived", "IconId", "IsSystem", "Name", "UserId" },
+                columns: new[] { "Id", "IconId", "IsSystem", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), false, new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), true, "Donate", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), false, new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), true, "Gardens", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), false, new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), true, "Utilities", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), false, new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), true, "Eat Out", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, new Guid("6550b905-6763-4e97-9038-50ec50d68853"), true, "Medicines", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), true, "Petro", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), false, new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), true, "Sports", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), true, "Investment", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), false, new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), true, "Grocery", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), false, new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), true, "Furniture", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), false, new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), true, "Toys", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), false, new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), true, "Clothes", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), false, new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), true, "Car", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), false, new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), true, "Households", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), false, new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), true, "Transport", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), false, new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), true, "Insurance", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), false, new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), true, "Family", new Guid("00000000-0000-0000-0000-000000000000") }
+                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), true, "Donate", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), true, "Gardens", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), true, "Utilities", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), true, "Eat Out", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), new Guid("6550b905-6763-4e97-9038-50ec50d68853"), true, "Medicines", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), true, "Petro", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), true, "Sports", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), true, "Investment", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), true, "Grocery", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), true, "Furniture", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), true, "Toys", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), true, "Clothes", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), true, "Car", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), true, "Households", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), true, "Transport", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), true, "Insurance", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), true, "Family", new Guid("00000000-0000-0000-0000-000000000000") }
                 });
 
             migrationBuilder.CreateIndex(

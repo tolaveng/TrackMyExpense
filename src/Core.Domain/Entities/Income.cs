@@ -17,5 +17,7 @@ namespace Core.Domain.Entities
         public DateTime Begin { get; set; }
         public DateTime End { get; set; }
         public virtual ICollection<BudgetJar> BudgetJars { get; set; }
+
+        public bool Archived { get; set; }
     }
 }

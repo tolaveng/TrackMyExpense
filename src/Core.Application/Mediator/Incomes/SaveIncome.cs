@@ -61,7 +61,7 @@ namespace Core.Application.Mediator.Incomes
                 Amount = x.Amount,
                 Percentage = x.Percentage,
                 IconId = x.IconId,
-        });
+            });
             await _unitOfWork.BudgetJarRepository.DeleteAsync(x => x.IncomeId == income.Id);
             await _unitOfWork.BudgetJarRepository.InsertRangeAsync(budgetJars);
             

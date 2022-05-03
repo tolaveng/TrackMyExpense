@@ -172,7 +172,6 @@ namespace Core.Infrastructure.Repository
             identityUser.FullName = appUser.FullName;
             identityUser.PhoneNumber = appUser.PhoneNumber;
             identityUser.Email = appUser.Email;
-            identityUser.Currency = appUser.Currency;
             identityUser.TimeZone = appUser.TimeZone;
             identityUser.CultureInfo = appUser.CultureInfo;
             identityUser.ProfileImage = appUser.ProfileImage;

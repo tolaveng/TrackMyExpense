@@ -1,7 +1,10 @@
-﻿@page "/add-income"
+﻿@page "/income/{id}"
 @attribute [Authorize]
 
+@using AutoMapper
 @using Core.Application.Mediator.BudgetJarTemplates
+@using Core.Application.Mediator.BudgetJars
+@using Core.Application.Mediator.Icons
 @using Core.Application.Mediator.Incomes
 @using Core.Application.Models
 @using Core.Application.Utils
@@ -9,8 +12,9 @@
 @using MediatR
 @using System.Security.Authentication
 @using Web.WebApp.Components
+@using Web.WebApp.Pages.BudgetJar
 
-<SetPageTitle Value=@($"{DefaultConstants.PageTitle} - Add Income") />
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Add Income")" />
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs>
         <BreadcrumbsItem Icon="@Icons.Filled.AttachMoney" Title="My Incomes" Href="/incomes"/>
@@ -19,18 +23,12 @@
     <MudCard Outlined="true" Class="p-3" Style="position: relative;">
         <MudCardContent>
             <MudContainer MaxWidth="@MaxWidth.Medium">
-                <EditForm Model="@incomeInputForm" Context="formContext" OnValidSubmit="@AddIncome">
+                <EditForm Model="@incomeInputForm" Context="formContext" OnValidSubmit="@SaveIncome">
                     <DataAnnotationsValidator/>
                     <FluentValidationValidator T="IncomeInputModel" TValidator="IncomeInputValidator"/>
                     <MudGrid>
                     <MudItem xs="12" sm="12">
                         <MudText>Add your income that you want to track between begin and end date period.</MudText>
-                    </MudItem>
-                    <MudItem xs="12" sm="12">
-                        <MudTextField Label="Amount" @bind-Value="@incomeInputForm.Amount"
-                            For="@(() => incomeInputForm.Amount)" Class="mb-3"
-                            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney"
-                            Immediate="true" TextChanged="@(x => CalculateBudgetJar(x))"/>
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudDatePicker Label="Begin date" @bind-Date="@incomeInputForm.Begin"
@@ -43,31 +41,34 @@
                             DateFormat="@dateTimeFormat" DisableToolbar="true"/>
                     </MudItem>
                     <MudItem xs="12" sm="12">
-                        <MudTextField Label="Note" Variant="Variant.Outlined" @bind-Value="@incomeInputForm.Note" Lines="3" />
+                        <MudTextField Label="Amount" @bind-Value="@incomeInputForm.Amount"
+                            For="@(() => incomeInputForm.Amount)" Class="mb-3"
+                            Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney"
+                            Immediate="true" TextChanged="@(x => CalculateBudgetJar(x))"/>
                     </MudItem>
                     <MudItem xs="12" sm="12">
-                        <MudText>Sumarry: The income is divided into @(budgetJars.Length) budget jars.</MudText>
+                        <MudTextField Label="Note" Variant="Variant.Outlined" @bind-Value="@incomeInputForm.Note" For="@(() => incomeInputForm.Note)" Lines="3" />
                     </MudItem>
-                    @foreach(var budgetJar in budgetJars)
-                    {
-                       <MudItem xs="6" sm="3">
-                           <MudCard Outlined="true" Style="height: 200px; overflow: visible">
-                               <MudCardHeader Class="justify-center align-center">
-                                   <MudImage Src="@(budgetJar.Icon.IconUrl)" Alt="@(budgetJar.Name)" Elevation="2" Class="rounded-lg"/>
-                               </MudCardHeader>
-                               <MudCardContent Style="padding-top: 0; text-align: center;">
-                                   <MudText Typo="Typo.h5">
-                                       <MudIcon Icon="@Icons.Filled.AttachMoney" />
-                                       @budgetJar.Amount.ToString("##.00")
-                                   </MudText>
-                                   <MudText>@budgetJar.Name (@budgetJar.Percentage%)</MudText>
-                               </MudCardContent>
-                           </MudCard>
-                       </MudItem>
-                    }
                     </MudGrid>
-                    <AppButton Type="submit" Text="Add Income" Color="@Color.Primary" IsLoading="@isSubmitting"
-                            IsDisabled="@(!formContext.IsModified() || !formContext.Validate())" Class="mt-3 mb-3" />
+                    <div class="mt-3">
+                        <MudText>Your jars: The income is divided into @(budgetJars.Count) budget jars.</MudText>
+                    </div>
+                    <div class="budgetjar-cards">
+                        @{
+                            var totalPercentages = budgetJars.Sum(x => x.Percentage);
+                        }
+                        @foreach(var budgetJar in budgetJars)
+                        {
+                        <BudgetJarCard @key="@budgetJar.Id" T="BudgetJarDto" BudgetJar="budgetJar" TotalPercentages="@totalPercentages"
+                        IconSet="@iconSet" FormattedAmount="@(CurrencyUtil.Formatted(budgetJar.Amount, cultureInfo))"
+                        DeleteDisabled="true" OnUpdated="@HandleBudgetJarUpdate"
+                        />
+                        
+                        }
+                    </div>
+                    <MudButton Type="button" Variant="Variant.Outlined" Color="@Color.Default" Class="m-3" OnClick="@GoBack">Back</MudButton>
+                    <AppButton Type="submit" Text="Save" Color="@Color.Primary" IsLoading="@isSubmitting"
+                            IsDisabled="@(!((formContext.IsModified() || isModified) && formContext.Validate()))" Class="m-3" />
                 </EditForm>
             </MudContainer>
         </MudCardContent>       
@@ -78,15 +79,23 @@
     [Inject] IMediator Mediator { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IMapper Mapper { get; set; }
 
     [CascadingParameter]
     public UserDto AuthUser { get; set; } = default;
 
+    [Parameter]
+    public string Id { get; set; }
+
+    private bool isNew;
+    private Guid incomeId;
     private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
     private string cultureInfo = DefaultConstants.DefaultCultureInfo;
     private bool isSubmitting;
+    private bool isModified;
     private IncomeInputModel incomeInputForm = new IncomeInputModel();
-    private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
+    private List<BudgetJarDto> budgetJars =  new List<BudgetJarDto>();
+    private IconDto[] iconSet = Array.Empty<IconDto>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,28 +104,89 @@
             throw new AuthenticationException();
         }
 
-        incomeInputForm = new IncomeInputModel(AuthUser);
-        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
-        cultureInfo = AuthUser.CultureInfo;
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            throw new InvalidOperationException("Missing Id");
+        }
 
-        var budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesQuery(true, AuthUser.Id));
+        if (Id.Equals("new", StringComparison.InvariantCultureIgnoreCase))
+        {
+            isNew = true;
+            incomeInputForm = new IncomeInputModel(AuthUser);
+            // Get default budget jars
+            var budgetJarTemplates = await GetBudgetJarsFromTemplates();
+            budgetJars = budgetJarTemplates.Select(BudgetJarDto.FromTemplate).ToList();
+
+        } else if (Guid.TryParse(Id, out incomeId))
+        {
+            isNew = false;
+            var income = await Mediator.Send(new GetIncomeById(AuthUser.Id, incomeId, AuthUser.TimeZone));
+            if (income == null)
+            {
+                throw new InvalidOperationException("Income is not found");
+            }
+            incomeInputForm = new IncomeInputModel(income);
+            budgetJars = await Mediator.Send(new GetBudgetJarsByIncomeId(income.Id));
+            budgetJars = budgetJars.OrderByDescending(x => x.Percentage).ToList();
+        } else
+        {
+            throw new InvalidOperationException("Invalid Id");
+        }
+
+        cultureInfo = AuthUser.CultureInfo;
+        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
+        iconSet = (await Mediator.Send(new GetIconsQuery())).ToArray();
+
+        // if all jars less than 100%, add an other jar
+        var totalPercentage = budgetJars.Sum(x => x.Percentage);
+        if (totalPercentage < 100)
+        {
+            var lastPercentage = Math.Round(100 - totalPercentage, 2, MidpointRounding.AwayFromZero);
+            var icon = Mapper.Map<IconDto>(DefaultConstants.DefaultIcon);
+            budgetJars.Add(new BudgetJarDto()
+            {
+                Id = Guid.NewGuid(),
+                UserId = AuthUser.Id,
+                Name = "Others",
+                Amount = 0,
+                Percentage = (float)lastPercentage,
+                IconId = icon.Id,
+                Icon = icon,
+            });
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("incomes");
+    }
+
+    private async Task<List<BudgetJarTemplateDto>> GetBudgetJarsFromTemplates()
+    {
+        var budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesByUserId(AuthUser.Id));
         if(!budgetJarTemplates.Any())
         {
             budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesQuery(true, null));
         }
-
-        budgetJars = budgetJarTemplates.OrderByDescending(x => x.Percentage).Select(BudgetJarDto.FromTemplate).ToArray();
-
-        base.OnInitialized();
+        budgetJarTemplates = budgetJarTemplates.OrderByDescending(x => x.Percentage).ToList();
+        return budgetJarTemplates;
     }
 
 
-    private async Task AddIncome()
+    private async Task SaveIncome()
     {
         if (incomeInputForm.Amount < 1) return;
+        // All budget jars must be 100%
+        if (budgetJars.Sum(x => x.Percentage) < 100)
+        { 
+            Snackbar.Clear();
+            Snackbar.Add("Sum of all budget jars must be 100%", MudBlazor.Severity.Error);
+            return;
+        }
+
         isSubmitting = true;
         var income = incomeInputForm.ToIncomeDto(AuthUser.TimeZone);
-        var result = await Mediator.Send(new SaveIncomeRequest(income, budgetJars));
+        var result = await Mediator.Send(new SaveIncomeRequest(income, budgetJars.ToArray()));
         if (result == Guid.Empty)
         {
             Snackbar.Clear();
@@ -129,14 +199,25 @@
 
     private void CalculateBudgetJar(string amountText)
     {
-        if (!int.TryParse(amountText, out var amount)) return;
+        if (!decimal.TryParse(amountText, out var amount)) return;
         if (!budgetJars.Any()) return;
 
         foreach(var budgetJar in budgetJars)
         {
-            budgetJar.Amount = Math.Round(amount * decimal.Divide(budgetJar.Percentage, 100), 2, MidpointRounding.AwayFromZero);
+            budgetJar.Amount = Math.Round(amount * decimal.Divide((decimal)budgetJar.Percentage, 100), 2, MidpointRounding.AwayFromZero);
         }
-        budgetJars.Last().Amount = amount - budgetJars.Take(budgetJars.Length - 1).Sum(x => x.Amount);
+        //budgetJars.Last().Amount = amount - budgetJars.Take(budgetJars.Count - 1).Sum(x => x.Amount);
+    }
+
+    private void HandleBudgetJarUpdate(BudgetJarDto budgetJar)
+    {
+        var jar = budgetJars.Single(x => x.Id == budgetJar.Id);
+        jar.Percentage = budgetJar.Percentage;
+        jar.Name = budgetJar.Name;
+        jar.Icon = budgetJar.Icon;
+        jar.IconId = budgetJar.IconId;
+        CalculateBudgetJar(incomeInputForm.Amount.ToString());
+        isModified = true;
     }
 
     public class IncomeInputModel
@@ -157,6 +238,16 @@
             var now = DateTimeUtil.TimeZoneNow(user.TimeZone);
             Begin = new DateTime(now.Year, now.Month, 1);
             End = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+        }
+
+        public IncomeInputModel(IncomeDto income)
+        {
+            Id = income.Id;
+            UserId = income.UserId;
+            Amount = income.Amount;
+            Note = income.Note;
+            Begin = income.Begin;
+            End = income.End;
         }
 
         public IncomeDto ToIncomeDto(string timeZone)

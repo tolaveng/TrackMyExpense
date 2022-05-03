@@ -1,14 +1,15 @@
-﻿using FluentValidation;
+﻿using Core.Application.Models.Interfaces;
+using FluentValidation;
 
 namespace Core.Application.Models
 {
-    public class BudgetJarDto : EntityDto<Guid>
+    public class BudgetJarDto : EntityDto<Guid>, IBudgetJar
     {
         public Guid UserId { get; set; }
         public Guid? IncomeId { get; set; }
 
         public string Name { get; set; } = string.Empty;
-        public int Percentage { get; set; }
+        public float Percentage { get; set; }
         public Decimal Amount { get; set; }
         public Guid IconId { get; set; }
         public IconDto Icon { get; set; } = new IconDto();

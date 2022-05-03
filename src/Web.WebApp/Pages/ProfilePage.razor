@@ -9,7 +9,7 @@
 @using Web.WebApp.Components
 @using Web.WebApp.Components.Dialogs
 
-<SetPageTitle Value=@($"{DefaultConstants.PageTitle} - Profile") />
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Profile")" />
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs>
@@ -52,9 +52,8 @@
                         <MudTextField Label="Full Name" @bind-Value="@profileInputForm.FullName" Immediate="true" For="@(() => profileInputForm.FullName)" Class="mb-3" />
                         <MudTextField Label="Email" @bind-Value="@profileInputForm.Email" Immediate="true" For="@(() => profileInputForm.Email)" Class="mb-3" />
                         <MudTextField Label="Phone Number" @bind-Value="@profileInputForm.PhoneNumber" Immediate="true" For="@(() => profileInputForm.PhoneNumber)" Class="mb-3" />
-                        <CurrencySelector Label="Currency" @bind-Value="@profileInputForm.Currency" For="@(() => profileInputForm.Currency)" Class="mb-3" />
                         <TimeZoneSelector Label="Time Zone" @bind-Value="@profileInputForm.TimeZone" For="@(() => profileInputForm.TimeZone)" Class="mb-3" />
-                        <CultureSelector Label="Date Time Format (1 April 2000)" @bind-Value="@profileInputForm.CultureInfo" For="@(() => profileInputForm.CultureInfo)" DateTimeSample="@dateTimeSample" Class="mb-3" />
+                        <CultureSelector Label="Currency Symbol and Date Time Format" @bind-Value="@profileInputForm.CultureInfo" For="@(() => profileInputForm.CultureInfo)" DateTimeSample="@dateTimeSample" Class="mb-3" />
                         <AppButton Type="submit" Text="Save Change" Color="@Color.Primary" IsLoading="@isSubmitting"
                             IsDisabled="@(!formContext.IsModified() || !formContext.Validate())" />
                     </MudItem>
@@ -123,7 +122,7 @@
     [CascadingParameter]
     public UserDto AuthUser { get; set; } = default;
 
-    private DateTime dateTimeSample = new DateTime(2000, 4, 1, 13, 00, 00, DateTimeKind.Unspecified);
+    private DateTime dateTimeSample = new DateTime(2000, 12, 31, 13, 00, 00, DateTimeKind.Unspecified);
     private ProfileInputModel profileInputForm = new ProfileInputModel();
     private PasswordInputModel passwordInputForm = new PasswordInputModel();
 
@@ -287,7 +286,6 @@
         public bool EmailConfirmed { get; set; }
         public string PhoneNumber { get; set; }
         public bool PhoneNumberConfirmed { get; set; }
-        public string Currency { get; set; }
         public string TimeZone { get; set; }
         public string CultureInfo { get; set; }
         public string ProfileImage { get; set; }
@@ -301,7 +299,6 @@
             FullName = user.FullName;
             Email = user.Email;
             PhoneNumber = user.PhoneNumber;
-            Currency = user.Currency;
             TimeZone = user.TimeZone;
             ProfileImage = user.ProfileImage;
             CultureInfo = user.CultureInfo;
@@ -316,7 +313,6 @@
                     FullName = FullName,
                     Email = Email,
                     PhoneNumber = PhoneNumber,
-                    Currency = Currency,
                     TimeZone = TimeZone,
                     ProfileImage = ProfileImage,
                     CultureInfo = CultureInfo,

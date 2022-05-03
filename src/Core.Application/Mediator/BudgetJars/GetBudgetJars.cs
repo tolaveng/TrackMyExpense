@@ -2,20 +2,13 @@
 using Core.Application.IRepositories;
 using Core.Application.Models;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Application.Mediator.BudgetJars
 {
     public class GetBudgetJarsQuery : IRequest<List<BudgetJarDto>>
     {
-        public bool IncludeArchived { get; set; }
-        public GetBudgetJarsQuery(bool includeArchived = false)
+        public GetBudgetJarsQuery()
         {
-            IncludeArchived = includeArchived;
         }
     }
     public class GetBudgetJarsHandler : IRequestHandler<GetBudgetJarsQuery, List<BudgetJarDto>>
@@ -30,7 +23,7 @@ namespace Core.Application.Mediator.BudgetJars
         public async Task<List<BudgetJarDto>> Handle(GetBudgetJarsQuery request, CancellationToken cancellationToken)
         {
             var repo = _unitOfWork.BudgetJarRepository;
-            var budgetJars = await repo.GetAllAsync(z => z.Archived || !request.IncludeArchived);
+            var budgetJars = await repo.GetAllAsync();
             return _mapper.Map<List<BudgetJarDto>>(budgetJars);
         }
     }

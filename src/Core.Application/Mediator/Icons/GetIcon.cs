@@ -19,7 +19,7 @@ namespace Core.Application.Mediator.Icons
         }
     }
 
-    public class GetIconRequestHandler : IRequestHandler<GetIconRequest, IconDto>
+    public class GetIconRequestHandler : IRequestHandler<GetIconRequest, IconDto?>
     {
         private readonly IMapper _mapper;
         public readonly IUnitOfWork _unitOfWork;
@@ -29,7 +29,7 @@ namespace Core.Application.Mediator.Icons
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<IconDto> Handle(GetIconRequest request, CancellationToken cancellationToken)
+        public async Task<IconDto?> Handle(GetIconRequest request, CancellationToken cancellationToken)
         {
             var icon = await _unitOfWork.IconRepository.GetAsync(z => z.Id == request.Id);
             if (icon == null) return null;

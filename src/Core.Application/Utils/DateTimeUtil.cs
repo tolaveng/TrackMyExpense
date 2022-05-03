@@ -7,22 +7,22 @@ namespace Core.Application.Utils
     {
         public const string DefaultTimeZoneId = "Australia/Sydney";
 
-        public static string GetDateTimeFormatFromCultureInfo(string cultureInfoString)
+        public static string GetDateTimeFormatFromCultureInfo(string cultureInfoName)
         {
-            if (string.IsNullOrWhiteSpace(cultureInfoString)) return DefaultConstants.DefaultDateTimeFormat;
+            if (string.IsNullOrWhiteSpace(cultureInfoName)) return DefaultConstants.DefaultDateTimeFormat;
 
-            var cultureInfo = new CultureInfo(cultureInfoString);
+            var cultureInfo = new CultureInfo(cultureInfoName);
             return new string(cultureInfo.DateTimeFormat.ShortDatePattern.Where(z => char.IsAscii(z)).ToArray());
         }
 
-        public static string FormatDateTimeByCultureInfo(DateTime dateTime, string cultureInfoString)
+        public static string FormatDateTimeByCultureInfo(DateTime dateTime, string cultureInfoName)
         {
-            if (string.IsNullOrWhiteSpace(cultureInfoString))
+            if (string.IsNullOrWhiteSpace(cultureInfoName))
             {
                 return dateTime.ToString(DefaultConstants.DefaultDateTimeFormat);
             }
 
-            var cultureInfo = new CultureInfo(cultureInfoString);
+            var cultureInfo = new CultureInfo(cultureInfoName);
             var shortDate = new string(cultureInfo.DateTimeFormat.ShortDatePattern.Where(z => char.IsAscii(z)).ToArray());
             return dateTime.ToString(shortDate);
         }

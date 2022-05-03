@@ -9,6 +9,5 @@ namespace Core.Application.Models
     public abstract class EntityDto<T>
     {
         public T Id { get; set; } = default(T);
-        public bool Archived { get; set; }
     }
 }
