@@ -22,6 +22,7 @@ namespace Core.Application.Mapper
 
             CreateMap<BudgetJar, BudgetJarDto>().ReverseMap();
             CreateMap<BudgetJarTemplate, BudgetJarTemplateDto>().ReverseMap();
+            CreateMap<ConsolidateBudgetJar, ConsolidateBudgetJarDto>().ReverseMap();
             CreateMap<ExpenseGroup, ExpenseGroupDto>().ReverseMap();
             CreateMap<Income, IncomeDto>().ReverseMap();
             CreateMap<Expense, ExpenseDto>().ReverseMap();

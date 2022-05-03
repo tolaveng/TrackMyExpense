@@ -1,0 +1,106 @@
+﻿@page "/expense/{id}"
+@attribute [Authorize]
+
+@using AutoMapper
+@using Core.Application.Models
+@using Core.Application.Utils
+@using Core.Domain.Enums
+@using FluentValidation
+@using MediatR
+@using System.Security.Authentication
+@using Web.WebApp.Components
+
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Add Expense")" />
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumbs>
+        <BreadcrumbsItem Icon="@Icons.Filled.Paid" Title="My Expenses" Href="/expenses"/>
+        <BreadcrumbsItem Title="Add Expense" />
+    </Breadcrumbs>
+    <MudCard Outlined="true" Class="p-3" Style="position: relative;">
+        <MudCardContent>
+            <MudContainer MaxWidth="@MaxWidth.Medium">
+            </MudContainer>
+        </MudCardContent>       
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IMapper Mapper { get; set; }
+
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private bool isNew;
+    private Guid incomeId;
+    private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
+    private string cultureInfo = DefaultConstants.DefaultCultureInfo;
+    private bool isSubmitting;
+    private bool isModified;
+
+    private ExpenseInputModel expenseInputForm = new ExpenseInputModel();
+    private List<BudgetJarDto> budgetJars =  new List<BudgetJarDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthUser == null)
+        {
+            throw new AuthenticationException();
+        }
+
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            throw new InvalidOperationException("Missing Id");
+        }
+
+        cultureInfo = AuthUser.CultureInfo;
+        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
+
+        if (Id.Equals("new", StringComparison.InvariantCultureIgnoreCase))
+        {
+            isNew = true;
+            expenseInputForm = new ExpenseInputModel(AuthUser);
+
+        } else if (Guid.TryParse(Id, out incomeId))
+        {
+            isNew = false;
+        } else
+        {
+            throw new InvalidOperationException("Invalid Id");
+        }
+
+
+    }
+
+    public class ExpenseInputModel
+    {
+        public Guid Id { get; set; } = Guid.Empty;
+        public Guid UserId { get; set; }
+        public DateTime? PaidDate { get; set; }
+        public decimal Amount { get; set; }
+        public string Description { get; set; }
+        public string Ref { get; set; }
+        public bool IsTaxable { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
+
+        public Guid BudgetJarId { get; set; }
+        public Guid ExpenseGroupId { get; set; }
+
+        public AttachmentDto[] Attachments { get; set; }
+
+        public ExpenseInputModel()
+        {
+            
+        }
+
+        public ExpenseInputModel(UserDto user)
+        {
+            
+        }
+    }
+}

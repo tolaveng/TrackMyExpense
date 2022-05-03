@@ -21,6 +21,8 @@ namespace Core.Infrastructure.Database
         public DbSet<PageHtml> PageHtmls { get; set; }
         public DbSet<BudgetJarTemplate> BudgetJarTemplates { get; set; }
         public DbSet<BudgetJar> BudgetJars { get; set; }
+
+        public DbSet<ConsolidateBudgetJar> ConsolidateBudgetJars { get; set; }
         public DbSet<ExpenseGroup> ExpenseGroups { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Income> Incomes { get; set; }
@@ -61,6 +63,7 @@ namespace Core.Infrastructure.Database
             modelBuilder.Entity<ExpenseGroup>().HasOne(x => x.Icon);
             modelBuilder.Entity<BudgetJar>().HasOne(x => x.Icon).WithMany().OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Icon>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<ConsolidateBudgetJar>().HasKey(x => x.Name);
 
             // Seed Default Data
             modelBuilder.ApplyConfiguration(new AppRoleConfig());
