@@ -26,8 +26,8 @@ namespace Core.Application.Mediator.BudgetJars
         public async Task<List<BudgetJarDto>> Handle(GetBudgetJarsByUserId request, CancellationToken cancellationToken)
         {
             var repo = _unitOfWork.BudgetJarRepository;
-            var budgetJars = await repo.GetAllAsync(z => z.UserId == request.UserId,
-                z => z.OrderBy(o => o.Percentage), new[] { "Icon" });
+            var budgetJars = await repo.GetAllAsync(x => !x.Archived && x.UserId == request.UserId,
+                x => x.OrderByDescending(o => o.Percentage), new[] { "Icon" });
             return _mapper.Map<List<BudgetJarDto>>(budgetJars);
         }
     }

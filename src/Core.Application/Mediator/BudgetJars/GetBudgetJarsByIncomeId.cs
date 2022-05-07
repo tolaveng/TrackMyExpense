@@ -26,8 +26,15 @@ namespace Core.Application.Mediator.BudgetJars
         }
         public async Task<List<BudgetJarDto>> Handle(GetBudgetJarsByIncomeId request, CancellationToken cancellationToken)
         {
-            var budgetJars = await _unitOfWork.BudgetJarRepository.GetAllAsync(z => z.IncomeId == request.IncomeId,
-                z => z.OrderBy(o => o.Percentage), new[] { "Icon" });
+            var incomeJars = await _unitOfWork.IncomeBudgetJarRepository.GetAllAsync(x => x.IncomeId == request.IncomeId);
+            var jarIds = incomeJars.Select(x => x.BudgetJarId).ToList();
+            var budgetJars = await _unitOfWork.BudgetJarRepository.GetAllAsync(x => jarIds.Contains(x.Id),
+                x => x.OrderByDescending(o => o.Percentage), new[] {"Icon"});
+            foreach(var jar in budgetJars)
+            {
+                jar.TotalBalance = 0;
+                jar.Percentage = incomeJars.Single(x => x.BudgetJarId == jar.Id).Percentage;
+            }
             return _mapper.Map<List<BudgetJarDto>>(budgetJars);
         }
     }

@@ -1,11 +1,8 @@
 ﻿@using System.ComponentModel.DataAnnotations
-@using Core.Application.Mediator.BudgetJarTemplates
+@using Core.Application.Mediator.BudgetJars
 @using Core.Application.Models
-@using Core.Application.Models.Interfaces
 @using MediatR
 @using Web.WebApp.Components.Dialogs
-
-@typeparam T where T : IBudgetJar
 
 <MudCard Outlined="true" Class="budgetjar-card" @ondblclick="@EditClick">
     <div class="icons">
@@ -82,7 +79,7 @@
 
 @code {
     [Parameter]
-    public T BudgetJar { get; set; }
+    public BudgetJarDto BudgetJar { get; set; }
 
     [Parameter]
     public bool ReadOnly { get; set; }
@@ -100,7 +97,7 @@
     public bool IsNew { get; set; }
 
     [Parameter]
-    public EventCallback<T> OnUpdated { get; set; }
+    public EventCallback<BudgetJarDto> OnUpdated { get; set; }
 
     [Parameter]
     public EventCallback<Guid> OnDeleted { get; set; }

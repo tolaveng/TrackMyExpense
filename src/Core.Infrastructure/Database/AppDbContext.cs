@@ -19,10 +19,8 @@ namespace Core.Infrastructure.Database
 
         public DbSet<SysAttribute> SysAttributes { get; set; }
         public DbSet<PageHtml> PageHtmls { get; set; }
-        public DbSet<BudgetJarTemplate> BudgetJarTemplates { get; set; }
         public DbSet<BudgetJar> BudgetJars { get; set; }
-
-        public DbSet<ConsolidateBudgetJar> ConsolidateBudgetJars { get; set; }
+        public DbSet<IncomeBudgetJar> IncomeBudgetJars { get; set; }
         public DbSet<ExpenseGroup> ExpenseGroups { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Income> Incomes { get; set; }
@@ -55,22 +53,25 @@ namespace Core.Infrastructure.Database
             modelBuilder.Entity<Expense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Expense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Expense>().HasIndex(x => x.PaidDate);
-            modelBuilder.Entity<Income>().HasMany(x => x.BudgetJars).WithOne().HasForeignKey(x => x.IncomeId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<IncomeBudgetJar>().HasKey(x => new { x.IncomeId, x.BudgetJarId });
+            modelBuilder.Entity<IncomeBudgetJar>().HasOne(x => x.Income).WithMany(x => x.IncomeBudgetJars).HasForeignKey(x => x.IncomeId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<IncomeBudgetJar>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<AppIdentityUser>().HasMany(x => x.Subscriptions).WithOne().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<BudgetJarTemplate>().HasOne(x => x.Icon);
+            
             modelBuilder.Entity<ExpenseGroup>().HasOne(x => x.Icon);
             modelBuilder.Entity<BudgetJar>().HasOne(x => x.Icon).WithMany().OnDelete(DeleteBehavior.SetNull);
             modelBuilder.Entity<Icon>().HasIndex(x => x.Name).IsUnique();
-            modelBuilder.Entity<ConsolidateBudgetJar>().HasKey(x => x.Name);
+            
 
             // Seed Default Data
             modelBuilder.ApplyConfiguration(new AppRoleConfig());
             modelBuilder.ApplyConfiguration(new IconConfig());
-            modelBuilder.ApplyConfiguration(new BudgetJarTemplateConfig());
+            modelBuilder.ApplyConfiguration(new BudgetJarConfig());
             modelBuilder.ApplyConfiguration(new ExpenseGroupConfig());
-            modelBuilder.ApplyConfiguration(new CurrencyConfig());
+            // Deprecated
+            //modelBuilder.ApplyConfiguration(new CurrencyConfig());
         }
     }
 }

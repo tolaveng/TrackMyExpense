@@ -24,7 +24,7 @@ namespace Core.Application.Services.IServices
         AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl);
         Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
         Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
-        Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
+        Task<GenericResponse<Guid>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
 
         int GetCount();
         PagedResponse<UserDto> GetUsers(string search, Pagination pagination);

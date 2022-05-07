@@ -13,8 +13,7 @@ namespace Core.Application.IRepositories
         IGenericRepository<PageHtml> PageHtmlRepository { get; }
         IGenericRepository<Subscription> SubscriptionRepository { get; }
         IGenericRepository<BudgetJar> BudgetJarRepository { get; }
-        IGenericRepository<BudgetJarTemplate> BudgetJarTemplateRepository { get; }
-        IGenericRepository<ConsolidateBudgetJar> ConsolidateBudgetJarRepository { get; }
+        IGenericRepository<IncomeBudgetJar> IncomeBudgetJarRepository { get; }
         IGenericRepository<Income> IncomeRepository { get; }
         IGenericRepository<Expense> ExpenseRepository { get; }
         IGenericRepository<ExpenseGroup> ExpenseGroupRepository { get; }

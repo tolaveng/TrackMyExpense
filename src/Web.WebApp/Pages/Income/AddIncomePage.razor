@@ -2,7 +2,6 @@
 @attribute [Authorize]
 
 @using AutoMapper
-@using Core.Application.Mediator.BudgetJarTemplates
 @using Core.Application.Mediator.BudgetJars
 @using Core.Application.Mediator.Icons
 @using Core.Application.Mediator.Incomes
@@ -59,8 +58,8 @@
                         }
                         @foreach(var budgetJar in budgetJars)
                         {
-                        <BudgetJarCard @key="@budgetJar.Id" T="BudgetJarDto" BudgetJar="budgetJar" TotalPercentages="@totalPercentages"
-                        IconSet="@iconSet" FormattedAmount="@(CurrencyUtil.Formatted(budgetJar.Amount, cultureInfo))"
+                        <BudgetJarCard @key="@budgetJar.Id" BudgetJar="budgetJar" TotalPercentages="@totalPercentages"
+                        IconSet="@iconSet" FormattedAmount="@(CurrencyUtil.Formatted(budgetJar.TotalBalance, cultureInfo))"
                         DeleteDisabled="true" OnUpdated="@HandleBudgetJarUpdate"
                         />
                         
@@ -109,15 +108,18 @@
             throw new InvalidOperationException("Missing Id");
         }
 
+        cultureInfo = AuthUser.CultureInfo;
+        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
+        iconSet = (await Mediator.Send(new GetIconsQuery())).ToArray();
+
         if (Id.Equals("new", StringComparison.InvariantCultureIgnoreCase))
         {
             isNew = true;
             incomeInputForm = new IncomeInputModel(AuthUser);
-            // Get default budget jars
-            var budgetJarTemplates = await GetBudgetJarsFromTemplates();
-            budgetJars = budgetJarTemplates.Select(BudgetJarDto.FromTemplate).ToList();
+            budgetJars = await GetUserBudgetJars();
 
-        } else if (Guid.TryParse(Id, out incomeId))
+        }
+        else if (Guid.TryParse(Id, out incomeId))
         {
             isNew = false;
             var income = await Mediator.Send(new GetIncomeById(AuthUser.Id, incomeId, AuthUser.TimeZone));
@@ -133,10 +135,6 @@
             throw new InvalidOperationException("Invalid Id");
         }
 
-        cultureInfo = AuthUser.CultureInfo;
-        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
-        iconSet = (await Mediator.Send(new GetIconsQuery())).ToArray();
-
         // if all jars less than 100%, add an other jar
         var totalPercentage = budgetJars.Sum(x => x.Percentage);
         if (totalPercentage < 100)
@@ -148,7 +146,7 @@
                 Id = Guid.NewGuid(),
                 UserId = AuthUser.Id,
                 Name = "Others",
-                Amount = 0,
+                TotalBalance = 0,
                 Percentage = (float)lastPercentage,
                 IconId = icon.Id,
                 Icon = icon,
@@ -161,15 +159,20 @@
         NavigationManager.NavigateTo("incomes");
     }
 
-    private async Task<List<BudgetJarTemplateDto>> GetBudgetJarsFromTemplates()
+    private async Task<List<BudgetJarDto>> GetUserBudgetJars()
     {
-        var budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesByUserId(AuthUser.Id));
-        if(!budgetJarTemplates.Any())
+        var userBudgetJars = await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id));
+        if(!userBudgetJars.Any())
         {
-            budgetJarTemplates = await Mediator.Send(new GetBudgetJarTemplatesQuery(true, null));
+            userBudgetJars = await Mediator.Send(new GetDefaultBudgetJars());
+            foreach(var jar in userBudgetJars)
+            {
+                jar.Id = Guid.NewGuid();
+                jar.UserId = AuthUser.Id;
+            }
         }
-        budgetJarTemplates = budgetJarTemplates.OrderByDescending(x => x.Percentage).ToList();
-        return budgetJarTemplates;
+        userBudgetJars = userBudgetJars.OrderByDescending(x => x.Percentage).ToList();
+        return userBudgetJars;
     }
 
 
@@ -177,7 +180,7 @@
     {
         if (incomeInputForm.Amount < 1) return;
         // All budget jars must be 100%
-        if (budgetJars.Sum(x => x.Percentage) < 100)
+        if (budgetJars.Sum(x => x.Percentage) != 100)
         { 
             Snackbar.Clear();
             Snackbar.Add("Sum of all budget jars must be 100%", MudBlazor.Severity.Error);
@@ -204,7 +207,7 @@
 
         foreach(var budgetJar in budgetJars)
         {
-            budgetJar.Amount = Math.Round(amount * decimal.Divide((decimal)budgetJar.Percentage, 100), 2, MidpointRounding.AwayFromZero);
+            budgetJar.TotalBalance = Math.Round(amount * decimal.Divide((decimal)budgetJar.Percentage, 100), 2, MidpointRounding.AwayFromZero);
         }
         //budgetJars.Last().Amount = amount - budgetJars.Take(budgetJars.Count - 1).Sum(x => x.Amount);
     }

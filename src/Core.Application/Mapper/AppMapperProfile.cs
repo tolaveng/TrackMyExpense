@@ -19,10 +19,8 @@ namespace Core.Application.Mapper
             CreateMap<Currency, CurrencyDto>().ReverseMap();
             CreateMap<PageHtml, PageHtmlDto>().ReverseMap();
             CreateMap<Subscription, SubscriptionDto>().ReverseMap();
-
             CreateMap<BudgetJar, BudgetJarDto>().ReverseMap();
-            CreateMap<BudgetJarTemplate, BudgetJarTemplateDto>().ReverseMap();
-            CreateMap<ConsolidateBudgetJar, ConsolidateBudgetJarDto>().ReverseMap();
+            CreateMap<IncomeBudgetJar, IncomeBudgetJarDto>().ReverseMap();
             CreateMap<ExpenseGroup, ExpenseGroupDto>().ReverseMap();
             CreateMap<Income, IncomeDto>().ReverseMap();
             CreateMap<Expense, ExpenseDto>().ReverseMap();

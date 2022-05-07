@@ -36,8 +36,8 @@ namespace Core.Application.Mediator.Incomes
         }
         public async Task<IncomeDto?> Handle(GetIncomeById request, CancellationToken cancellationToken)
         {
-            var income = await _unitOfWork.IncomeRepository.GetAsync(x => x.Id == request.IncomeId);
-            if (income == null || income.UserId != request.UserId)
+            var income = await _unitOfWork.IncomeRepository.GetAsync(x => x.Id == request.IncomeId && x.UserId == request.UserId);
+            if (income == null)
             {
                 return null;
             }

@@ -3,11 +3,7 @@ using Core.Application.IRepositories;
 using Core.Application.Models;
 using Core.Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Core.Application.Mediator.BudgetJars
 {
@@ -34,15 +30,15 @@ namespace Core.Application.Mediator.BudgetJars
         public async Task<Guid> Handle(SaveBudgetJarCommand request, CancellationToken cancellationToken)
         {
             var budgetJar = _mapper.Map<BudgetJar>(request.BudgetJarDto);
-            if (budgetJar.Id != Guid.Empty)
-            {
-                _unitOfWork.BudgetJarRepository.Update(budgetJar);
-            }
-            else
+            if (budgetJar.Id == Guid.Empty)
             {
                 budgetJar.Id = Guid.NewGuid();
                 budgetJar.Icon = null;  // prevent adding new icon
                 await _unitOfWork.BudgetJarRepository.InsertAsync(budgetJar);
+            }
+            else
+            {
+                _unitOfWork.BudgetJarRepository.Update(budgetJar);
             }
 
             await _unitOfWork.SaveAsync();

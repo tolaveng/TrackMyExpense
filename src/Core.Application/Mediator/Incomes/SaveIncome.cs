@@ -3,11 +3,6 @@ using Core.Application.IRepositories;
 using Core.Application.Models;
 using Core.Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Application.Mediator.Incomes
 {
@@ -35,6 +30,7 @@ namespace Core.Application.Mediator.Incomes
 
         public async Task<Guid> Handle(SaveIncomeRequest request, CancellationToken cancellationToken)
         {
+            // income
             var income = _mapper.Map<Income>(request.Income);
             if (income.Id != Guid.Empty)
             {
@@ -50,21 +46,59 @@ namespace Core.Application.Mediator.Incomes
                 income.Id = Guid.NewGuid();
                 var result = await _unitOfWork.IncomeRepository.InsertAsync(income);
                 if (!result) return Guid.Empty;
+
             }
 
-            var budgetJars = request.BudgetJars.Select(x => new BudgetJar()
+            // income budget jars
+            var dbBudgetJars = await _unitOfWork.BudgetJarRepository.GetAllAsync(x => x.UserId == income.UserId);
+            var dbIncomeJars = await _unitOfWork.IncomeBudgetJarRepository.GetAllAsync(x => x.IncomeId == income.Id);
+
+            foreach(var requestJar in request.BudgetJars)
             {
-                Id = Guid.NewGuid(),
-                IncomeId = income.Id,
-                UserId = income.UserId,
-                Name = x.Name,
-                Amount = x.Amount,
-                Percentage = x.Percentage,
-                IconId = x.IconId,
-            });
-            await _unitOfWork.BudgetJarRepository.DeleteAsync(x => x.IncomeId == income.Id);
-            await _unitOfWork.BudgetJarRepository.InsertRangeAsync(budgetJars);
-            
+                var dbJar = dbBudgetJars.SingleOrDefault(x => x.Id == requestJar.Id);
+                var newAmount = Math.Round(income.Amount * decimal.Divide((decimal)requestJar.Percentage, 100), 2, MidpointRounding.AwayFromZero);
+                if (dbJar != null)
+                {
+                    var dbIncomeJar = dbIncomeJars.SingleOrDefault(x => x.IncomeId == income.Id && x.BudgetJarId == dbJar.Id);
+                    var oldAmount = dbIncomeJar != null ? dbIncomeJar.Amount : 0;
+                    dbJar.TotalBalance = dbJar.TotalBalance - oldAmount + newAmount;
+                    _unitOfWork.BudgetJarRepository.Update(dbJar);
+
+                    if (dbIncomeJar != null)
+                    {
+                        dbIncomeJar.Percentage = requestJar.Percentage;
+                        dbIncomeJar.Amount = newAmount;
+                        _unitOfWork.IncomeBudgetJarRepository.Update(dbIncomeJar);
+                    } else
+                    {
+                        var newIncomeJar = new IncomeBudgetJar()
+                        {
+                            IncomeId = income.Id,
+                            BudgetJarId = dbJar.Id,
+                            Amount = newAmount,
+                            Percentage = requestJar.Percentage,
+                        };
+                        await _unitOfWork.IncomeBudgetJarRepository.InsertAsync(newIncomeJar);
+                    }
+
+                } else
+                {
+                    var newJar = _mapper.Map<BudgetJar>(requestJar);
+                    newJar.UserId = income.UserId;
+                    newJar.TotalBalance = newAmount;
+                    await _unitOfWork.BudgetJarRepository.InsertAsync(newJar);
+
+                    var newIncomeJar = new IncomeBudgetJar()
+                    {
+                        IncomeId = income.Id,
+                        BudgetJarId = newJar.Id,
+                        Amount = newAmount,
+                        Percentage = requestJar.Percentage,
+                    };
+                    await _unitOfWork.IncomeBudgetJarRepository.InsertAsync(newIncomeJar);
+                }
+            }
+
             await _unitOfWork.SaveAsync();
             return income.Id;
         }

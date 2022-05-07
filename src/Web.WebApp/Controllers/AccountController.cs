@@ -1,5 +1,7 @@
-﻿using Core.Application.Models;
+﻿using Core.Application.Mediator.BudgetJars;
+using Core.Application.Models;
 using Core.Application.Services.IServices;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,10 +14,12 @@ namespace Web.WebApp.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly Mediator _mediator;
 
-        public AccountController(IUserService userService)
+        public AccountController(IUserService userService, Mediator mediator)
         {
             _userService = userService;
+            _mediator = mediator;
         }
 
         public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
@@ -36,6 +40,9 @@ namespace Web.WebApp.Controllers
             var response = await _userService.ExternalLoginSignInAsync(loginInfo);
             if (response.Succeeded)
             {
+                // Create budget jar
+                await _mediator.Send(new CreateBudgetJarsFromDefault(response.Data));
+
                 return LocalRedirect(returnUrl);
             }
 

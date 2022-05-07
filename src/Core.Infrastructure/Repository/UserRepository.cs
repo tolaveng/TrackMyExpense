@@ -251,27 +251,31 @@ namespace Core.Infrastructure.Repository
             return await _signInManager.GetExternalLoginInfoAsync();
         }
 
-        public async Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo)
+        public async Task<GenericResponse<Guid>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo)
         {
+            var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+            var fullName = loginInfo.Principal.FindFirstValue(ClaimTypes.Name);
+
+            if (email == null)
+            {
+                return GenericResponse<Guid>.Failure("Log in failed. Cannot obtain an email from your account.");
+            }
+
             var result = await _signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, false, true);
             if (result.Succeeded)
             {
-                return GenericResponse<string>.Success(string.Empty);
+                var user = await _userManager.FindByEmailAsync(email);
+                return GenericResponse<Guid>.Success(user.Id);
             }
             
-            var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
-            var fullName = loginInfo.Principal.FindFirstValue(ClaimTypes.Name);
-            if (email == null)
-            {
-                return GenericResponse<string>.Failure("Log in failed. Cannot get an email from your account.");
-            }
 
-            // check if user exist
+            // check if user exist or create
             var appUser = await _userManager.FindByEmailAsync(email);
             if (appUser == null)
             {
                 appUser = new AppIdentityUser()
                 {
+                    Id = Guid.NewGuid(),
                     Email = email,
                     UserName = email,
                     FullName = fullName,
@@ -280,7 +284,7 @@ namespace Core.Infrastructure.Repository
                 var createResult = await _userManager.CreateAsync(appUser);
                 if (!createResult.Succeeded)
                 {
-                    return GenericResponse<string>.Failure("Unexpected error occured. Please try again later");
+                    return GenericResponse<Guid>.Failure("Unexpected error occured. Please try again later");
                 }
             }
 
@@ -289,10 +293,10 @@ namespace Core.Infrastructure.Repository
             if (addResult.Succeeded)
             {
                 await _signInManager.SignInAsync(appUser, isPersistent: false);
-                return GenericResponse<string>.Success(string.Empty);
+                return GenericResponse<Guid>.Success(appUser.Id);
             }
 
-            return GenericResponse<string>.Failure("Unexpected error occured. Please try again later");
+            return GenericResponse<Guid>.Failure("Unexpected error occured. Please try again later");
         }
 
         public async Task<string> GeneratePasswordResetTokenAsync(Guid userId)

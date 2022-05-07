@@ -1,6 +1,5 @@
 ﻿@page "/budgetjars";
 @using AutoMapper
-@using Core.Application.Mediator.BudgetJarTemplates
 @using Core.Application.Mediator.BudgetJars
 @using Core.Application.Mediator.Icons
 @using Core.Application.Models
@@ -20,8 +19,7 @@
                 {
                     foreach (BudgetJarModel budgetJar in budgetJars)
                     {
-                        var budgetJarDto = budgetJar as BudgetJarTemplateDto;
-                        <BudgetJarCard @key="@budgetJar.Id" T="BudgetJarTemplateDto" BudgetJar="@budgetJarDto" TotalPercentages="@totalPercentages"
+                        <BudgetJarCard @key="@budgetJar.Id" BudgetJar="@budgetJar" TotalPercentages="@totalPercentages"
                             IconSet="@iconSet" OnUpdated="@HandleBudgetJarUpdated" OnDeleted="@HandleBudgetJarDeleted" IsNew="@budgetJar.IsNew" />
                     }
                 }
@@ -55,7 +53,7 @@
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        var budgetJarsDto = await Mediator.Send(new GetBudgetJarTemplatesByUserId(AuthUser.Id));
+        var budgetJarsDto = await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id));
         budgetJars = budgetJarsDto.OrderByDescending(x => x.Percentage).Select(x => new BudgetJarModel(x)).ToList();
         totalPercentages = budgetJars.Sum(x => x.Percentage);
 
@@ -71,7 +69,7 @@
         if (!budgetJars.Any())
         {
             isLoading = true;
-            var budgetJarsDto = await Mediator.Send(new CreateBudgetJarTemplatesFromSystem(AuthUser.Id));
+            var budgetJarsDto = await Mediator.Send(new CreateBudgetJarsFromDefault(AuthUser.Id));
             budgetJars = budgetJarsDto.OrderByDescending(x => x.Percentage).Select(x => new BudgetJarModel(x)).ToList();
             totalPercentages = budgetJars.Sum(x => x.Percentage);
             isLoading = false;
@@ -79,14 +77,15 @@
         }
     }
 
-    private async Task HandleBudgetJarUpdated(BudgetJarTemplateDto result)
+    private async Task HandleBudgetJarUpdated(BudgetJarDto result)
     {
         var budgetJar = budgetJars.Single(x => x.Id == result.Id);
         budgetJar.IconId = result.IconId;
         budgetJar.Icon = result.Icon;
         budgetJar.Name = result.Name;
         budgetJar.Percentage = result.Percentage;
-        await Mediator.Send(new SaveBudgetJarTemplateCommand(budgetJar, budgetJar.IsNew));
+        budgetJar.IsDefault = false;
+        await Mediator.Send(new SaveBudgetJarCommand(budgetJar));
         budgetJar.IsNew = false;
 
         totalPercentages = budgetJars.Sum(x => x.Percentage);
@@ -97,7 +96,7 @@
     {
         budgetJars = budgetJars.Where(x => x.Id != id).ToList();
         totalPercentages = budgetJars.Sum(x => x.Percentage);
-        await Mediator.Send(new DeleteBudgetJarTemplateCommand(id));
+        await Mediator.Send(new DeleteBudgetJarCommand(id, false));
         StateHasChanged();
     }
 
@@ -109,8 +108,8 @@
             Id = Guid.NewGuid(),
             UserId = AuthUser.Id,
             Name = "",
-            IsSystem = false,
-            Amount = 0,
+            IsDefault = false,
+            TotalBalance = 0,
             Percentage = 0,
             IconId = icon.Id,
             Icon = icon,
@@ -118,23 +117,22 @@
         });
     }
 
-    protected class BudgetJarModel : BudgetJarTemplateDto
+    protected class BudgetJarModel : BudgetJarDto
     {
         public bool IsNew { get; set; }
 
         public BudgetJarModel(){}
 
-        public BudgetJarModel(BudgetJarTemplateDto budgetJar)
+        public BudgetJarModel(BudgetJarDto budgetJar)
         {
             IsNew = false;
             Id = budgetJar.Id;
             UserId = budgetJar.UserId;
             Name = budgetJar.Name;
             Percentage = budgetJar.Percentage;
-            IsSystem = budgetJar.IsSystem;
+            IsDefault = false;
             IconId = budgetJar.IconId;
             Icon = budgetJar.Icon;
-            Amount = budgetJar.Amount;
         }
     }
 }

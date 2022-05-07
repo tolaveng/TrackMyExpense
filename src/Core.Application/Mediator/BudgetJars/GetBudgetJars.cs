@@ -23,7 +23,7 @@ namespace Core.Application.Mediator.BudgetJars
         public async Task<List<BudgetJarDto>> Handle(GetBudgetJarsQuery request, CancellationToken cancellationToken)
         {
             var repo = _unitOfWork.BudgetJarRepository;
-            var budgetJars = await repo.GetAllAsync();
+            var budgetJars = await repo.GetAllAsync(x => !x.Archived);
             return _mapper.Map<List<BudgetJarDto>>(budgetJars);
         }
     }

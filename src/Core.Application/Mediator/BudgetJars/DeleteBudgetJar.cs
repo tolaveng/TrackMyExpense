@@ -1,19 +1,17 @@
 ﻿using Core.Application.IRepositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Core.Application.Mediator.BudgetJars
 {
     public class DeleteBudgetJarCommand : IRequest<bool>
     {
         public Guid Id  { get; set; }
-        public DeleteBudgetJarCommand(Guid id)
+        public bool IsArchived { get; set; }
+        public DeleteBudgetJarCommand(Guid id, bool archive)
         {
             Id = id;
+            IsArchived = archive;
         }
     }
 
@@ -27,13 +25,22 @@ namespace Core.Application.Mediator.BudgetJars
         public async Task<bool> Handle(DeleteBudgetJarCommand request, CancellationToken cancellationToken)
         {
             var repo = _unitOfWork.BudgetJarRepository;
-            var deleted = await repo.DeleteAsync(request.Id);
-            if (deleted)
+            var result = false;
+            if (request.IsArchived)
+            {
+                var budgetJar = await repo.GetAsync(x => x.Id == request.Id);
+                budgetJar.Archived = true;
+                result = repo.Update(budgetJar);
+            } else
+            {
+                result = await repo.DeleteAsync(request.Id);
+            }
+
+            if (result)
             {
                 await _unitOfWork.SaveAsync();
-                return true;
             }
-            return false;
+            return result;
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Core.Application.IRepositories
         AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl);
         Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
         Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
-        Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
+        Task<GenericResponse<Guid>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo);
 
         int GetCount();
         PagedResponse<AppUser> GetUsers(string search, Pagination pagination);

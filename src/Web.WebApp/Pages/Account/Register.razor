@@ -2,9 +2,11 @@
 @attribute [AllowAnonymous]
 @layout EmptyLayout
 
+@using Core.Application.Mediator.BudgetJars
 @using Core.Application.Services.IServices
 @using Core.Domain.Constants
 @using Core.Domain.Entities
+@using MediatR
 @using Microsoft.AspNetCore.Components
 @using Core.Application.Models
 @using System.ComponentModel.DataAnnotations
@@ -68,6 +70,8 @@
 
 
 @code {
+    [Inject] IMediator Mediator { get; set; }
+
     public bool IsSubmitting { get; set; }
     public RegisterInput Input { get; set; } = new RegisterInput();
     public string ErrorMessage { get; set; }
@@ -115,6 +119,7 @@
         };
         var user = new UserDto()
         {
+            Id = Guid.NewGuid(),
             Username = Input.Email,
             FullName = Input.FullName,
             Email = Input.Email,
@@ -130,6 +135,9 @@
             StateHasChanged();
             return;
         }
+
+        // Create budget jar
+        await Mediator.Send(new CreateBudgetJarsFromDefault(user.Id));
 
         // Confirm email
         var token = await UserService.GenerateEmailConfirmationTokenAsync(result.Data);

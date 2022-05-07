@@ -87,7 +87,7 @@ namespace Core.Application.Services
             return await _userRepository.GetExternalLoginInfoAsync();
         }
 
-        public async Task<GenericResponse<string>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo)
+        public async Task<GenericResponse<Guid>> ExternalLoginSignInAsync(ExternalLoginInfo loginInfo)
         {
             return await _userRepository.ExternalLoginSignInAsync(loginInfo);
         }

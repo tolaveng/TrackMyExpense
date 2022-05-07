@@ -14,8 +14,7 @@ namespace Core.Infrastructure.Repository
         private IGenericRepository<SysAttribute> _sysAttributeRepository;
         private IGenericRepository<PageHtml> _pageHtmlRepository;
         private IGenericRepository<BudgetJar> _budgetJarRepository;
-        private IGenericRepository<BudgetJarTemplate> _budgetJarTemplateRepository;
-        private IGenericRepository<ConsolidateBudgetJar> _consolidateBudgetJarRepository;
+        private IGenericRepository<IncomeBudgetJar> _incomeBudgetJarRepository;
         private IGenericRepository<Subscription> _subscriptionRepository;
         private IGenericRepository<Income> _incomeRepository;
         private IGenericRepository<Expense> _expenseRepository;
@@ -31,8 +30,7 @@ namespace Core.Infrastructure.Repository
         public IGenericRepository<SysAttribute> SysAttributeRepository => _sysAttributeRepository ??= new GenericRepository<SysAttribute>(_context);
         public IGenericRepository<PageHtml> PageHtmlRepository => _pageHtmlRepository ??= new GenericRepository<PageHtml>(_context);
         public IGenericRepository<BudgetJar> BudgetJarRepository => _budgetJarRepository ??= new GenericRepository<BudgetJar>(_context);
-        public IGenericRepository<BudgetJarTemplate> BudgetJarTemplateRepository => _budgetJarTemplateRepository ??= new GenericRepository<BudgetJarTemplate>(_context);
-        public IGenericRepository<ConsolidateBudgetJar> ConsolidateBudgetJarRepository => _consolidateBudgetJarRepository ??= new GenericRepository<ConsolidateBudgetJar>(_context);
+        public IGenericRepository<IncomeBudgetJar> IncomeBudgetJarRepository => _incomeBudgetJarRepository ??= new GenericRepository<IncomeBudgetJar>(_context);
         public IGenericRepository<Subscription> SubscriptionRepository => _subscriptionRepository ??= new GenericRepository<Subscription>(_context);
         public IGenericRepository<Income> IncomeRepository => _incomeRepository ??= new GenericRepository<Income>(_context);
         public IGenericRepository<Expense> ExpenseRepository => _expenseRepository ??= new GenericRepository<Expense>(_context);
