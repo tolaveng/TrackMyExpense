@@ -86,6 +86,7 @@ namespace Core.Application.Mediator.Incomes
                     var newJar = _mapper.Map<BudgetJar>(requestJar);
                     newJar.UserId = income.UserId;
                     newJar.TotalBalance = newAmount;
+                    newJar.Icon = null; // Prevent recreate an icon
                     await _unitOfWork.BudgetJarRepository.InsertAsync(newJar);
 
                     var newIncomeJar = new IncomeBudgetJar()

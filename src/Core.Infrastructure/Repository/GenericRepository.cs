@@ -33,6 +33,11 @@ namespace Core.Infrastructure.Repository
             return await _db.CountAsync(expression);
         }
 
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> expression = null)
+        {
+            return await _db.AnyAsync(expression);
+        }
+
         public async Task<bool> DeleteAsync(int id)
         {
             var record = await _db.FindAsync(id);

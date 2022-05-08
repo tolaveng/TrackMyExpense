@@ -17,7 +17,7 @@
         } else if (!ReadOnly)
         {
             <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Edit" aria-label="Edit" title="Edit" OnClick="@EditClick" />
-            @if (!DeleteDisabled)
+            @if (!HideDelete)
             {
                 <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Delete" aria-label="Delete" Title="Delete" OnClick="@DeleteClick" />
             }
@@ -62,8 +62,15 @@
                 <MudTextField @bind-Value="@inputModel.Percentage" Placeholder="Percentage"
                     Adornment="Adornment.End" AdornmentIcon="@Icons.Filled.Percent"
                     For="@(() => inputModel.Percentage)"/>
-                <MudTextField @bind-Value="@inputModel.Name" Placeholder="Name or description" 
-                    For="@(() => inputModel.Name)" />
+                @if(HideEditName)
+                {
+                    <MudText>@inputModel.Name</MudText>
+                }
+                else
+                {
+                    <MudTextField @bind-Value="@inputModel.Name" Placeholder="Name or description" 
+                    For="@(() => inputModel.Name)" />    
+                }
             </EditForm>   
         } else
         {
@@ -85,7 +92,10 @@
     public bool ReadOnly { get; set; }
 
     [Parameter]
-    public bool DeleteDisabled { get; set; }
+    public bool HideDelete { get; set; }
+
+    [Parameter]
+    public bool HideEditName { get; set; }
 
     [Parameter]
     public float TotalPercentages { get; set; }
@@ -134,12 +144,19 @@
         isEditing = true;
     }
 
-    private void CancelClick()
+    private async Task CancelClick()
     {
         isEditing = false;
+        // reset
         inputModel.Icon.Id = BudgetJar.IconId;
         inputModel.Name = BudgetJar.Name;
         inputModel.Percentage = BudgetJar.Percentage;
+
+        // if new, invoke delete
+        if (IsNew && OnDeleted.HasDelegate)
+        {
+            await OnDeleted.InvokeAsync(BudgetJar.Id);
+        }
     }
 
     private async Task OnSaveClicked()
@@ -169,6 +186,15 @@
 
     private async Task DeleteClick()
     {
+        if (IsNew)
+        {
+            if (OnDeleted.HasDelegate)
+            {
+                await OnDeleted.InvokeAsync(BudgetJar.Id);
+            }
+            return;
+        }
+
         var dialogParams = new DialogParameters() {
             ["Message"] = "Are you sure you want to delete this budget jar?",
             ["Color"] = Color.Error,
@@ -211,7 +237,7 @@
         public string Name { get; set; }
 
         [Required(ErrorMessage = "Required")]
-        [Range(1, 100, ErrorMessage = "Valid number (1-100)")]
+        [Range(0, 100, ErrorMessage = "Valid number (0-100)")]
         public float Percentage { get; set; }
     }
 

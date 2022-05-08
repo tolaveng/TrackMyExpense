@@ -33,6 +33,13 @@ namespace Core.Application.Mediator.BudgetJars
                 result = repo.Update(budgetJar);
             } else
             {
+                // Inused
+                var inIncomeJar = await _unitOfWork.IncomeBudgetJarRepository.ExistsAsync(x => x.BudgetJarId == request.Id);
+                if (inIncomeJar) return false;
+
+                var inExpense = await _unitOfWork.ExpenseRepository.ExistsAsync(x => x.BudgetJarId == request.Id);
+                if (inExpense) return false;
+
                 result = await repo.DeleteAsync(request.Id);
             }
 

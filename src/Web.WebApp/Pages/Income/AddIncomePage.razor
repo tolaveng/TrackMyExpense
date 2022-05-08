@@ -60,7 +60,7 @@
                         {
                         <BudgetJarCard @key="@budgetJar.Id" BudgetJar="budgetJar" TotalPercentages="@totalPercentages"
                         IconSet="@iconSet" FormattedAmount="@(CurrencyUtil.Formatted(budgetJar.TotalBalance, cultureInfo))"
-                        DeleteDisabled="true" OnUpdated="@HandleBudgetJarUpdate"
+                        HideDelete="true" HideEditName="true" OnUpdated="@HandleBudgetJarUpdate"
                         />
                         
                         }
@@ -171,7 +171,7 @@
                 jar.UserId = AuthUser.Id;
             }
         }
-        userBudgetJars = userBudgetJars.OrderByDescending(x => x.Percentage).ToList();
+        userBudgetJars = userBudgetJars.Where(z => z.Percentage > 0).OrderByDescending(x => x.Percentage).ToList();
         return userBudgetJars;
     }
 

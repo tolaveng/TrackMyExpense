@@ -3,6 +3,7 @@
 @using Core.Application.Mediator.BudgetJars
 @using Core.Application.Mediator.Icons
 @using Core.Application.Models
+@using Core.Application.Utils
 @using MediatR
 
 <SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Budget Jars")" />
@@ -14,13 +15,17 @@
     <MudCard Outlined="true" Class="p-3" Style="position: relative;">
         <MudCardContent>
             <MudContainer MaxWidth="@MaxWidth.Medium">
+                <MudText Typo="Typo.h6">Current balance: @(CurrencyUtil.Formatted(totalBalance, cultureInfo))</MudText>
+                <br/>
                 <div class="budgetjar-cards">
                 @if (budgetJars.Any())
                 {
                     foreach (BudgetJarModel budgetJar in budgetJars)
                     {
                         <BudgetJarCard @key="@budgetJar.Id" BudgetJar="@budgetJar" TotalPercentages="@totalPercentages"
-                            IconSet="@iconSet" OnUpdated="@HandleBudgetJarUpdated" OnDeleted="@HandleBudgetJarDeleted" IsNew="@budgetJar.IsNew" />
+                            IconSet="@iconSet" OnUpdated="@HandleBudgetJarUpdated" OnDeleted="@HandleBudgetJarDeleted"
+                            IsNew="@(budgetJar.IsNew)" FormattedAmount="@($"Balance: {CurrencyUtil.Formatted(budgetJar.TotalBalance, cultureInfo)}")"
+                            HideDelete="@(budgetJar.TotalBalance > 0)"/>
                     }
                 }
                     <MudCard Outlined="true" Class="budgetjar-card budgetjar-card-addnew" @onclick="@AddNewClick">
@@ -45,17 +50,21 @@
     [CascadingParameter]
     public UserDto AuthUser { get; set; } = default;
 
+    private string cultureInfo = DefaultConstants.DefaultCultureInfo;
     private bool isLoading;
     private List<BudgetJarModel> budgetJars = new List<BudgetJarModel>();
     private float totalPercentages;
+    private decimal totalBalance;
     private IconDto[] iconSet = Array.Empty<IconDto>();
 
     protected override async Task OnInitializedAsync()
     {
+        cultureInfo = AuthUser.CultureInfo;
         isLoading = true;
         var budgetJarsDto = await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id));
-        budgetJars = budgetJarsDto.OrderByDescending(x => x.Percentage).Select(x => new BudgetJarModel(x)).ToList();
+        budgetJars = budgetJarsDto.Select(x => new BudgetJarModel(x, false)).ToList();
         totalPercentages = budgetJars.Sum(x => x.Percentage);
+        totalBalance = budgetJars.Sum(x => x.TotalBalance);
 
         iconSet = (await Mediator.Send(new GetIconsQuery())).ToArray();
         isLoading = false;
@@ -65,38 +74,60 @@
     {
         if (!firstRender) return;
 
-        // If there is none, create from system templates
-        if (!budgetJars.Any())
-        {
-            isLoading = true;
-            var budgetJarsDto = await Mediator.Send(new CreateBudgetJarsFromDefault(AuthUser.Id));
-            budgetJars = budgetJarsDto.OrderByDescending(x => x.Percentage).Select(x => new BudgetJarModel(x)).ToList();
-            totalPercentages = budgetJars.Sum(x => x.Percentage);
-            isLoading = false;
-            StateHasChanged();
-        }
+        // If there is none, create from default jars
+        //if (!budgetJars.Any())
+        //{
+        //    isLoading = true;
+        //    var budgetJarsDto = await Mediator.Send(new CreateBudgetJarsFromDefault(AuthUser.Id));
+        //    budgetJars = budgetJarsDto.OrderByDescending(x => x.Percentage).Select(x => new BudgetJarModel(x)).ToList();
+        //    totalPercentages = 0;
+        //    totalBalance = 0;
+        //    isLoading = false;
+        //    StateHasChanged();
+        //}
     }
 
-    private async Task HandleBudgetJarUpdated(BudgetJarDto result)
+    private async Task HandleBudgetJarUpdated(BudgetJarDto jar)
     {
-        var budgetJar = budgetJars.Single(x => x.Id == result.Id);
-        budgetJar.IconId = result.IconId;
-        budgetJar.Icon = result.Icon;
-        budgetJar.Name = result.Name;
-        budgetJar.Percentage = result.Percentage;
-        budgetJar.IsDefault = false;
-        await Mediator.Send(new SaveBudgetJarCommand(budgetJar));
-        budgetJar.IsNew = false;
+        jar.UserId = AuthUser.Id;
+        jar.IsDefault = false;
+        var id = await Mediator.Send(new SaveBudgetJarCommand(jar));
+
+        var budgetJar = budgetJars.SingleOrDefault(x => x.Id == id);
+        if (budgetJar != null)
+        {
+            budgetJar.IsNew = false;
+            budgetJar.IconId = jar.IconId;
+            budgetJar.Icon = jar.Icon;
+            budgetJar.Name = jar.Name;
+            budgetJar.Percentage = jar.Percentage;
+        } else
+        {
+            budgetJars.Add(new BudgetJarModel(jar, false));
+        }
 
         totalPercentages = budgetJars.Sum(x => x.Percentage);
+        totalBalance = budgetJars.Sum(x => x.TotalBalance);
         StateHasChanged();
     }
 
     private async Task HandleBudgetJarDeleted(Guid id)
     {
-        budgetJars = budgetJars.Where(x => x.Id != id).ToList();
+        var jar = budgetJars.SingleOrDefault(x => x.Id == id);
+        if (!jar.IsNew)
+        {
+            var result = await Mediator.Send(new DeleteBudgetJarCommand(id, false));
+            if (!result)
+            {
+                Snackbar.Clear();
+                Snackbar.Add("Cannot delete the budget jar. Make it is not in used in the income and expense.", MudBlazor.Severity.Error);
+                return;
+            }    
+        }
+
+        budgetJars.Remove(jar);
         totalPercentages = budgetJars.Sum(x => x.Percentage);
-        await Mediator.Send(new DeleteBudgetJarCommand(id, false));
+        totalBalance = budgetJars.Sum(x => x.TotalBalance);
         StateHasChanged();
     }
 
@@ -105,6 +136,7 @@
         var icon = Mapper.Map<IconDto>(DefaultConstants.DefaultIcon);
         budgetJars.Add(new BudgetJarModel()
         {
+            IsNew = true,
             Id = Guid.NewGuid(),
             UserId = AuthUser.Id,
             Name = "",
@@ -113,7 +145,6 @@
             Percentage = 0,
             IconId = icon.Id,
             Icon = icon,
-            IsNew = true
         });
     }
 
@@ -123,9 +154,9 @@
 
         public BudgetJarModel(){}
 
-        public BudgetJarModel(BudgetJarDto budgetJar)
+        public BudgetJarModel(BudgetJarDto budgetJar, bool isNew)
         {
-            IsNew = false;
+            IsNew = isNew;
             Id = budgetJar.Id;
             UserId = budgetJar.UserId;
             Name = budgetJar.Name;
@@ -133,6 +164,7 @@
             IsDefault = false;
             IconId = budgetJar.IconId;
             Icon = budgetJar.Icon;
+            TotalBalance = budgetJar.TotalBalance;
         }
     }
 }

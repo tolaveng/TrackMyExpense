@@ -11,6 +11,7 @@ namespace Core.Application.IRepositories
     {
         Task<IEnumerable<T>> GetAllAsync();
         Task<int> CountAsync(Expression<Func<T, bool>>? expression = null);
+        Task<bool> ExistsAsync(Expression<Func<T, bool>>? expression = null);
 
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,

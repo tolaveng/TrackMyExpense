@@ -30,6 +30,7 @@ namespace Core.Application.Mediator.BudgetJars
         public async Task<Guid> Handle(SaveBudgetJarCommand request, CancellationToken cancellationToken)
         {
             var budgetJar = _mapper.Map<BudgetJar>(request.BudgetJarDto);
+
             if (budgetJar.Id == Guid.Empty)
             {
                 budgetJar.Id = Guid.NewGuid();
@@ -38,7 +39,15 @@ namespace Core.Application.Mediator.BudgetJars
             }
             else
             {
-                _unitOfWork.BudgetJarRepository.Update(budgetJar);
+                var dbJar = await _unitOfWork.BudgetJarRepository.GetAsync(x => x.Id == budgetJar.Id);
+                if (dbJar != null)
+                {
+                    _unitOfWork.BudgetJarRepository.Update(budgetJar);
+                } else
+                {
+                    budgetJar.Icon = null;  // prevent adding new icon
+                    await _unitOfWork.BudgetJarRepository.InsertAsync(budgetJar);
+                }
             }
 
             await _unitOfWork.SaveAsync();
