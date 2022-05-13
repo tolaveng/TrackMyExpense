@@ -1,0 +1,38 @@
+﻿.profile-image {
+    border: 1px solid #009688;
+    border-radius: 50%;
+    cursor: pointer;
+    display: block;
+    height: 150px;
+    width: 150px;
+    padding: 0;
+    position: relative;
+    text-decoration: none;
+    overflow: hidden;
+}
+
+::deep .profile-image > svg,
+::deep .profile-image > img {
+    height: 100%;
+    width: 100%;
+}
+
+::deep .profile-image > .text-edit {
+    color: #000000;
+    background-color: rgba(255, 255, 255, .5);
+    bottom: 0;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    position: absolute;
+    margin-bottom: 6px;
+    transition: transform 0.5s;
+    text-align: center;
+    width: 100%;
+}
+
+::deep .profile-image:hover > .text-edit {
+    transform: translateY(-2px);
+}
+
+

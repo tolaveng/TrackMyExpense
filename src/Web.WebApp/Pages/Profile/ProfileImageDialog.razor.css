@@ -1,0 +1,39 @@
+﻿#profile-image-drop-zone {
+    width: 100%;
+    border: 2px dashed #CCCCCC;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+#profile-image-drop-zone.hover {
+    border-color: #009688;
+    background-color: #DDDDDD;
+}
+
+#profile-image-drop-zone.error {
+    border-color: red;
+    background-color: transparent;
+}
+
+#profile-image-drop-zone #error-message {
+    color: red;
+    display: block;
+    visibility: hidden;
+}
+
+#profile-image-drop-zone.error #error-message {
+    visibility: visible;
+}
+
+#profile-image-drop-zone > label {
+    color: #0366d6;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#profile-image-cropper-wrapper {
+    min-height: 420px;
+    margin: 0 auto;
+}
