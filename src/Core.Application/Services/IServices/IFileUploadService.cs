@@ -14,10 +14,15 @@ namespace Core.Application.Services.IServices
         long MaxFileSize { get; set; }
 
         public event EventHandler<int> UploadProgress;
+
         Task<FileUploadResponse> SaveIconFileAsync(FileUploadRequest fileUploadRequest,
             string saveFileName, CancellationToken ct);
         Task<FileUploadResponse> SaveProfileImageAsync(FileUploadRequest fileUploadRequest,
             string saveFileName, CancellationToken ct);
+
+        Task<FileUploadResponse> SaveAttachmentAsync(FileUploadRequest fileUploadRequest,
+            string saveFileName, CancellationToken ct);
+
         Task<FileUploadResponse> SaveProfileImageThumbnailAsync(FileUploadRequest fileUploadRequest,
             string saveFileName, CancellationToken ct);
 

@@ -25,7 +25,7 @@
         <div id="fileUploaderPreview">
         @foreach(var file in browserFiles)
         {
-            <FileUploaderItem FileName="@file.Name" />
+            <FileUploaderItem @key="@file.Name" FileName="@file.Name" OnRemove="@FileRemoveHandler" />
         }
         </div>   
     }
@@ -75,7 +75,7 @@
         invalidFiles.Clear();
         // Why it's clear, BrowserFile is just a pointer to the input file.
         browserFiles.Clear();
-        foreach(var file in files)
+        foreach(var file in files.DistinctBy(x => x.Name))
         {
             if (file.Size > MaxFileSize)
             {
@@ -93,6 +93,11 @@
             browserFiles.Add(file);
         }
 
+    }
+
+    private void FileRemoveHandler(string fileName)
+    {
+        browserFiles = browserFiles.Where(x => x.Name != fileName).ToList();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
