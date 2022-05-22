@@ -1,0 +1,117 @@
+﻿@using System.IO
+@using System.Threading
+
+@implements IAsyncDisposable
+
+<div id="fileUploaderDropZone" @ref="dropZoneElement">
+    <span>Drag and drop or </span><label for="fileUploaderFileSelector">Click here</label> to select files
+    
+    <!-- File selector to add files -->
+    <input type="file" id="fileUploaderFileSelector" @ref="fileUploaderFileSelector" multiple style="visibility:hidden; height: 0; width: 0;" />
+
+    <!-- Real file input to Blazor -->
+    <InputFile id="fileUploaderInputFile" @ref="inputFile" OnChange="@InputFileHandler" multiple 
+    style="display: none" />
+
+    <div id="fileUploaderErrorMessage">
+        @if (invalidFiles.Any())
+        {
+            <div>Please check file(s) below cannot be upload:</div>
+            @((MarkupString)string.Join("<br/>", invalidFiles));
+        }
+    </div>
+    @if (browserFiles.Any())
+    {
+        <div id="fileUploaderPreview">
+        @foreach(var file in browserFiles)
+        {
+            <FileUploaderItem FileName="@file.Name" />
+        }
+        </div>   
+    }
+    @if (IsUploading)
+    {
+        <div class="fileUploaderProgress">
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+        </div>
+    }
+</div>
+
+
+@code {
+    [Inject] IJSRuntime JSRuntime { get; set; }
+
+    [Parameter]
+    public bool IsUploading { get; set; }
+
+    [Parameter]
+    public long MaxFileSize { get; set; } = 5 * 1024 * 1024 ;
+
+    [Parameter]
+    public string MaxFileSizeText { get; set; } = "5MB";
+
+    [Parameter]
+    public string[] AllowExtensions { get; set; } = new[] { ".png", ".jpg", ".jpeg", ".pdf", ".docx", ".doc", ".txt" };
+
+    private string DragClass = string.Empty;
+    private ElementReference dropZoneElement;
+    private ElementReference fileUploaderFileSelector;
+    private InputFile inputFile;
+    private IJSObjectReference fileUploaderInsance;
+    private IJSObjectReference dropZoneInstance;
+
+    private List<IBrowserFile> browserFiles = new List<IBrowserFile>();
+    private List<string> invalidFiles = new List<string>();
+
+    public List<IBrowserFile> GetBrowserFiles()
+    {
+        return browserFiles;
+    }
+
+    private void InputFileHandler(InputFileChangeEventArgs e)
+    {
+        var files = e.GetMultipleFiles(10);
+        if (!files.Any()) return;
+        invalidFiles.Clear();
+        // Why it's clear, BrowserFile is just a pointer to the input file.
+        browserFiles.Clear();
+        foreach(var file in files)
+        {
+            if (file.Size > MaxFileSize)
+            {
+                invalidFiles.Add($"- {file.Name} 's size must less than {MaxFileSizeText}.");
+                continue;
+            }
+
+            var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+            if (string.IsNullOrEmpty(ext) || !AllowExtensions.Contains(ext))
+            {
+                invalidFiles.Add($"- {file.Name} 's type must be {string.Join(", ", AllowExtensions)}.");
+                continue;
+            }
+
+            browserFiles.Add(file);
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        // Initialize the drop zone
+        fileUploaderInsance = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/FileUploader/FileUploader.razor.js");
+        dropZoneInstance = await fileUploaderInsance.InvokeAsync<IJSObjectReference>("FileUploder_Init",
+            dropZoneElement, fileUploaderFileSelector, inputFile.Element);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (dropZoneInstance != null)
+        {
+            await dropZoneInstance.InvokeVoidAsync("dispose");
+            await dropZoneInstance.DisposeAsync();
+        }
+    }
+
+}

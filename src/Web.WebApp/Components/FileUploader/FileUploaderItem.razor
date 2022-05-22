@@ -1,0 +1,24 @@
+﻿@using System.IO
+<div class=@($"fileUploader-item {GetClassName()}")>
+    <MudIconButton Class="fileUploader-item-icon" Icon="@Icons.Material.Filled.Close" Color="@Color.Error"
+        Size="Size.Small" aria-label="Remove" Title="Remove" OnClick="@RemoveClick" />
+    <span class="fileUploader-file-name">@FileName</span>
+</div>
+
+@code {
+    [Parameter]
+    public string FileName { get; set; }
+
+
+    private string GetClassName()
+    {
+        if (string.IsNullOrEmpty(FileName)) return "";
+        var ext = Path.GetExtension(FileName).ToLowerInvariant().Replace(".", "-");
+        return $"fileUploader{ext}";
+    }
+
+    private void RemoveClick()
+    {
+
+    }
+}
