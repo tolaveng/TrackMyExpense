@@ -1,0 +1,110 @@
+﻿@using Core.Application.Providers.IProviders
+@using System.IO
+<MudDialog>
+    <DialogContent>
+        <div class="fileuploader-preview">
+            @if (showLoading)
+            {
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Class="fileuploader-preview-loading" />   
+            }
+            @if (!string.IsNullOrEmpty(ImageSrc))
+            {
+                <img src="@ImageSrc" @ref="@fileUploderPreviewImage" title="" class="fileuploader-preview-image" hidden="@(!isImage)" />
+            }
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <AppButton Color="Color.Error"  OnClick="OnRemoveClicked" IsOutline="true"
+            IsDisabled="@(File.BowserFile != null)" Icon="@Icons.Filled.DeleteForever" Text="Delete" />
+        <MudSpacer />
+        @if (!string.IsNullOrEmpty(DownloadUrl))
+        {
+            <a href="@DownloadUrl" @ref="@fileUploderPreviewDownload" type="buitton" target="_blank" rel="noopener" download="@File.Name"
+            class="mud-button-root mud-button mud-button-filled mud-button-filled-primary mud-button-filled-size-medium mud-ripple"
+            >
+                <span class="mud-button-label">
+                    <span class="mud-button-icon-start mud-button-icon-size-medium">
+                        <MudIcon Icon="@Icons.Filled.Download" />
+                    </span>
+                    Download
+                </span>
+            </a>
+        }
+        <AppButton OnClick="OnCloseClicked" IsOutline="true" Icon="@Icons.Filled.Close" Text="Close" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] public IFileDirectoryProvider  FileDirectoryProvider { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] IJSRuntime JSRuntime { get; set; }
+
+    [Parameter]
+    public FileUploaderFile File  { get; set; }
+
+    [Parameter]
+    public EventCallback<FileUploaderFile> OnRemove { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private ElementReference fileUploderPreviewImage;
+    private ElementReference fileUploderPreviewDownload;
+
+    private string[] imageExtensions = new[] { ".png", ".jpg", ".jpeg", ".gif", ".svg"};
+
+    private string ImageSrc;
+    private string DownloadUrl;
+    private bool showLoading;
+    private bool isImage;
+
+    protected override void OnInitialized()
+    {
+        var ext = Path.GetExtension(File.FileName);
+        isImage = imageExtensions.Contains(ext);
+
+        if (File.BowserFile == null)
+        {
+            DownloadUrl = FileDirectoryProvider.GetAttachmentUrl(File.FileName, NavigationManager.BaseUri);
+            if (isImage)
+            {
+                showLoading = true;
+                ImageSrc = DownloadUrl;
+            }
+        } else
+        {
+            ImageSrc = FileDirectoryProvider.GetAssetFileUrl("image-placeholder-small.png", NavigationManager.BaseUri);
+            DownloadUrl = "#";
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (File.BowserFile != null)
+        {
+            try
+            {
+                var jsImageStream = File.BowserFile.OpenReadStream(File.BowserFile.Size);
+                var dotnetStream = new DotNetStreamReference(jsImageStream);
+                var jsObject = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/FileUploader/FileUploaderPreviewDialog.razor.js");
+                await jsObject.InvokeVoidAsync("fileUploaderImagePreview", dotnetStream,
+                    fileUploderPreviewImage, fileUploderPreviewDownload, File.BowserFile.Name, isImage);
+            }
+            catch(Exception)
+            {
+                // ignored
+            }
+
+        }
+    }
+
+    private async Task OnRemoveClicked()
+    {
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync(File);
+        }
+    }
+    private void OnCloseClicked() => MudDialog.Cancel();
+}

@@ -9,13 +9,16 @@ namespace Core.Application.Providers.IProviders
 {
     public interface IFileDirectoryProvider
     {
+        string GetAssetFileUrl(string fileName, string baseUri);
         string GetUploadDirectory(string[] subDirectories);
         string GetIconDirectory();
+        string GetAttachmentDirectory();
         string GetProfileImageDirectory();
         string GetProfileImageThumbnailsDirectory();
-        string ResolveDirectoryUrl(string[] subDirectories, string baseUri);
-        string ResolveIconUrl(IconType iconType, string path);
-        string ResolveProfileImageUrl(string fileName, string baseUri);
-        string ResolveProfileImageThumbnailUrl(string fileName, string baseUri);
+        string GetUploadDirectoryUrl(string[] subDirectories, string baseUri);
+        string GetIconUrl(IconType iconType, string path);
+        string GetProfileImageUrl(string fileName, string baseUri);
+        string GetAttachmentUrl(string fileName, string baseUri);
+        string GetProfileImageThumbnailUrl(string fileName, string baseUri);
     }
 }

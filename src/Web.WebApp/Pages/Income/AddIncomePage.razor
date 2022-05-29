@@ -13,11 +13,14 @@
 @using Web.WebApp.Components
 @using Web.WebApp.Pages.BudgetJar
 
-<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Add Income")" />
+@{
+    var title = isNew ? "Add Income" : "Edit Income";
+}
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - {title}")" />
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs>
         <BreadcrumbsItem Icon="@Icons.Filled.AttachMoney" Title="My Incomes" Href="/incomes"/>
-        <BreadcrumbsItem Title="Add Income" />
+        <BreadcrumbsItem Title="@title" />
     </Breadcrumbs>
     <MudCard Outlined="true" Class="p-3" Style="position: relative;">
         <MudCardContent>
@@ -27,7 +30,7 @@
                     <FluentValidationValidator T="IncomeInputModel" TValidator="IncomeInputValidator"/>
                     <MudGrid>
                     <MudItem xs="12" sm="12">
-                        <MudText>Add your income that you want to track between begin and end date period.</MudText>
+                        <MudText>Add an income into your budget jars.</MudText>
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudDatePicker Label="Begin date" @bind-Date="@incomeInputForm.Begin"
@@ -65,9 +68,13 @@
                         
                         }
                     </div>
-                    <MudButton Type="button" Variant="Variant.Outlined" Color="@Color.Default" Class="m-3" OnClick="@GoBack">Back</MudButton>
+                    @if (!isNew)
+                    {
+                        <MudButton Type="button" Variant="Variant.Outlined" Color="@Color.Default" Class="mt-3 mr-3" OnClick="@OnCancel">
+                            Cancel</MudButton>
+                    }
                     <AppButton Type="submit" Text="Save" Color="@Color.Primary" IsLoading="@isSubmitting"
-                            IsDisabled="@(!((formContext.IsModified() || isModified) && formContext.Validate()))" Class="m-3" />
+                            IsDisabled="@(!((formContext.IsModified() || isModified) && formContext.Validate()))" Class="mt-3" />
                 </EditForm>
             </MudContainer>
         </MudCardContent>       
@@ -154,9 +161,9 @@
         }
     }
 
-    private void GoBack()
+    private void OnCancel()
     {
-        NavigationManager.NavigateTo("incomes");
+        NavigationManager.NavigateTo("incomes");    
     }
 
     private async Task<List<BudgetJarDto>> GetUserBudgetJars()
@@ -169,6 +176,7 @@
             {
                 jar.Id = Guid.NewGuid();
                 jar.UserId = AuthUser.Id;
+                jar.IsDefault = false;
             }
         }
         userBudgetJars = userBudgetJars.Where(z => z.Percentage > 0).OrderByDescending(x => x.Percentage).ToList();
@@ -236,6 +244,7 @@
 
         public IncomeInputModel(UserDto user)
         {
+            Id = Guid.Empty;
             UserId = user.Id;
             Amount = 0;
             var now = DateTimeUtil.TimeZoneNow(user.TimeZone);

@@ -145,8 +145,8 @@
             imageName = AuthUser.ProfileImage;
 
             var baseUri = NavigationManager.BaseUri;
-            imageUrl = FileDirectoryProvider.ResolveProfileImageUrl(AuthUser.ProfileImage, baseUri);
-            imageThumbnailUrl = FileDirectoryProvider.ResolveProfileImageThumbnailUrl(AuthUser.ProfileImage, baseUri);
+            imageUrl = FileDirectoryProvider.GetProfileImageUrl(AuthUser.ProfileImage, baseUri);
+            imageThumbnailUrl = FileDirectoryProvider.GetProfileImageThumbnailUrl(AuthUser.ProfileImage, baseUri);
         }
 
         if (AuthUser.Subscriptions != null)
@@ -261,8 +261,8 @@
                 // preview
                 profileInputForm.ProfileImage = imageName;
                 var baseUri = NavigationManager.BaseUri;
-                imageUrl = FileDirectoryProvider.ResolveProfileImageUrl(imageName, baseUri);
-                imageThumbnailUrl = FileDirectoryProvider.ResolveProfileImageThumbnailUrl(imageName, baseUri);
+                imageUrl = FileDirectoryProvider.GetProfileImageUrl(imageName, baseUri);
+                imageThumbnailUrl = FileDirectoryProvider.GetProfileImageThumbnailUrl(imageName, baseUri);
             }
         }
     }

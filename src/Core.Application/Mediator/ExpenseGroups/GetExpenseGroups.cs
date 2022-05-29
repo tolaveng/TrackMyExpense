@@ -13,9 +13,11 @@ namespace Core.Application.Mediator.Categories
     public class GetExpenseGroupsQuery : IRequest<List<ExpenseGroupDto>>
     {
         public bool IsSystem { get; set; }
-        public GetExpenseGroupsQuery(bool isSystem)
+        public Guid? UserId { get; set; }
+        public GetExpenseGroupsQuery(bool isSystem, Guid? userId = null)
         {
             IsSystem = isSystem;
+            UserId = userId;
         }
     }
     public class GetExpenseGroupsHandler : IRequestHandler<GetExpenseGroupsQuery, List<ExpenseGroupDto>>
@@ -30,7 +32,9 @@ namespace Core.Application.Mediator.Categories
         public async Task<List<ExpenseGroupDto>> Handle(GetExpenseGroupsQuery request, CancellationToken cancellationToken)
         {
             var repo = _unitOfWork.ExpenseGroupRepository;
-            var expenseGroups = await repo.GetAllAsync(z => z.IsSystem || !request.IsSystem, null, new [] {"Icon"});
+            var expenseGroups = await repo.GetAllAsync(x => (x.IsSystem || !request.IsSystem) &&
+            (!request.UserId.HasValue || x.UserId == request.UserId),
+                x => x.OrderBy(o => o.Name), new [] {"Icon"});
             return _mapper.Map<List<ExpenseGroupDto>>(expenseGroups);
         }
     }

@@ -2,7 +2,6 @@
 using Core.Application.Utils;
 using Core.Application.Providers.IProviders;
 using Core.Application.Services.IServices;
-using Core.Domain.Enums;
 
 namespace Core.Application.Services
 {
@@ -35,6 +34,18 @@ namespace Core.Application.Services
             }
             return result;
         }
+
+        public async Task<FileUploadResponse> SaveAttachmentAsync(FileUploadRequest file, string saveFileName, CancellationToken ct)
+        {
+            var imageDir = FileDirectoryProvider.GetAttachmentDirectory();
+            var result = await SaveFileAsync(file, imageDir, saveFileName, ct);
+            if (result.Succeeded && file.IsImage)
+            {
+                result.FileSize = ImageSharpHelper.ResizeAndSave(Path.Combine(imageDir, result.FileName));
+            }
+            return result;
+        }
+
         public async Task<FileUploadResponse> SaveProfileImageThumbnailAsync(FileUploadRequest file, string saveFileName, CancellationToken ct)
         {
             return await SaveFileAsync(file, FileDirectoryProvider.GetProfileImageThumbnailsDirectory(), saveFileName, ct);
@@ -66,7 +77,7 @@ namespace Core.Application.Services
                 return FileUploadResponse.Fail($"File size must be less than {Math.Abs(MaxFileSize / 1024)} KB");
             }
             
-
+            // Append an extension, when saving without it.
             if (string.IsNullOrEmpty(Path.GetExtension(saveFileName)))
             {
                 saveFileName = $"{saveFileName}{file.Extension}";
@@ -99,10 +110,11 @@ namespace Core.Application.Services
                     OnUploadProgress(0);
                     return FileUploadResponse.Fail("Fild upload have been cancelled");
                 };
-
+                // remove uploding...
                 File.Move(saveFilePath, saveFilePath.Replace(".uploading", ""), true);
                 OnUploadProgress(100);
-                return FileUploadResponse.Success(saveFileName);
+
+                return FileUploadResponse.Success(saveFileName, file.Stream.Length);
 
             }
             catch (Exception ex)
@@ -156,6 +168,23 @@ namespace Core.Application.Services
             return await Task.FromResult(true);
         }
 
-
+        public async Task<bool> DeleteAttachmentsAsync(string[] fileNames)
+        {
+            foreach(var fileName in fileNames)
+            {
+                var deleteFile = Path.Combine(FileDirectoryProvider.GetAttachmentDirectory(), fileName);
+                if (!File.Exists(deleteFile)) continue;
+                try
+                {
+                    File.Delete(deleteFile);
+                }
+                catch (Exception)
+                {
+                    return await Task.FromResult(false);
+                }
+            }
+            
+            return await Task.FromResult(true);
+        }
     }
 }

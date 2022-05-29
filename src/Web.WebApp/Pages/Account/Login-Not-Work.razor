@@ -50,15 +50,15 @@
 
     public bool RememberMe { get; set; } = false;
     
-    protected override async Task OnInitializedAsync()
-    {
+    //protected override async Task OnInitializedAsync()
+    //{
         //var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
         //if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("redirectUrl", out var _redirectUrl))
         //{
         //    RedirectUrl = _redirectUrl;
         //}
         // Clear the existing external cookie to ensure a clean login process
-    }
+    //}
 
     private async Task<bool> UserLogin()
     {

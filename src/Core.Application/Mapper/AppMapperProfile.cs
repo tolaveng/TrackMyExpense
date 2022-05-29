@@ -46,7 +46,7 @@ namespace Core.Application.Mapper
                 destination.IconUrl = string.Empty;
                 return;
             }
-            destination.IconUrl = _fileDirectoryProvider.ResolveIconUrl(source.IconType, source.Path);
+            destination.IconUrl = _fileDirectoryProvider.GetIconUrl(source.IconType, source.Path);
         }
     }
 
@@ -60,8 +60,8 @@ namespace Core.Application.Mapper
         }
         public void Process(AppUser source, UserDto destination, ResolutionContext context)
         {
-            destination.ProfileImageUrl = _fileDirectoryProvider.ResolveProfileImageUrl(source.ProfileImage, string.Empty);
-            destination.ProfileImageThumbnailUrl = _fileDirectoryProvider.ResolveProfileImageThumbnailUrl(source.ProfileImage, string.Empty);
+            destination.ProfileImageUrl = _fileDirectoryProvider.GetProfileImageUrl(source.ProfileImage, string.Empty);
+            destination.ProfileImageThumbnailUrl = _fileDirectoryProvider.GetProfileImageThumbnailUrl(source.ProfileImage, string.Empty);
         }
     }
 }

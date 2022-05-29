@@ -11,12 +11,15 @@ namespace Core.Domain.Entities
 {
     public class Attachment : BaseEntity<Guid>
     {
+        public Guid ExpenseId { get; set; }
+
+        /* Friendly Name */
         [MaxLength(128)]
         public string Name { get; set; }
 
-        [MaxLength(128)]
-        public string Title { get; set; }
+        /* FileName only, not include directory or path */
+        public string FileName { get; set; }
 
-        public string Url { get; set; }
+        public long FileSize { get; set; }
     }
 }

@@ -2,25 +2,123 @@
 @attribute [Authorize]
 
 @using AutoMapper
+@using Core.Application.Common.Files
+@using Core.Application.Extensions
+@using Core.Application.Mediator.BudgetJars
+@using Core.Application.Mediator.Categories
+@using Core.Application.Mediator.Expenses
 @using Core.Application.Models
+@using Core.Application.Services.IServices
 @using Core.Application.Utils
 @using Core.Domain.Enums
 @using FluentValidation
 @using MediatR
 @using System.Security.Authentication
+@using System.Threading
 @using Web.WebApp.Components
+@using Web.WebApp.Components.FileUploader
 
-<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Add Expense")" />
+@implements IAsyncDisposable
+
+@{
+    var title = isNew ? "Add Expense" : "Edit Expense";
+}
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - {title}")" />
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs>
         <BreadcrumbsItem Icon="@Icons.Filled.Paid" Title="My Expenses" Href="/expenses"/>
-        <BreadcrumbsItem Title="Add Expense" />
+        <BreadcrumbsItem Title="@title" />
     </Breadcrumbs>
     <MudCard Outlined="true" Class="p-3" Style="position: relative;">
         <MudCardContent>
             <MudContainer MaxWidth="@MaxWidth.Medium">
+                <AppOverlay IsLoading="@isLoading" />
+                @if (budgetJars.Any())
+                {
+                <EditForm Model="@expenseInputForm" Context="formContext" OnValidSubmit="@SaveExpense">
+                    <DataAnnotationsValidator/>
+                    <FluentValidationValidator T="ExpenseInputModel" TValidator="ExpenseInputModelValidator"/>
+                    <MudGrid>
+                        <MudItem xs="12" sm="12">
+                        <MudSelect Label="Income Budget Jar" @bind-Value="@expenseInputForm.BudgetJarId" For="@(() => expenseInputForm.BudgetJarId)"
+                            Class="mb-3" AnchorOrigin="Origin.BottomCenter">
+                            <MudSelectItem Value="@(Guid.Empty)">Select a jar</MudSelectItem>
+                            @foreach (var budgetJar in budgetJars)
+                            {
+                            <MudSelectItem Value="@(budgetJar.Id)">
+                                <img src="@budgetJar.Icon.IconUrl" height="24" width="24" class="mr-2" />
+                                @budgetJar.Name
+                            </MudSelectItem>
+                            }
+                        </MudSelect>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Label="Amount" @bind-Value="@expenseInputForm.Amount" For="@(() => expenseInputForm.Amount)" Class="mb-3"/>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudDatePicker Label="Date" @bind-Date="@expenseInputForm.PaidDate" Placeholder="@dateTimeFormat"
+                            For="@(() => expenseInputForm.PaidDate)" DateFormat="@dateTimeFormat" DisableToolbar="true"/>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="12">
+                            <MudSelect Label="Category" @bind-Value="@expenseInputForm.ExpenseGroupId" For="@(() => expenseInputForm.ExpenseGroupId)"
+                                Class="mb-3" AnchorOrigin="Origin.BottomCenter">
+                                <MudSelectItem Value="@(Guid.Empty)">Select a category</MudSelectItem>
+                                @foreach (var group in expenseGroups)
+                                {
+                                <MudSelectItem Value="@(group.Id)">
+                                    <img src="@group.Icon.IconUrl" height="24" width="24" class="mr-2" />
+                                    @group.Name
+                                </MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="12">
+                            <MudSelect Label="Payment Type" @bind-Value="@expenseInputForm.PaymentMethod" For="@(() => expenseInputForm.PaymentMethod)"
+                                Class="mb-3" AnchorOrigin="Origin.BottomCenter">
+                                @foreach (PaymentMethod payMethod in Enum.GetValues(typeof(PaymentMethod)))
+                                {
+                                <MudSelectItem Value="@(payMethod)">@payMethod</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="12">
+                            <MudTextField Label="Note" Variant="Variant.Outlined" @bind-Value="@expenseInputForm.Description" For="@(() => expenseInputForm.Description)" Lines="3" />
+                        </MudItem>
+
+                        <MudItem xs="12" sm="12">
+                            <MudText>Upload receipts/invoices</MudText>
+                            @{
+                                var files = expenseInputForm.Attachments.Select(x => new FileUploaderFile(x.Name, x.FileName)).ToArray();
+                                <FileUploader @ref="@fileUploader" IsUploading="@isUploading" Files="@files" OnRemove="@FileRemoveHandler"
+                                    MaxFileSize="@maxFileSize" MaxFileSizeText="@maxFileSizeText" AllowExtensions="@allowExtensions"
+                                    OnUpload=@(() => isModified = true)
+                                    />
+                            }
+                        </MudItem>
+
+                        <MudCheckBox @bind-Checked="@expenseInputForm.IsTaxable" Label="Mark as Taxable" For=@(() => expenseInputForm.IsTaxable) />
+                    </MudGrid>
+                    @if(!isNew) {
+                        <MudButton Type="button" Variant="Variant.Outlined" Color="@Color.Default" Class="mt-3 mr-3" OnClick="@OnCancel">
+                        Cancel</MudButton>
+                    }
+                    <AppButton Type="submit" Text="Save" Color="@Color.Primary" IsLoading="@isSubmitting"
+                        IsDisabled="@(!((formContext.IsModified() || isModified) && formContext.Validate()))" Class="mt-3" />
+                </EditForm>
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle2">Please add an income before adding an expense. 
+                        <a href="./income/new">Add Income</a>
+                    </MudText>
+                }
             </MudContainer>
-        </MudCardContent>       
+        </MudCardContent>
     </MudCard>
 </MudContainer>
 
@@ -29,6 +127,7 @@
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
     [Inject] IMapper Mapper { get; set; }
+    [Inject] IFileUploadFactory FileUploadFactory { get; set; }
 
     [CascadingParameter]
     public UserDto AuthUser { get; set; } = default;
@@ -43,11 +142,24 @@
     private bool isSubmitting;
     private bool isModified;
 
+    private InputFile inputFile;
+
     private ExpenseInputModel expenseInputForm = new ExpenseInputModel();
     private List<BudgetJarDto> budgetJars =  new List<BudgetJarDto>();
+    private List<ExpenseGroupDto> expenseGroups =  new List<ExpenseGroupDto>();
+
+    private bool isLoading;
+    private FileUploader fileUploader;
+    private bool isUploading;
+    private CancellationTokenSource cts = new();
+
+    private long maxFileSize = 5 * 1024 * 1024 ;
+    private string maxFileSizeText = "5MB";
+    private string[] allowExtensions = new[] { ".png", ".jpg", ".jpeg", ".pdf", ".docx", ".doc", ".txt" };
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         if (AuthUser == null)
         {
             throw new AuthenticationException();
@@ -61,20 +173,125 @@
         cultureInfo = AuthUser.CultureInfo;
         dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
 
+        budgetJars = await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id));
+        expenseGroups = await Mediator.Send(new GetExpenseGroupsQuery(false, AuthUser.Id));
+        var systemExpenseGroups = await Mediator.Send(new GetExpenseGroupsQuery(true));
+        expenseGroups.AddRange(systemExpenseGroups);
+        expenseGroups = expenseGroups.DistinctBy(x => x.Name).ToList();
+
         if (Id.Equals("new", StringComparison.InvariantCultureIgnoreCase))
         {
             isNew = true;
             expenseInputForm = new ExpenseInputModel(AuthUser);
+            expenseInputForm.BudgetJarId = budgetJars.FirstOrDefault()?.Id ?? Guid.Empty;
+            expenseInputForm.ExpenseGroupId = expenseGroups.FirstOrDefault()?.Id ?? Guid.Empty;
 
         } else if (Guid.TryParse(Id, out incomeId))
         {
             isNew = false;
+            var expense = await Mediator.Send(new GetExpenseById(AuthUser.Id, incomeId, AuthUser.TimeZone));
+            if (expense == null)
+            {
+                throw new InvalidOperationException("Expense is not found");
+            }
+            expenseInputForm = new ExpenseInputModel(AuthUser, expense);
         } else
         {
             throw new InvalidOperationException("Invalid Id");
         }
+        isLoading = false;
+    }
 
+    private async Task SaveExpense()
+    {
+        if (expenseInputForm.Amount < 1) return;
 
+        isSubmitting = true;
+        var expense = expenseInputForm.ToExpenseDto(AuthUser.TimeZone);
+        var attachments = expense.Attachments.ToList();
+
+        // new files
+        var browserFiles = fileUploader.GetBrowserFiles();
+        if (browserFiles.Any())
+        {
+            isUploading = true;
+            StateHasChanged();
+            var newAttachments = await UploadAttachments(expense.Id, browserFiles);
+            attachments.AddRange(newAttachments);
+        }
+
+        var result = await Mediator.Send(new SaveExpenseRequest(expense, attachments));
+        if (result == Guid.Empty)
+        {
+            Snackbar.Clear();
+            Snackbar.Add("Something went wrong. Cannot save the expense. Please try again later.");
+            isSubmitting = false;
+            return;
+        }
+        NavigationManager.NavigateTo("/expenses");
+    }
+
+    private async Task<List<AttachmentDto>> UploadAttachments(Guid expenseId, List<IBrowserFile> browserFiles)
+    {
+        var fileUploadService = FileUploadFactory.GetFileUploadService();
+        fileUploadService.AllowExtensions = allowExtensions;
+        fileUploadService.MaxFileSize = maxFileSize;
+        var attachments = new List<AttachmentDto>();
+        foreach(var browserFile in browserFiles)
+        {
+            try
+            {
+                using (var fileStream = browserFile.OpenReadStream(fileUploadService.MaxFileSize)) {
+                    var fileName = browserFile.Name.SanitiseFileName();
+                    var fileUpload = new FileUploadRequest(fileStream, fileName);
+                    var saveFileName = Guid.NewGuid();
+                    var result = await fileUploadService.SaveAttachmentAsync(fileUpload, saveFileName.ToString(), cts.Token);
+                    if (result.Succeeded)
+                    {
+                        attachments.Add(new AttachmentDto()
+                        {
+                            ExpenseId = expenseId,
+                            Id = saveFileName,
+                            Name = fileName,
+                            FileName = result.FileName,
+                            FileSize = result.FileSize
+                        });
+                    }
+                }
+            }
+            catch(Exception)
+            {
+                // TODO: add log
+                // ignored
+            }
+        }
+        return attachments;
+    }
+
+    private void FileRemoveHandler(FileUploaderFile file)
+    {
+        expenseInputForm.Attachments = expenseInputForm.Attachments.Where(x => x.FileName != file.FileName).ToArray();
+        isModified = true;
+        StateHasChanged();
+    }
+
+    private void OnCancel()
+    {
+        if (!cts.IsCancellationRequested)
+        {
+            cts.Cancel();
+            cts.Dispose();   
+        }
+        NavigationManager.NavigateTo("expenses");    
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (!cts.IsCancellationRequested)
+        {
+            cts.Cancel();
+            cts.Dispose();   
+        }
     }
 
     public class ExpenseInputModel
@@ -84,7 +301,6 @@
         public DateTime? PaidDate { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
-        public string Ref { get; set; }
         public bool IsTaxable { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 
@@ -95,12 +311,67 @@
 
         public ExpenseInputModel()
         {
-            
+            Attachments = Array.Empty<AttachmentDto>();
         }
 
         public ExpenseInputModel(UserDto user)
         {
-            
+            Id = Guid.Empty;
+            UserId = user.Id;
+            var now = DateTimeUtil.TimeZoneNow(user.TimeZone);
+            PaidDate = now;
+            Attachments = Array.Empty<AttachmentDto>();
+        }
+
+        public ExpenseInputModel(UserDto user, ExpenseDto expense)
+        {
+            Id = expense.Id;
+            UserId = expense.UserId;
+            PaidDate = expense.PaidDate;
+            Amount = expense.Amount;
+            Description = expense.Description;
+            IsTaxable = expense.IsTaxable;
+            PaymentMethod = expense.PaymentMethod;
+            BudgetJarId = expense.BudgetJarId;
+            ExpenseGroupId = expense.ExpenseGroupId;
+
+            Attachments = expense.Attachments.ToArray();
+        }
+
+        public ExpenseDto ToExpenseDto(string timeZone)
+        {
+            return new ExpenseDto()
+            {
+                Id = Id,
+                UserId = UserId,
+                Amount = Amount,
+                Description = Description,
+                PaidDate = DateTimeUtil.ToUtcDateTime(PaidDate.Value, timeZone),
+                PaymentMethod = PaymentMethod,
+                IsTaxable = IsTaxable,
+                BudgetJarId = BudgetJarId,
+                ExpenseGroupId = ExpenseGroupId,
+                Attachments = Attachments
+            };
+        }
+    }
+
+    public class ExpenseInputModelValidator : AbstractValidator<ExpenseInputModel>
+    {
+        public ExpenseInputModelValidator()
+        {
+            RuleFor(x => x.Amount).NotEmpty().WithMessage("Amount is required")
+            //.InclusiveBetween(1, 1000000)
+            .GreaterThanOrEqualTo(1).WithMessage("Amount must be greater than or equal to 1")
+            .LessThan(1000000).WithMessage("Amount must be less than 1000000");
+
+            RuleFor(x => x.PaidDate).NotEmpty().WithMessage("Date is required");
+
+            RuleFor(x => x.BudgetJarId).NotEmpty().WithMessage("Budget is requried")
+            .NotEqual(Guid.Empty).WithMessage("Budget is requried");
+
+            RuleFor(x => x.ExpenseGroupId).NotEmpty().WithMessage("Category is requried")
+            .NotEqual(Guid.Empty).WithMessage("Category is requried");
         }
     }
 }

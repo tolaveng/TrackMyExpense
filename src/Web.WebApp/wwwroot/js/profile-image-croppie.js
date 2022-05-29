@@ -88,27 +88,38 @@ window.createProfileImageDropZone = function (dropZoneElement, inputFile) {
         dropZoneElement.classList.remove('hover');
         dropZoneElement.classList.remove('error');
         
-        var files = e.dataTransfer.files;
-        if (!files || files.length < 1) return;
+        let files = [];
+        if (e.dataTransfer.items) {
+            for (var i = 0; i < e.dataTransfer.items.length; i++) {
+                // If dropped items aren't files, reject them
+                if (e.dataTransfer.items[i].kind === 'file') {
+                    files.push(e.dataTransfer.items[i].getAsFile())
+                }
+            }
+        } else {
+            files = e.dataTransfer.files;
+        }
 
+        if (files.length == 0) return;
         if (files.length > 1) {
             dropZoneElement.classList.add('error');
-            dropZoneElement.querySelector('#error-message').innerHTML = "Support only one image";
+            dropZoneElement.querySelector('#error-message').innerHTML = "Please drop only one image";
             return;
         }
-        var file = files[0];
+        // Get the first one
+        const file = files[0];
         if (allowFileExts.indexOf(file.type.toLowerCase()) < 0) {
             dropZoneElement.classList.add('error');
-            dropZoneElement.querySelector('#error-message').innerHTML = "Support image only";
+            dropZoneElement.querySelector('#error-message').innerHTML = "Support an image only";
             return;
         }
-        
         // Set the files property of the input element and raise the change event
-        inputFile.files = files;
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        inputFile.files = dt.files;
         const event = new Event('change', { bubbles: true });
         inputFile.dispatchEvent(event);
     }
-
 
     // Register all events
     dropZoneElement.addEventListener('dragenter', onDragHover);

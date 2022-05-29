@@ -13,8 +13,6 @@ namespace Core.Application.Models
         public decimal Amount { get; set; }
         public string Description { get; set; } = String.Empty;
         public DateTime PaidDate { get; set; }
-        public string Ref { get; set; } = String.Empty;
-        public string Payee { get; set; } = String.Empty;
         public bool IsTaxable { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 

@@ -10,8 +10,6 @@ namespace Core.Domain.Entities
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public DateTime PaidDate { get; set; }
-        public string Ref { get; set; }
-        public string Payee { get; set; }
         public bool IsTaxable { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 

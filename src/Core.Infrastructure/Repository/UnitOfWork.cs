@@ -18,6 +18,7 @@ namespace Core.Infrastructure.Repository
         private IGenericRepository<Subscription> _subscriptionRepository;
         private IGenericRepository<Income> _incomeRepository;
         private IGenericRepository<Expense> _expenseRepository;
+        private IGenericRepository<Attachment> _attachmentRepository;
         private IGenericRepository<ExpenseGroup> _expenseGroupRepository;
         private IGenericRepository<Icon> _iconRepository;
         private IGenericRepository<Currency> _currencyRepository;
@@ -34,6 +35,7 @@ namespace Core.Infrastructure.Repository
         public IGenericRepository<Subscription> SubscriptionRepository => _subscriptionRepository ??= new GenericRepository<Subscription>(_context);
         public IGenericRepository<Income> IncomeRepository => _incomeRepository ??= new GenericRepository<Income>(_context);
         public IGenericRepository<Expense> ExpenseRepository => _expenseRepository ??= new GenericRepository<Expense>(_context);
+        public IGenericRepository<Attachment> AttachmentRepository => _attachmentRepository ??= new GenericRepository<Attachment>(_context);
         public IGenericRepository<ExpenseGroup> ExpenseGroupRepository => _expenseGroupRepository ??= new GenericRepository<ExpenseGroup>(_context);
         public IGenericRepository<Icon> IconRepository => _iconRepository ??= new GenericRepository<Icon>(_context);
 

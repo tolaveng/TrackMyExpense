@@ -25,7 +25,7 @@ namespace Core.Application.Models
                 Path = icon.Path,
                 IconType = icon.IconType,
                 IsHidden = icon.IsHidden,
-                IconUrl = fileDirectoryProvider.ResolveIconUrl(icon.IconType, icon.Path)
+                IconUrl = fileDirectoryProvider.GetIconUrl(icon.IconType, icon.Path)
         };
         }
     }

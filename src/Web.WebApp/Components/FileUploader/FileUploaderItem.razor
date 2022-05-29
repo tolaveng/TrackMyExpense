@@ -1,24 +1,41 @@
 ﻿@using System.IO
-<div class=@($"fileUploader-item {GetClassName()}")>
+<div @key="@File.FileName" class=@($"fileUploader-item {GetClassName()}") @onclick="@OnImageClicked">
     <MudIconButton Class="fileUploader-item-icon" Icon="@Icons.Material.Filled.Close" Color="@Color.Error"
-        Size="Size.Small" aria-label="Remove" Title="Remove" OnClick="@RemoveClick" />
-    <span class="fileUploader-file-name">@FileName</span>
+        Size="Size.Small" aria-label="Remove" Title="Remove" OnClick="@OnRemoveClicked" />
+    <span class="fileUploader-file-name">@File.Name</span>
 </div>
 
 @code {
+    [Inject] IDialogService Dialog { get; set; }
+
     [Parameter]
-    public string FileName { get; set; }
+    public FileUploaderFile File  { get; set; }
+
+    [Parameter]
+    public EventCallback<FileUploaderFile> OnRemove { get; set; }
 
 
     private string GetClassName()
     {
-        if (string.IsNullOrEmpty(FileName)) return "";
-        var ext = Path.GetExtension(FileName).ToLowerInvariant().Replace(".", "-");
+        if (string.IsNullOrEmpty(File.FileName)) return "";
+        var ext = Path.GetExtension(File.FileName).ToLowerInvariant().Replace(".", "-");
         return $"fileUploader{ext}";
     }
 
-    private void RemoveClick()
+    private async Task OnRemoveClicked()
     {
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync(File);
+        }
+    }
 
+    private async Task OnImageClicked()
+    {
+        var parameters = new DialogParameters {
+            ["File"] = File,
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = Dialog.Show<FileUploaderPreviewDialog>(File.Name, parameters, options);
     }
 }

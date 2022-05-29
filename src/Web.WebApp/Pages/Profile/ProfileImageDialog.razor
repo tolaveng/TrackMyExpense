@@ -10,7 +10,7 @@
         <EditForm Model="@FileInputForm">
             <div id="profile-image-drop-zone" @ref="dropZoneElement" >
                 <span>Drag and drop an image here or </span><label for="select-file">Select an image</label> to upload <br />
-                <InputFile id="select-file" @ref="inputFile" OnChange="@InputFileHandler" hidden/>
+                <InputFile id="select-file" @ref="inputFile" OnChange="@InputFileHandler" style="visibility:hidden;" />
                 <span id="error-message"></span>
                 <div style="visibility: @(imageVisibility)">
                     <hr />
@@ -51,7 +51,7 @@
 
     private IBrowserFile browserFile = null;
     private long maxFileSize = 5 * 1024 * 1024;
-    private string maxFikeSizeText = "5MB";
+    private string maxFileSizeText = "5MB";
     private string[] allowExtensions = new[] { ".png", ".jpg", ".jpeg" };
 
     private bool isLoading = false;
@@ -93,7 +93,6 @@
         var fileUploadService = FileUploadFactory.GetFileUploadService();
         fileUploadService.AllowExtensions = allowExtensions;
         fileUploadService.MaxFileSize = maxFileSize;
-        //fileUploadService.UploadProgress += updateProgress;
 
         try
         {
@@ -123,7 +122,7 @@
             var dataReference = await JSRuntime.InvokeAsync<IJSStreamReference>("getProfileImageAsByteArray");
             if (dataReference.Length > maxFileSize)
             {
-                Snackbar.Add($"Support an image's size less than {maxFikeSizeText}.", Severity.Error);
+                Snackbar.Add($"Support an image's size less than {maxFileSizeText}.", Severity.Error);
                 return;
             }
 
@@ -188,7 +187,7 @@
         var file = e.File;
         if (file.Size > maxFileSize)
         {
-            Snackbar.Add($"Support an image's size less than {maxFikeSizeText}.", Severity.Error);
+            Snackbar.Add($"Support an image's size less than {maxFileSizeText}.", Severity.Error);
             return;
         }
 

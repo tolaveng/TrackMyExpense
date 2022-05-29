@@ -20,12 +20,19 @@
             @((MarkupString)string.Join("<br/>", invalidFiles));
         }
     </div>
-    @if (browserFiles.Any())
+    @if (browserFiles.Any() || Files.Any())
     {
         <div id="fileUploaderPreview">
-        @foreach(var file in browserFiles)
+        @* existing file *@
+        @foreach(var file in Files)
         {
-            <FileUploaderItem @key="@file.Name" FileName="@file.Name" OnRemove="@FileRemoveHandler" />
+            <FileUploaderItem @key="@file" File="@file" OnRemove="@FileRemoveHandler" />
+        }
+        @* new upload file *@
+        @foreach(var browserFile in browserFiles)
+        {
+            var file = new FileUploaderFile(browserFile.Name, browserFile.Name, browserFile);
+            <FileUploaderItem @key="@file.Name" File="@file" OnRemove="@FileRemoveHandler" />
         }
         </div>   
     }
@@ -45,6 +52,9 @@
     public bool IsUploading { get; set; }
 
     [Parameter]
+    public FileUploaderFile[] Files { get; set; }
+
+    [Parameter]
     public long MaxFileSize { get; set; } = 5 * 1024 * 1024 ;
 
     [Parameter]
@@ -52,6 +62,12 @@
 
     [Parameter]
     public string[] AllowExtensions { get; set; } = new[] { ".png", ".jpg", ".jpeg", ".pdf", ".docx", ".doc", ".txt" };
+
+    [Parameter]
+    public EventCallback<FileUploaderFile> OnRemove { get; set; }
+
+    [Parameter]
+    public EventCallback<IBrowserFile[]> OnUpload { get; set; }
 
     private string DragClass = string.Empty;
     private ElementReference dropZoneElement;
@@ -68,7 +84,7 @@
         return browserFiles;
     }
 
-    private void InputFileHandler(InputFileChangeEventArgs e)
+    private async void InputFileHandler(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(10);
         if (!files.Any()) return;
@@ -93,11 +109,20 @@
             browserFiles.Add(file);
         }
 
+        if (OnUpload.HasDelegate)
+        {
+            await OnUpload.InvokeAsync(browserFiles.ToArray());
+        }
     }
 
-    private void FileRemoveHandler(string fileName)
+    private async Task FileRemoveHandler(FileUploaderFile file)
     {
-        browserFiles = browserFiles.Where(x => x.Name != fileName).ToList();
+        browserFiles = browserFiles.Where(x => x.Name != file.FileName).ToList();
+
+        if (OnRemove.HasDelegate)
+        {
+            await OnRemove.InvokeAsync(file);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -118,5 +143,4 @@
             await dropZoneInstance.DisposeAsync();
         }
     }
-
 }

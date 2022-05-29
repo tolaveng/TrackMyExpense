@@ -98,7 +98,7 @@ namespace Core.Infrastructure.Repository
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _db.ToListAsync();
+            return await _db.AsNoTracking().ToListAsync();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> expression = null,

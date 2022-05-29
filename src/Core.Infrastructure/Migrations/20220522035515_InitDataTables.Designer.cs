@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220504094609_InitDataTables")]
+    [Migration("20220522035515_InitDataTables")]
     partial class InitDataTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,25 +30,24 @@ namespace Core.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ExpenseId")
+                    b.Property<Guid>("ExpenseId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("text");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
-                    b.Property<string>("Title")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ExpenseId");
 
-                    b.ToTable("Attachment");
+                    b.ToTable("Attachements");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.BudgetJar", b =>
@@ -212,17 +211,11 @@ namespace Core.Infrastructure.Migrations
                     b.Property<DateTime>("PaidDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Payee")
-                        .HasColumnType("text");
-
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("integer");
 
                     b.Property<int?>("RecurrentExpenseId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Ref")
-                        .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -1025,14 +1018,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "3afc0be9-9663-4a61-aef2-bf270d65733e",
+                            ConcurrencyStamp = "234fec98-4428-402c-8c72-4867b4476348",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "6e55f5a1-d4f9-4b69-94f0-6f25b7e7d701",
+                            ConcurrencyStamp = "4b37acea-085f-4792-abc0-3eedb571e4bd",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -1226,7 +1219,8 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Expense", null)
                         .WithMany("Attachments")
                         .HasForeignKey("ExpenseId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.BudgetJar", b =>
@@ -1234,7 +1228,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Icon", "Icon")
                         .WithMany()
                         .HasForeignKey("IconId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Icon");
@@ -1245,13 +1239,13 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.BudgetJar", "BudgetJar")
                         .WithMany()
                         .HasForeignKey("BudgetJarId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.ExpenseGroup", "ExpenseGroup")
                         .WithMany()
                         .HasForeignKey("ExpenseGroupId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("BudgetJar");
@@ -1264,7 +1258,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.Icon", "Icon")
                         .WithMany()
                         .HasForeignKey("IconId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Icon");
@@ -1275,13 +1269,13 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.BudgetJar", "BudgetJar")
                         .WithMany()
                         .HasForeignKey("BudgetJarId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.Income", "Income")
                         .WithMany("IncomeBudgetJars")
                         .HasForeignKey("IncomeId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("BudgetJar");
@@ -1294,13 +1288,13 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Domain.Entities.BudgetJar", "BudgetJar")
                         .WithMany()
                         .HasForeignKey("BudgetJarId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Core.Domain.Entities.ExpenseGroup", "ExpenseGroup")
                         .WithMany()
                         .HasForeignKey("ExpenseGroupId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("BudgetJar");
@@ -1313,7 +1307,7 @@ namespace Core.Infrastructure.Migrations
                     b.HasOne("Core.Infrastructure.Database.Identity.AppIdentityUser", null)
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

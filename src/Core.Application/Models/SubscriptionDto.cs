@@ -30,7 +30,7 @@ namespace Core.Application.Models
                 .When(x => x.SubscriptionType == SubscriptionType.Premium)
                 .WithMessage("Paid Amount must be greater than 0.");
             RuleFor(x => x.Begin).NotEmpty().WithMessage("Begin date cannot be empty");
-            RuleFor(x => x.End.Value).GreaterThanOrEqualTo(x => x.Begin)
+            RuleFor(x => x.End).GreaterThanOrEqualTo(x => x.Begin)
                 .When(x => x.End.HasValue)
                 .WithMessage("End date must be after the Begin date.");
         }

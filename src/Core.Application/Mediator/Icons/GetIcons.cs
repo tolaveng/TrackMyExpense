@@ -17,18 +17,16 @@ namespace Core.Application.Mediator.Icons
     {
         private readonly IMapper _mapper;
         public readonly IUnitOfWork _unitOfWork;
-        private readonly IFileDirectoryProvider _fileDirectoryProvider;
-        public GetIconsHandler(IMapper mapper, IUnitOfWork unitOfWork, IFileDirectoryProvider fileDirectoryProvider)
+        public GetIconsHandler(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-            _fileDirectoryProvider = fileDirectoryProvider;
         }
         public async Task<List<IconDto>> Handle(GetIconsQuery request, CancellationToken cancellationToken)
         {
             var repo = _unitOfWork.IconRepository;
-            var icons = await repo.GetAllAsync(z => z.Archived || !request.IncludeArchived,
-                z => z.OrderBy(o => o.IconType).ThenBy(o => o.Name));
+            var icons = await repo.GetAllAsync(x => x.Archived || !request.IncludeArchived,
+                x => x.OrderBy(o => o.IconType).ThenBy(o => o.Name));
             
             return _mapper.Map<List<IconDto>>(icons);
         }

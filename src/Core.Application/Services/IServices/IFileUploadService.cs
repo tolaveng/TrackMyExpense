@@ -29,5 +29,7 @@ namespace Core.Application.Services.IServices
         Task<bool> DeleteIconFileAsync(string filePath);
         Task<bool> DeleteProfileImageAsync(string imageName);
         Task<bool> DeleteProfileImageThumbnailAsync(string imageName);
+
+        Task<bool> DeleteAttachmentsAsync(string[] fileNames);
     }
 }

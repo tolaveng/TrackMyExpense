@@ -16,6 +16,7 @@ namespace Core.Application.IRepositories
         IGenericRepository<IncomeBudgetJar> IncomeBudgetJarRepository { get; }
         IGenericRepository<Income> IncomeRepository { get; }
         IGenericRepository<Expense> ExpenseRepository { get; }
+        IGenericRepository<Attachment> AttachmentRepository { get; }
         IGenericRepository<ExpenseGroup> ExpenseGroupRepository { get; }
         IGenericRepository<Icon> IconRepository { get; }
         IGenericRepository<Currency> CurrencyRepository { get; }

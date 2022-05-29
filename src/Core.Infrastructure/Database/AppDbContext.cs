@@ -28,6 +28,7 @@ namespace Core.Infrastructure.Database
         public DbSet<RecurrentExpense> RecurrentExpenses { get; set; }
         public DbSet<Icon> Icons { get; set; }
         public DbSet<Currency> Currencies { get; set; }
+        public DbSet<Attachment> Attachements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,19 +50,19 @@ namespace Core.Infrastructure.Database
 
             // Relationship:
             // https://docs.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key
-            modelBuilder.Entity<Expense>().HasMany(x => x.Attachments).WithOne().OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<Expense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<Expense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<Expense>().HasMany(x => x.Attachments).WithOne().OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Expense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Expense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Expense>().HasIndex(x => x.PaidDate);
             modelBuilder.Entity<IncomeBudgetJar>().HasKey(x => new { x.IncomeId, x.BudgetJarId });
-            modelBuilder.Entity<IncomeBudgetJar>().HasOne(x => x.Income).WithMany(x => x.IncomeBudgetJars).HasForeignKey(x => x.IncomeId).OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<IncomeBudgetJar>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<AppIdentityUser>().HasMany(x => x.Subscriptions).WithOne().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.SetNull);
-            modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<IncomeBudgetJar>().HasOne(x => x.Income).WithMany(x => x.IncomeBudgetJars).HasForeignKey(x => x.IncomeId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<IncomeBudgetJar>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<AppIdentityUser>().HasMany(x => x.Subscriptions).WithOne().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.BudgetJar).WithMany().HasForeignKey(x => x.BudgetJarId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<RecurrentExpense>().HasOne(x => x.ExpenseGroup).WithMany().HasForeignKey(x => x.ExpenseGroupId).OnDelete(DeleteBehavior.NoAction);
             
-            modelBuilder.Entity<ExpenseGroup>().HasOne(x => x.Icon);
-            modelBuilder.Entity<BudgetJar>().HasOne(x => x.Icon).WithMany().OnDelete(DeleteBehavior.SetNull);
+            modelBuilder.Entity<ExpenseGroup>().HasOne(x => x.Icon).WithMany().OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<BudgetJar>().HasOne(x => x.Icon).WithMany().OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Icon>().HasIndex(x => x.Name).IsUnique();
             
 

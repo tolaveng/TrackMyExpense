@@ -1,7 +1,8 @@
-﻿@page "/incomes"
+﻿@page "/expenses"
 @using AutoMapper
 @using Core.Application.Common
-@using Core.Application.Mediator.Incomes
+@using Core.Application.Mediator.Expenses
+@using Core.Application.Mediator.Icons
 @using Core.Application.Models
 @using Core.Application.Utils
 @using MediatR
@@ -9,40 +10,48 @@
 @using Web.WebApp.Components.Dialogs
 @attribute [Authorize]
 
-<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Incomes")" />
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Expenses")" />
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs>
-        <BreadcrumbsItem Icon="@Icons.Filled.AttachMoney" Title="Incomes"/>
+        <BreadcrumbsItem Icon="@Icons.Filled.Paid" Title="Expenses"/>
     </Breadcrumbs>
     <MudCard>
         <MudCardContent>
-            <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<IncomeDto>>>(ServerReload))"
+            <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<ExpenseDto>>>(ServerReload))"
         Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
         Loading="@loading" LoadingProgressColor="Color.Info"
-        T= "IncomeDto">
+        T= "ExpenseDto">
             <ToolBarContent>
                 <MudSpacer />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
-                    Add Income
+                    Add Expense
                 </MudButton>
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Begin" T="IncomeDto">Begin</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="End" T="IncomeDto">End</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Amount" T="IncomeDto">Amount</MudTableSortLabel></MudTh>
-                <MudTh>Note</MudTh>
+                <MudTh><MudTableSortLabel SortLabel="PaidDate" T="ExpenseDto">Date</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Jar" T="ExpenseDto">Jar</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Amount" T="ExpenseDto">Amount</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="ExpenseGroup" T="ExpenseDto">Category</MudTableSortLabel></MudTh>
+                <MudTh>Description</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Begin">@context.Begin.ToString(dateTimeFormat)</MudTd>
-                <MudTd DataLabel="End" HideSmall="@true">@context.End.ToString(dateTimeFormat)</MudTd>
+                <MudTd DataLabel="Date">@context.PaidDate.ToString(dateTimeFormat)</MudTd>
+                <MudTd DataLabel="Jar">
+                    <img src="@context.BudgetJar.Icon.IconUrl" height="24" width="24" class="mr-2" />
+                    @context.BudgetJar.Name
+                </MudTd>
                 <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
-                <MudTd DataLabel="Note" HideSmall="@true">
-                    @if(!string.IsNullOrWhiteSpace(context.Note) && context.Note.Length > 64)
+                <MudTd DataLabel="Category">
+                    <img src="@context.ExpenseGroup.Icon.IconUrl" height="24" width="24" class="mr-2" />
+                    @context.ExpenseGroup.Name
+                </MudTd>
+                <MudTd DataLabel="Description" HideSmall="@true">
+                    @if(!string.IsNullOrWhiteSpace(context.Description) && context.Description.Length > 64)
                     {
-                        @($"{context.Note.Substring(0, 64)}...")
+                        @($"{context.Description.Substring(0, 64)}...")
                     } else {
-                        @context.Note
+                        @context.Description
                     }
                 </MudTd>
                 <MudTd DataLabel="Actions">
@@ -81,7 +90,7 @@
     private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
     private string cultureInfo = DefaultConstants.DefaultCultureInfo;
 
-    private MudTable<IncomeDto> table;
+    private MudTable<ExpenseDto> table;
     private int TotalItems;
     private string searchString = null;
     private bool loading = true;
@@ -95,7 +104,7 @@
         base.OnInitialized();
     }
 
-    private async Task<TableData<IncomeDto>> ServerReload(TableState state)
+    private async Task<TableData<ExpenseDto>> ServerReload(TableState state)
     {
         if (AuthUser == null)
         {
@@ -106,43 +115,58 @@
         var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel,
             state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending);
 
-        var result = await Mediator.Send(new GetIncomesPaged(AuthUser.Id, timeZoneId, pagination));
+        var result = await Mediator.Send(new GetExpensesPaged(AuthUser.Id, timeZoneId, pagination));
         TotalItems = result.TotalCount;
+
+        // resovle icons
+        var iconIds = result.Data.Select(x => x.BudgetJar.IconId).ToList();
+        iconIds.AddRange(result.Data.Select(x => x.ExpenseGroup.IconId));
+        var icons = await Mediator.Send(new GetIconsByIds(iconIds));
+        var iconDictionary = icons.ToDictionary(x => x.Id);
+        foreach(var data in result.Data)
+        {
+            data.BudgetJar.Icon = iconDictionary.TryGetValue(data.BudgetJar.IconId, out var icon)
+            ? icon : new IconDto();
+
+            data.ExpenseGroup.Icon = iconDictionary.TryGetValue(data.ExpenseGroup.IconId, out var aIcon)
+            ? aIcon : new IconDto();
+        }
+
         loading = false;
-        return new TableData<IncomeDto>() {TotalItems = result.TotalCount, Items = result.Data};
+        return new TableData<ExpenseDto>() {TotalItems = result.TotalCount, Items = result.Data};
     }
 
     private void AddNew()
     {
-        NavigationManager.NavigateTo("/income/new");
+        NavigationManager.NavigateTo("/expense/new");
     }
 
-    private void EditRow(Guid incomeId)
+    private void EditRow(Guid id)
     {
-        NavigationManager.NavigateTo($"/income/{incomeId}");
+        NavigationManager.NavigateTo($"/expense/{id}");
     }
 
-    private async Task DeleteRow(Guid incomeId)
+    private async Task DeleteRow(Guid id)
     {
         var dialogParams = new DialogParameters() {
-            ["Message"] = "Are you sure you want to delete this income?",
+            ["Message"] = "Are you sure you want to delete this expense?",
             ["Color"] = Color.Error,
             ["PrimaryButtonText"] = "Delete"
         };
-        var dialog = Dialog.Show<ConfirmDialog>("Delete Income", dialogParams);
+        var dialog = Dialog.Show<ConfirmDialog>("Delete Expense", dialogParams);
         var result = await dialog.Result;
         if (result.Cancelled) return;
         try
         {
-            var deleted = await Mediator.Send(new DeleteIncome(incomeId));
+            var deleted = await Mediator.Send(new DeleteExpense(id));
             if (deleted)
             {
                 await table.ReloadServerData();
-                Snackbar.Add("Income has been deleted successfully.", Severity.Success);
+                Snackbar.Add("Expense has been deleted successfully.", Severity.Success);
             }
         } catch (Exception)
         {
-            Snackbar.Add("Sorry, cannot delete the income. Please try again later", Severity.Error);
+            Snackbar.Add("Sorry, cannot delete the expense. Please try again later", Severity.Error);
         }
     }
 }

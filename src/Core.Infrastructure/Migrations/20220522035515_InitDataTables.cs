@@ -148,8 +148,7 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_BudgetJars_Icons_IconId",
                         column: x => x.IconId,
                         principalTable: "Icons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -169,8 +168,7 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_ExpenseGroups_Icons_IconId",
                         column: x => x.IconId,
                         principalTable: "Icons",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -224,8 +222,7 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_Subscriptions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -329,14 +326,12 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_IncomeBudgetJars_BudgetJars_BudgetJarId",
                         column: x => x.BudgetJarId,
                         principalTable: "BudgetJars",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_IncomeBudgetJars_Incomes_IncomeId",
                         column: x => x.IncomeId,
                         principalTable: "Incomes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -348,8 +343,6 @@ namespace Core.Infrastructure.Migrations
                     Amount = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     PaidDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Ref = table.Column<string>(type: "text", nullable: true),
-                    Payee = table.Column<string>(type: "text", nullable: true),
                     IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
                     BudgetJarId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -368,14 +361,12 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_Expenses_BudgetJars_BudgetJarId",
                         column: x => x.BudgetJarId,
                         principalTable: "BudgetJars",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Expenses_ExpenseGroups_ExpenseGroupId",
                         column: x => x.ExpenseGroupId,
                         principalTable: "ExpenseGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -406,35 +397,33 @@ namespace Core.Infrastructure.Migrations
                         name: "FK_RecurrentExpenses_BudgetJars_BudgetJarId",
                         column: x => x.BudgetJarId,
                         principalTable: "BudgetJars",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_RecurrentExpenses_ExpenseGroups_ExpenseGroupId",
                         column: x => x.ExpenseGroupId,
                         principalTable: "ExpenseGroups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Attachment",
+                name: "Attachements",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ExpenseId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    Title = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    Url = table.Column<string>(type: "text", nullable: true),
-                    ExpenseId = table.Column<Guid>(type: "uuid", nullable: true)
+                    FileName = table.Column<string>(type: "text", nullable: true),
+                    FileSize = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Attachment", x => x.Id);
+                    table.PrimaryKey("PK_Attachements", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Attachment_Expenses_ExpenseId",
+                        name: "FK_Attachements_Expenses_ExpenseId",
                         column: x => x.ExpenseId,
                         principalTable: "Expenses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -486,8 +475,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "6e55f5a1-d4f9-4b69-94f0-6f25b7e7d701", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "3afc0be9-9663-4a61-aef2-bf270d65733e", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "4b37acea-085f-4792-abc0-3eedb571e4bd", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "234fec98-4428-402c-8c72-4867b4476348", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -530,8 +519,8 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Attachment_ExpenseId",
-                table: "Attachment",
+                name: "IX_Attachements_ExpenseId",
+                table: "Attachements",
                 column: "ExpenseId");
 
             migrationBuilder.CreateIndex(
@@ -626,7 +615,7 @@ namespace Core.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Attachment");
+                name: "Attachements");
 
             migrationBuilder.DropTable(
                 name: "Currencies");

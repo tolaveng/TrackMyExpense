@@ -2,11 +2,7 @@
 using Core.Application.Settings;
 using Core.Domain.Enums;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Core.Application.Providers
 {
@@ -17,6 +13,11 @@ namespace Core.Application.Providers
         public FileDirectoryProvider(IOptions<FileUploadSetting> options)
         {
             FileUploadSetting = options.Value;
+        }
+
+        public string GetAssetFileUrl(string fileName, string baseUri)
+        {
+            return $"{baseUri}/assets/{fileName}";
         }
 
         public string GetUploadDirectory(string[] subDirectories)
@@ -54,7 +55,7 @@ namespace Core.Application.Providers
             return GetUploadDirectory(new string[] { "ProfileImages", "Thumbnails" });
         }
 
-        public string ResolveDirectoryUrl(string[] subDirectories, string baseUri)
+        public string GetUploadDirectoryUrl(string[] subDirectories, string baseUri)
         {
             var url = FileUploadSetting.UploadWebUrl;
             if (!string.IsNullOrEmpty(baseUri))
@@ -70,30 +71,44 @@ namespace Core.Application.Providers
             return $"{url}/";
         }
 
-        public string ResolveIconUrl(IconType iconType, string path)
+        public string GetIconUrl(IconType iconType, string path)
         {
             if (string.IsNullOrEmpty(path)) return "";
 
             return iconType switch
             {
-                IconType.Upload => $"{ResolveDirectoryUrl(new[] { "icons" }, string.Empty)}{path}",
+                IconType.Upload => $"{GetUploadDirectoryUrl(new[] { "icons" }, string.Empty)}{path}",
                 _ => path,
             };
         }
 
-        public string ResolveProfileImageUrl(string fileName, string baseUri)
+        public string GetProfileImageUrl(string fileName, string baseUri)
         {
             if (string.IsNullOrEmpty(fileName)) return string.Empty;
 
             fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
-            return $"{ResolveDirectoryUrl(new[] { "profileimages" }, baseUri)}{fileName}";
+            return $"{GetUploadDirectoryUrl(new[] { "profileimages" }, baseUri)}{fileName}";
         }
-        public string ResolveProfileImageThumbnailUrl(string fileName, string baseUri)
+
+        public string GetProfileImageThumbnailUrl(string fileName, string baseUri)
         {
             if (string.IsNullOrEmpty(fileName)) return string.Empty;
 
             fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
-            return $"{ResolveDirectoryUrl(new[] { "profileimages", "thumbnails" }, baseUri)}{fileName}";
+            return $"{GetUploadDirectoryUrl(new[] { "profileimages", "thumbnails" }, baseUri)}{fileName}";
+        }
+
+        public string GetAttachmentDirectory()
+        {
+            return GetUploadDirectory(new string[] { "Attachments" });
+        }
+
+        public string GetAttachmentUrl(string fileName, string baseUri)
+        {
+            if (string.IsNullOrEmpty(fileName)) return string.Empty;
+
+            fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
+            return $"{GetUploadDirectoryUrl(new[] { "attachments" }, baseUri)}{fileName}";
         }
     }
 }
