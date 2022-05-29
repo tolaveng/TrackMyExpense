@@ -29,7 +29,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<None Include="$(SolutionDir)src\Assets\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" LinkBase="Assets\" />
+		<None Include="$(SolutionDir)src\StaticFiles\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" LinkBase="StaticFiles\" />
 	</ItemGroup>
 	
 </Project>

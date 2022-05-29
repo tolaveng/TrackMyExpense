@@ -197,6 +197,15 @@ namespace Web.WebApp
                 });
             }
 
+            // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-6.0
+            var runDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            app.UseStaticFiles(new StaticFileOptions
+            {
+
+                FileProvider = new PhysicalFileProvider(Path.Combine(runDir, "StaticFiles")),
+                RequestPath = "/staticfiles"
+            });
+
             app.UseRouting();
             app.UseCookiePolicy();
             app.UseAuthentication();
