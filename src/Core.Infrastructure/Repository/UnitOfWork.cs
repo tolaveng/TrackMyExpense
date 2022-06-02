@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Infrastructure.Repository
 {
+    // The Repository and Unit of Work Patterns
+    // https://docs.microsoft.com/en-us/aspnet/mvc/overview/older-versions/getting-started-with-ef-5-using-mvc-4/implementing-the-repository-and-unit-of-work-patterns-in-an-asp-net-mvc-application
+
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
