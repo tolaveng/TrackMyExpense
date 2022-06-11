@@ -18,6 +18,8 @@ namespace Core.Tests.Repositories
             mock.Setup(x => x.ExpenseRepository).Returns(ExpenseRepositoryMock.GetRepository().Object);
             mock.Setup(x => x.BudgetJarRepository).Returns(BudgetJarRepositoryMock.GetRepository().Object);
             mock.Setup(x => x.AttachmentRepository).Returns(AttachmentRepositoryMock.GetRepository().Object);
+            mock.Setup(x => x.IncomeRepository).Returns(IncomeRepositoryMock.GetRepository().Object);
+            mock.Setup(x => x.IncomeBudgetJarRepository).Returns(IncomeBudgetJarRepositoryMock.GetRepository().Object);
 
             return mock;
         }

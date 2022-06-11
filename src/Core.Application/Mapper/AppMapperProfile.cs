@@ -48,6 +48,11 @@ namespace Core.Application.Mapper
             }
             destination.IconUrl = _fileDirectoryProvider.GetIconUrl(source.IconType, source.Path);
         }
+
+        public SetIconWebUrl()
+        {
+            // need by auto mapper
+        }
     }
 
     // Resove Profile Image

@@ -16,10 +16,10 @@ namespace Core.Tests.Repositories
         {
             var expenses = new List<Expense>();
             expenses.Add(new Expense() {
-                Id = Guid.Parse("4B3F4C32-3DDD-4A67-BC24-B725B8883274"),
+                Id = ConstantMock.ExpenseId,
                 Amount = 25,
                 Description = "Test expense",
-                BudgetJarId = Guid.Parse("BCA42767-831C-43A4-A3AC-9ECBC74A223F"), // see budget jar mock
+                BudgetJarId = ConstantMock.BudgetJarId1
             });
 
             var repo = new Mock<IGenericRepository<Expense>>();

@@ -18,27 +18,31 @@ namespace Core.Tests.Repositories
 
             var icon = new Icon()
             {
-                Id = Guid.Parse("CFC2D349-BBAA-4228-8B0C-8CF91714070B"),
+                Id = ConstantMock.IconId,
                 Name = "Icon1",
                 Path = ""
             };
-
+            // Total balances comes from income mock
             budgetJars.Add(new BudgetJar()
             {
-                Id = Guid.Parse("BCA42767-831C-43A4-A3AC-9ECBC74A223F"),
+                UserId = ConstantMock.UserId,
+                Id = ConstantMock.BudgetJarId1,
                 Name = "BudgetJar1",
                 Icon = icon,
                 IconId = icon.Id,
-                TotalBalance = 100
+                TotalBalance = 140,
+                Percentage = 70,
             });
 
             budgetJars.Add(new BudgetJar()
             {
-                Id = Guid.Parse("C7F0319A-719F-4A0D-872B-96E4FD2CC6F2"),
+                UserId = ConstantMock.UserId,
+                Id = ConstantMock.BudgetJarId2,
                 Name = "BudgetJar2",
                 Icon = icon,
                 IconId = icon.Id,
-                TotalBalance = 50
+                TotalBalance = 60,
+                Percentage = 30,
             });
 
 
@@ -46,15 +50,25 @@ namespace Core.Tests.Repositories
 
             repo.Setup(x => x.GetAllAsync()).ReturnsAsync(budgetJars);
 
+            repo.Setup(x => x.GetAllAsync(It.IsAny<Expression<Func<BudgetJar, bool>>>(),
+                It.IsAny<Func<IQueryable<BudgetJar>, IOrderedQueryable<BudgetJar>>?>(),
+                It.IsAny<string[]?>()))
+                .Returns((Expression<Func<BudgetJar, bool>> expression,
+                Func<IQueryable<BudgetJar>, IOrderedQueryable<BudgetJar>> ? orderBy,
+                string[]? includes) =>
+                {
+                    return Task.FromResult(budgetJars.Where(expression.Compile().Invoke));
+                });
+
             repo.Setup(x => x.GetAsync(It.IsAny<Expression<Func<BudgetJar, bool>>>(), It.IsAny<string[]?>()))
-                .Returns( async (Expression<Func<BudgetJar, bool>> expression, string[]? includes) =>
+                .Returns(async (Expression<Func<BudgetJar, bool>> expression, string[]? includes) =>
                 {
                     var jar = budgetJars.FirstOrDefault(expression.Compile().Invoke);
                     if (jar == null) throw new ArgumentException("Budget jar not found.");
                     return await Task.FromResult(jar);
                 });
 
-            
+
             repo.Setup(x => x.Update(It.IsAny<BudgetJar>())).Returns((BudgetJar budgetJar) =>
             {
                 var jar = budgetJars.Single(x => x.Id == budgetJar.Id);

@@ -4,9 +4,7 @@ using Core.Application.Mapper;
 using Core.Application.Mediator.Expenses;
 using Core.Application.Models;
 using Core.Application.Services.IServices;
-using Core.Domain.Entities;
 using Core.Tests.Repositories;
-using MediatR;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -48,8 +46,8 @@ namespace Core.Tests.Expenses
             var expense = new ExpenseDto()
             {
                 Id = Guid.Empty,
-                BudgetJarId = Guid.Parse("BCA42767-831C-43A4-A3AC-9ECBC74A223F"), // see budgetjar mock
-                
+                BudgetJarId = ConstantMock.BudgetJarId1,
+
                 Attachments = new List<AttachmentDto>(),
                 Amount = 50,
                 Description = "Test",
@@ -62,14 +60,14 @@ namespace Core.Tests.Expenses
             var budgetJar = await _unitOfWorkMock.Object.BudgetJarRepository.GetAsync(x => x.Id == expense.BudgetJarId);
 
             Assert.NotEqual(Guid.Empty, guid);
-            Assert.Equal(50, budgetJar.TotalBalance);
+            Assert.Equal(90, budgetJar.TotalBalance); // 140 - 50
         }
 
         [Fact]
         public async void SaveExpense_Should_Save_Existing()
         {
             var expense = await _unitOfWorkMock.Object.ExpenseRepository
-                .GetAsync(x => x.Id == Guid.Parse("4B3F4C32-3DDD-4A67-BC24-B725B8883274"));
+                .GetAsync(x => x.Id == ConstantMock.ExpenseId);
             if (expense == null) throw new ArgumentNullException("Expense not found");
 
             var attachments = await _unitOfWorkMock.Object.AttachmentRepository.GetAllAsync(x => x.ExpenseId == expense.Id);
@@ -87,14 +85,14 @@ namespace Core.Tests.Expenses
             Assert.NotEqual(Guid.Empty, guid);
             Assert.NotNull(updatedExpense);
             Assert.Equal(updatedExpense.ExpenseGroupId, Guid.Parse("12B8589B-6647-43C8-859C-0AD6BFD8F967"));
-            Assert.Equal(100, budgetJar.TotalBalance);
+            Assert.Equal(140, budgetJar.TotalBalance);
         }
 
         [Fact]
         public async void SaveExpense_Should_Save_Existing_Update_Amount()
         {
             var expense = await _unitOfWorkMock.Object.ExpenseRepository
-                .GetAsync(x => x.Id == Guid.Parse("4B3F4C32-3DDD-4A67-BC24-B725B8883274"));
+                .GetAsync(x => x.Id == ConstantMock.ExpenseId);
             if (expense == null) throw new ArgumentNullException("Expense not found");
 
             var attachments = await _unitOfWorkMock.Object.AttachmentRepository.GetAllAsync(x => x.ExpenseId == expense.Id);
@@ -112,14 +110,14 @@ namespace Core.Tests.Expenses
             Assert.NotEqual(Guid.Empty, guid);
             Assert.NotNull(updatedExpense);
             Assert.Equal(50, updatedExpense.Amount);
-            Assert.Equal(75, budgetJar.TotalBalance); // 100 + 25 - 50
+            Assert.Equal(115, budgetJar.TotalBalance); // 140 + 25 - 50
         }
 
         [Fact]
-        public async void SaveExpense_Should_Save_Existing_Update_BudgetJar()
+        public async void SaveExpense_Should_Save_Existing_Swap_BudgetJar()
         {
             var expense = await _unitOfWorkMock.Object.ExpenseRepository
-                .GetAsync(x => x.Id == Guid.Parse("4B3F4C32-3DDD-4A67-BC24-B725B8883274"));
+                .GetAsync(x => x.Id == ConstantMock.ExpenseId);
             if (expense == null) throw new ArgumentNullException("Expense not found");
 
             var attachments = await _unitOfWorkMock.Object.AttachmentRepository.GetAllAsync(x => x.ExpenseId == expense.Id);
@@ -127,7 +125,7 @@ namespace Core.Tests.Expenses
 
             var oldBudgetJarId = expense.BudgetJarId;
             var expenseDto = _mapper.Map<ExpenseDto>(expense);
-            expenseDto.BudgetJarId = Guid.Parse("C7F0319A-719F-4A0D-872B-96E4FD2CC6F2");
+            expenseDto.BudgetJarId = ConstantMock.BudgetJarId2;
 
             var request = new SaveExpenseRequest(expenseDto, attachmentsDto);
             var guid = await _handler.Handle(request, CancellationToken.None);
@@ -136,17 +134,19 @@ namespace Core.Tests.Expenses
             var newBudgetJar = await _unitOfWorkMock.Object.BudgetJarRepository.GetAsync(x => x.Id == expenseDto.BudgetJarId);
             var updatedExpense = await _unitOfWorkMock.Object.ExpenseRepository.GetAsync(x => x.Id == expenseDto.Id);
 
+            // expens 25 in jar 1 => jar 2
+
             Assert.NotEqual(Guid.Empty, guid);
             Assert.NotNull(updatedExpense);
-            Assert.Equal(125, oldBudgetJar.TotalBalance); // 100 + 25
-            Assert.Equal(25, newBudgetJar.TotalBalance); // 50 - 25
+            Assert.Equal(165, oldBudgetJar.TotalBalance); // 140 + 25
+            Assert.Equal(35, newBudgetJar.TotalBalance); // 60 - 25
         }
 
         [Fact]
         public async void SaveExpense_Should_Save_Existing_Update_BudgetJar_Amount()
         {
             var expense = await _unitOfWorkMock.Object.ExpenseRepository
-                .GetAsync(x => x.Id == Guid.Parse("4B3F4C32-3DDD-4A67-BC24-B725B8883274"));
+                .GetAsync(x => x.Id == ConstantMock.ExpenseId);
             if (expense == null) throw new ArgumentNullException("Expense not found");
 
             var attachments = await _unitOfWorkMock.Object.AttachmentRepository.GetAllAsync(x => x.ExpenseId == expense.Id);
@@ -154,7 +154,7 @@ namespace Core.Tests.Expenses
 
             var oldBudgetJarId = expense.BudgetJarId;
             var expenseDto = _mapper.Map<ExpenseDto>(expense);
-            expenseDto.BudgetJarId = Guid.Parse("C7F0319A-719F-4A0D-872B-96E4FD2CC6F2");
+            expenseDto.BudgetJarId = ConstantMock.BudgetJarId2;
             expenseDto.Amount = 30;
 
             var request = new SaveExpenseRequest(expenseDto, attachmentsDto);
@@ -166,8 +166,8 @@ namespace Core.Tests.Expenses
 
             Assert.NotEqual(Guid.Empty, guid);
             Assert.NotNull(updatedExpense);
-            Assert.Equal(125, oldBudgetJar.TotalBalance); // 100 + 25
-            Assert.Equal(20, newBudgetJar.TotalBalance); // 50 - 30
+            Assert.Equal(165, oldBudgetJar.TotalBalance); // 140 + 25
+            Assert.Equal(30, newBudgetJar.TotalBalance); // 60 - 30
         }
     }
 }
