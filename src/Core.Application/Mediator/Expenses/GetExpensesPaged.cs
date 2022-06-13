@@ -6,6 +6,7 @@ using Core.Application.Utils;
 using Core.Domain.Entities;
 using MediatR;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Core.Application.Mediator.Expenses
 {
@@ -15,11 +16,14 @@ namespace Core.Application.Mediator.Expenses
         public Guid UserId { get; set; }
         public Pagination Pagination { get; set; } = new Pagination();
 
-        public GetExpensesPaged(Guid userId, string timeZoneId, Pagination pagination)
+        public ExpenseFilter? Filter { get; set; }
+
+        public GetExpensesPaged(Guid userId, string timeZoneId, Pagination pagination, ExpenseFilter? filter = null)
         {
             TimeZoneId = timeZoneId;
             UserId = userId;
             Pagination = pagination;
+            Filter = filter;
         }
     }
 
@@ -47,8 +51,8 @@ namespace Core.Application.Mediator.Expenses
 
                 case "BudgetJar":
                     orderBy = request.Pagination.SortDirection == Pagination.Ascending
-                    ? orderBy = x => x.OrderBy(z => z.BudgetJarId)
-                    : orderBy = x => x.OrderByDescending(z => z.BudgetJarId); // TODO: sort by string
+                    ? orderBy = x => x.OrderBy(z => z.BudgetJar.Name)
+                    : orderBy = x => x.OrderByDescending(z => z.BudgetJar.Name);
                     break;
 
                 case "Amount":
@@ -56,9 +60,33 @@ namespace Core.Application.Mediator.Expenses
                     ? orderBy = x => x.OrderBy(z => z.Amount)
                     : orderBy = x => x.OrderByDescending(z => z.Amount);
                     break;
+
+                case "ExpenseGroup":
+                    orderBy = request.Pagination.SortDirection == Pagination.Ascending
+                    ? orderBy = x => x.OrderBy(z => z.ExpenseGroup.Name)
+                    : orderBy = x => x.OrderByDescending(z => z.ExpenseGroup.Name);
+                    break;
             }
 
-            Expression<Func<Expense, bool>> expression = (z) => z.UserId == request.UserId && !z.Archived;
+            Expression<Func<Expense, bool>> expression = x => x.UserId == request.UserId && !x.Archived;
+
+            if (request.Filter != null)
+            {
+                var properties = typeof(ExpenseFilter).GetProperties();
+                foreach (var prop in properties)
+                {
+                    if (prop == null || prop == default) continue;
+                    var value = prop.GetValue(request.Filter, null);
+                    if (value == null) continue;
+
+                    var predicate = GetPredicate(prop.Name, value);
+                    if (predicate != null)
+                    {   
+                        expression = LinqUtil.AndAlso(expression, predicate);
+                    }
+                }
+            }
+
             var count = await _unitOfWork.ExpenseRepository.CountAsync(expression);
             var data = await _unitOfWork.ExpenseRepository.GetPagedAsync(request.Pagination.Page, request.Pagination.PageSize,
                 expression, orderBy, new []{"BudgetJar", "ExpenseGroup" });
@@ -67,6 +95,55 @@ namespace Core.Application.Mediator.Expenses
                 item.PaidDate = DateTimeUtil.ToTimeZoneDateTime(item.PaidDate, request.TimeZoneId);
             }
             return new PagedResponse<ExpenseDto>(_mapper.Map<IEnumerable<ExpenseDto>>(data), count);
+        }
+
+        private Expression<Func<Expense, bool>>? GetPredicate(string Name, object Value)
+        {
+            switch (Name)
+            {
+                case "PaidDate":
+                    if (Value is DateTime paidDate)
+                    {
+                        return x =>
+                            x.PaidDate >= paidDate.StartOfDayUtc() && x.PaidDate <= paidDate.EndOfDayUtc();
+                    }
+                    break;
+
+                case "BudgetJarId":
+                    if (Value is Guid budgetJarId && budgetJarId != Guid.Empty)
+                    {
+                        return x => x.BudgetJarId == budgetJarId;
+                    }
+                    break;
+
+                case "ExpenseGroupId":
+                    if (Value is Guid expenseGroupId && expenseGroupId != Guid.Empty) {
+                        return x => x.ExpenseGroupId == expenseGroupId;
+                    }
+                    break;
+
+                case "Description":
+                    if (Value is string description && !string.IsNullOrWhiteSpace(description))
+                    {
+                        return x => x.Description.ToLower().Contains(description.ToLower());
+                    }
+                    break;
+
+                case "MinAmount":
+                    if (Value is decimal minAmount && minAmount > -1)
+                    {
+                        return x => x.Amount >= minAmount;
+                    }
+                    break;
+
+                case "MaxAmount":
+                    if (Value is decimal maxAmount && maxAmount > -1)
+                    {
+                        return x => x.Amount <= maxAmount;
+                    }
+                    break;
+            }
+            return null;
         }
     }
 }

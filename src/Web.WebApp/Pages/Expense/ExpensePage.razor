@@ -8,6 +8,7 @@
 @using MediatR
 @using System.Security.Authentication
 @using Web.WebApp.Components.Dialogs
+@using static Web.WebApp.Pages.Expense.ExpenseFilterSelector
 @attribute [Authorize]
 
 <SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Expenses")" />
@@ -22,14 +23,15 @@
         Loading="@loading" LoadingProgressColor="Color.Info"
         T= "ExpenseDto">
             <ToolBarContent>
-                <MudSpacer />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
                     Add Expense
                 </MudButton>
+                <MudSpacer />
+                <ExpenseFilterSelector Filter="@filter" OnFilterChanged="@OnFilterChanged" />
             </ToolBarContent>
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortLabel="PaidDate" T="ExpenseDto">Date</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="Jar" T="ExpenseDto">Jar</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="BudgetJar" T="ExpenseDto">Jar</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Amount" T="ExpenseDto">Amount</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="ExpenseGroup" T="ExpenseDto">Category</MudTableSortLabel></MudTh>
                 <MudTh>Description</MudTh>
@@ -95,6 +97,8 @@
     private string searchString = null;
     private bool loading = true;
 
+    private ExpenseFilter filter = new ExpenseFilter();
+
     protected override void OnInitialized()
     {
         timeZoneId = AuthUser.TimeZone;
@@ -115,7 +119,7 @@
         var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel,
             state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending);
 
-        var result = await Mediator.Send(new GetExpensesPaged(AuthUser.Id, timeZoneId, pagination));
+        var result = await Mediator.Send(new GetExpensesPaged(AuthUser.Id, timeZoneId, pagination, filter));
         TotalItems = result.TotalCount;
 
         // resovle icons
@@ -166,7 +170,13 @@
             }
         } catch (Exception)
         {
-            Snackbar.Add("Sorry, cannot delete the expense. Please try again later", Severity.Error);
+            Snackbar.Add("Something went wrong. Please try again later", Severity.Error);
         }
+    }
+
+    private async Task OnFilterChanged(ExpenseFilter aFilter)
+    {
+        filter = aFilter;
+        await table.ReloadServerData();
     }
 }

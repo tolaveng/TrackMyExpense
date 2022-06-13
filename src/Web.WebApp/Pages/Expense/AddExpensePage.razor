@@ -47,14 +47,14 @@
                             {
                             <MudSelectItem Value="@(budgetJar.Id)">
                                 <img src="@budgetJar.Icon.IconUrl" height="24" width="24" class="mr-2" />
-                                @budgetJar.Name
+                                @budgetJar.Name - Balance: @(CurrencyUtil.Formatted(budgetJar.TotalBalance, cultureInfo))
                             </MudSelectItem>
                             }
                         </MudSelect>
                         </MudItem>
 
                         <MudItem xs="12" sm="6">
-                            <MudTextField Label="Amount" @bind-Value="@expenseInputForm.Amount" For="@(() => expenseInputForm.Amount)" Class="mb-3"/>
+                            <MudTextField Label="Amount" @bind-Value="@expenseInputForm.Amount" For="@(() => expenseInputForm.Amount)" MaxLength="10" Class="mb-3"/>
                         </MudItem>
 
                         <MudItem xs="12" sm="6">
@@ -87,7 +87,7 @@
                         </MudItem>
 
                         <MudItem xs="12" sm="12">
-                            <MudTextField Label="Note" Variant="Variant.Outlined" @bind-Value="@expenseInputForm.Description" For="@(() => expenseInputForm.Description)" Lines="3" />
+                            <MudTextField Label="Description" Variant="Variant.Outlined" @bind-Value="@expenseInputForm.Description" For="@(() => expenseInputForm.Description)" Lines="3" />
                         </MudItem>
 
                         <MudItem xs="12" sm="12">
@@ -346,7 +346,7 @@
                 UserId = UserId,
                 Amount = Amount,
                 Description = Description,
-                PaidDate = DateTimeUtil.ToUtcDateTime(PaidDate.Value, timeZone),
+                PaidDate = DateTimeUtil.ToUtcDateTime(PaidDate.Value.Date, timeZone),
                 PaymentMethod = PaymentMethod,
                 IsTaxable = IsTaxable,
                 BudgetJarId = BudgetJarId,

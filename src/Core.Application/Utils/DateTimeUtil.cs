@@ -60,5 +60,15 @@ namespace Core.Application.Utils
         {
             return TimeZoneInfo.ConvertTimeToUtc(timeZoneDateTime, GetTimeZoneInfoOrDefault(timeZoneId));
         }
+
+        public static DateTime StartOfDayUtc(this DateTime dateTime)
+        {
+            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 0, 0, 0, DateTimeKind.Utc);
+        }
+
+        public static DateTime EndOfDayUtc(this DateTime dateTime)
+        {
+            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 23, 59, 59, DateTimeKind.Utc);
+        }
     }
 }

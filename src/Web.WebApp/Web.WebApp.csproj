@@ -26,8 +26,4 @@
     <ProjectReference Include="..\Core.Infrastructure\Core.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Components\Ui\enums\" />
-  </ItemGroup>
-
 </Project>

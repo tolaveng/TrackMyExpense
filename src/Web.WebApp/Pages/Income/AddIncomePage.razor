@@ -44,7 +44,7 @@
                     </MudItem>
                     <MudItem xs="12" sm="12">
                         <MudTextField Label="Amount" @bind-Value="@incomeInputForm.Amount"
-                            For="@(() => incomeInputForm.Amount)" Class="mb-3"
+                            For="@(() => incomeInputForm.Amount)" MaxLength="10" Class="mb-3"
                             Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney"
                             Immediate="true" TextChanged="@(x => CalculateBudgetJar(x))"/>
                     </MudItem>
@@ -270,8 +270,8 @@
                 UserId = UserId,
                 Amount = Amount,
                 Note = Note,
-                Begin = DateTimeUtil.ToUtcDateTime(Begin.Value, timeZone),
-                End = DateTimeUtil.ToUtcDateTime(End.Value, timeZone)
+                Begin = DateTimeUtil.ToUtcDateTime(Begin.Value.Date, timeZone),
+                End = DateTimeUtil.ToUtcDateTime(End.Value.Date, timeZone)
             };
         }
     }
