@@ -1,6 +1,7 @@
 ﻿@using Core.Domain.Constants
 
-<MudNavMenu Class="drawer">
+<MudNavMenu Class="drawer"
+    Style="height: 100%; overflow-y: scroll;">
     <AuthorizeView>
         <Authorized>
             <MudNavGroup Title="Expenses" Expanded="true">
@@ -26,10 +27,6 @@
                     Budget Jars
                 </MudNavLink>
             </MudNavGroup>
-
-            <MudNavLink Href="/account/logout" IconColor="@Color.Error" Icon="@Icons.Filled.Logout" Class="drawer-item-bottom">
-                <MudText Color="@Color.Error">Log Out</MudText>
-            </MudNavLink>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView Roles=@UserBaseRole.Admin>
@@ -41,8 +38,8 @@
                 <MudNavLink Href="/admin/budgetjars" IconColor="@Color.Primary" Icon="@Icons.Filled.AccountTree">
                     Budget Jars
                 </MudNavLink>
-                <MudNavLink Href="/admin/expense-groups" IconColor="@Color.Primary" Icon="@Icons.Filled.Category">
-                    Expense Groups
+                <MudNavLink Href="/admin/categories" IconColor="@Color.Primary" Icon="@Icons.Filled.Category">
+                    Categories
                 </MudNavLink>
                 <MudNavLink Href="/admin/icon-management" IconColor="@Color.Primary" Icon="@Icons.Filled.Architecture">
                     Icon Management

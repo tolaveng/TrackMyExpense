@@ -19,6 +19,15 @@
                 <a href="/"><img src="/img/TrackMyExpense.svg" style="width: auto; height: 22px;"/></a>
             </MudDrawerHeader>
             <NavMenu />
+            <MudDrawerHeader>
+                <AuthorizeView>
+                <Authorized>
+                    <MudNavLink Href="/account/logout" IconColor="@Color.Error" Icon="@Icons.Filled.Logout">
+                        <MudText Color="@Color.Error">Log Out</MudText>
+                    </MudNavLink>
+                </Authorized>
+                </AuthorizeView>
+            </MudDrawerHeader>
         </MudDrawer>
         <MudMainContent Style="min-height: 520px;">
             @Body
