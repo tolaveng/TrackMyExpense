@@ -151,85 +151,7 @@ namespace Core.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Text")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UnicodeDecimal")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UnicodeHex")
-                        .HasColumnType("text");
-
-                    b.HasKey("Code");
-
-                    b.ToTable("Currencies");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("BudgetJarId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ExpenseGroupId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsTaxable")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("PaidDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("RecurrentExpenseId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BudgetJarId");
-
-                    b.HasIndex("ExpenseGroupId");
-
-                    b.HasIndex("PaidDate");
-
-                    b.ToTable("Expenses");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.ExpenseGroup", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Category", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -252,7 +174,7 @@ namespace Core.Infrastructure.Migrations
 
                     b.HasIndex("IconId");
 
-                    b.ToTable("ExpenseGroups");
+                    b.ToTable("Categories");
 
                     b.HasData(
                         new
@@ -407,6 +329,84 @@ namespace Core.Infrastructure.Migrations
                             Name = "Others",
                             UserId = new Guid("00000000-0000-0000-0000-000000000000")
                         });
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Currency", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UnicodeDecimal")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UnicodeHex")
+                        .HasColumnType("text");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("Currencies");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("BudgetJarId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsTaxable")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("PaidDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RecurrentExpenseId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BudgetJarId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("PaidDate");
+
+                    b.ToTable("Expenses");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Icon", b =>
@@ -859,11 +859,11 @@ namespace Core.Infrastructure.Migrations
                     b.Property<Guid>("BudgetJarId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
-
-                    b.Property<Guid>("ExpenseGroupId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("FinishDate")
                         .HasColumnType("timestamp with time zone");
@@ -899,7 +899,7 @@ namespace Core.Infrastructure.Migrations
 
                     b.HasIndex("BudgetJarId");
 
-                    b.HasIndex("ExpenseGroupId");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("RecurrentExpenses");
                 });
@@ -1016,14 +1016,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "234fec98-4428-402c-8c72-4867b4476348",
+                            ConcurrencyStamp = "5629d745-6e8b-471a-b8fd-83758755e50f",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "4b37acea-085f-4792-abc0-3eedb571e4bd",
+                            ConcurrencyStamp = "1bfbfc27-bffe-4c84-8020-eadebe3ccb41",
                             Name = "user",
                             NormalizedName = "USER"
                         });
@@ -1232,26 +1232,7 @@ namespace Core.Infrastructure.Migrations
                     b.Navigation("Icon");
                 });
 
-            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
-                {
-                    b.HasOne("Core.Domain.Entities.BudgetJar", "BudgetJar")
-                        .WithMany()
-                        .HasForeignKey("BudgetJarId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Core.Domain.Entities.ExpenseGroup", "ExpenseGroup")
-                        .WithMany()
-                        .HasForeignKey("ExpenseGroupId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("BudgetJar");
-
-                    b.Navigation("ExpenseGroup");
-                });
-
-            modelBuilder.Entity("Core.Domain.Entities.ExpenseGroup", b =>
+            modelBuilder.Entity("Core.Domain.Entities.Category", b =>
                 {
                     b.HasOne("Core.Domain.Entities.Icon", "Icon")
                         .WithMany()
@@ -1260,6 +1241,25 @@ namespace Core.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Icon");
+                });
+
+            modelBuilder.Entity("Core.Domain.Entities.Expense", b =>
+                {
+                    b.HasOne("Core.Domain.Entities.BudgetJar", "BudgetJar")
+                        .WithMany()
+                        .HasForeignKey("BudgetJarId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Core.Domain.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("BudgetJar");
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.IncomeBudgetJar", b =>
@@ -1289,15 +1289,15 @@ namespace Core.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Core.Domain.Entities.ExpenseGroup", "ExpenseGroup")
+                    b.HasOne("Core.Domain.Entities.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("ExpenseGroupId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("BudgetJar");
 
-                    b.Navigation("ExpenseGroup");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Core.Domain.Entities.Subscription", b =>

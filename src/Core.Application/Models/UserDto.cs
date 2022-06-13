@@ -27,5 +27,9 @@ namespace Core.Application.Models
         public string ProfileImageUrl { get; set; } = string.Empty;
         public string ProfileImageThumbnailUrl { get; set; } = string.Empty;
 
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime? RefreshTokenExpiry { get; set; }
+        public DateTime? LastSeen { get; set; }
+
     }
 }

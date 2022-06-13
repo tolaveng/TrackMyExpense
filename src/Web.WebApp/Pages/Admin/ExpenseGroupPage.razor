@@ -15,12 +15,12 @@
     <MudCard>
         <MudCardContent>
             <MudForm Model="@model" @ref="@form">
-            <MudTable Items="@expenseGroups" Hover="true" Loading="isLoading" CanCancelEdit="true"
+            <MudTable Items="@categories" Hover="true" Loading="isLoading" CanCancelEdit="true"
               SortLabel="Sort By" CommitEditTooltip="Save Change" CustomFooter="true"
               RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
               RowEditCommit="CommitChange" IsEditRowSwitchingBlocked="false" >
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<ExpenseGroupDto, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<CategoryDto, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
                     <MudTh Style="width: 250px">Icon</MudTh>
                     <MudTh>Actions</MudTh>
                 </HeaderContent>
@@ -87,34 +87,34 @@
     [Inject] IDialogService Dialog { get; set; }
 
     private bool isLoading = false;
-    private List<ExpenseGroupDto> expenseGroups = new List<ExpenseGroupDto>();
+    private List<CategoryDto> categories = new List<CategoryDto>();
     private List<IconDto> iconAssets = new List<IconDto>();
 
     private MudForm form;
-    private ExpenseGroupDto model = new ExpenseGroupDto();
+    private CategoryDto model = new CategoryDto();
 
-    private ExpenseGroupValidator validator = new ExpenseGroupValidator();
+    private CategoryValidator validator = new CategoryValidator();
 
-    private ExpenseGroupDto elementBeforeEdit;
+    private CategoryDto elementBeforeEdit;
     private void BackupItem(object element)
     {
         elementBeforeEdit = new()
         {
-            Name = ((ExpenseGroupDto)element).Name,
-            IconId = ((ExpenseGroupDto)element).IconId
+            Name = ((CategoryDto)element).Name,
+            IconId = ((CategoryDto)element).IconId
         };
     }
 
     private void ResetItemToOriginalValues(object element)
     {
-        ((ExpenseGroupDto)element).Name = elementBeforeEdit.Name;
-        ((ExpenseGroupDto)element).IconId = elementBeforeEdit.IconId;
+        ((CategoryDto)element).Name = elementBeforeEdit.Name;
+        ((CategoryDto)element).IconId = elementBeforeEdit.IconId;
     }
 
     protected async override Task OnInitializedAsync()
     {
         isLoading = true;
-        expenseGroups = await Mediator.Send(new GetExpenseGroupsQuery(true));
+        categories = await Mediator.Send(new GetCategoriesQuery(true));
         iconAssets = await Mediator.Send(new GetIconsQuery());
         isLoading = false;
     }
@@ -124,13 +124,13 @@
     {
         isLoading = true;
         StateHasChanged();
-        var expenseGroup = (ExpenseGroupDto)element;
+        var category = (CategoryDto)element;
         InvokeAsync(async () => {
-            var saved = await SaveChange(expenseGroup);
+            var saved = await SaveChange(category);
             if (!saved)
             {
-                expenseGroup.Name = elementBeforeEdit.Name;
-                expenseGroup.IconId = elementBeforeEdit.IconId;
+                category.Name = elementBeforeEdit.Name;
+                category.IconId = elementBeforeEdit.IconId;
             }
             isLoading = false;
             StateHasChanged();
@@ -144,24 +144,24 @@
         isLoading = true;
         await SaveChange(model);
 
-        model = new ExpenseGroupDto();
+        model = new CategoryDto();
         isLoading = false;
     }
 
-    private async Task<bool> SaveChange(ExpenseGroupDto expenseGroup)
+    private async Task<bool> SaveChange(CategoryDto category)
     {
         Snackbar.Clear();
         try
         {
-            expenseGroup.IsSystem = true;
-            expenseGroup.Icon = iconAssets.Single(x => x.Id == expenseGroup.IconId);
-            var savedId = await Mediator.Send(new SaveExpenseGroupCommand(expenseGroup));
+            category.IsSystem = true;
+            category.Icon = iconAssets.Single(x => x.Id == category.IconId);
+            var savedId = await Mediator.Send(new SaveCategoryCommand(category));
 
             // update UI
-            if (expenseGroups.All(x => x.Id != savedId))
+            if (categories.All(x => x.Id != savedId))
             {
-                expenseGroup.Id = savedId;
-                expenseGroups.Add(ExpenseGroupDto.Clone(expenseGroup));
+                category.Id = savedId;
+                categories.Add(CategoryDto.Clone(category));
             }
             form.Reset();
             Snackbar.Add("Expense Group saved successfully", Severity.Success);
@@ -187,10 +187,10 @@
         {
             try
             {
-                var deleted = await Mediator.Send(new DeleteExpenseGroupCommand(id));
+                var deleted = await Mediator.Send(new DeleteCategoryCommand(id));
                 if (deleted)
                 {
-                    expenseGroups.Remove(expenseGroups.Single(x => x.Id == id));
+                    categories.Remove(categories.Single(x => x.Id == id));
                     StateHasChanged();
                     Snackbar.Add("Expense Group has been deleted successfully.", Severity.Success);
                 }

@@ -19,8 +19,8 @@ namespace Core.Application.Models
         public ICollection<AttachmentDto> Attachments { get; set; } = new List<AttachmentDto>();
         public Guid BudgetJarId { get; set; }
         public BudgetJarDto BudgetJar { get; set; } = new BudgetJarDto();
-        public Guid ExpenseGroupId { get; set; }
-        public ExpenseGroupDto ExpenseGroup { get; set; } = new ExpenseGroupDto();
+        public Guid CategoryId { get; set; }
+        public CategoryDto Category { get; set; } = new CategoryDto();
 
         public int? RecurrentExpenseId { get; set; }
     }

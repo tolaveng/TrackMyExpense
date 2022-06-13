@@ -17,7 +17,7 @@ namespace Core.Application.IRepositories
         IGenericRepository<Income> IncomeRepository { get; }
         IGenericRepository<Expense> ExpenseRepository { get; }
         IGenericRepository<Attachment> AttachmentRepository { get; }
-        IGenericRepository<ExpenseGroup> ExpenseGroupRepository { get; }
+        IGenericRepository<Category> CategoryRepository { get; }
         IGenericRepository<Icon> IconRepository { get; }
         IGenericRepository<Currency> CurrencyRepository { get; }
         Task SaveAsync();

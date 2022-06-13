@@ -38,8 +38,8 @@ namespace Core.Tests.Repositories
             {
                 var exp = expenses.Single(x => x.Id == expense.Id);
                 exp.Attachments = expense.Attachments;
-                exp.ExpenseGroup = expense.ExpenseGroup;
-                exp.ExpenseGroupId = expense.ExpenseGroupId;
+                exp.Category = expense.Category;
+                exp.CategoryId = expense.CategoryId;
                 exp.Amount = expense.Amount;
                 exp.BudgetJar = expense.BudgetJar;
                 exp.BudgetJarId = expense.BudgetJarId;

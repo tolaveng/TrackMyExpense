@@ -22,7 +22,7 @@ namespace Core.Infrastructure.Repository
         private IGenericRepository<Income> _incomeRepository;
         private IGenericRepository<Expense> _expenseRepository;
         private IGenericRepository<Attachment> _attachmentRepository;
-        private IGenericRepository<ExpenseGroup> _expenseGroupRepository;
+        private IGenericRepository<Category> _categoryRepository;
         private IGenericRepository<Icon> _iconRepository;
         private IGenericRepository<Currency> _currencyRepository;
 
@@ -39,7 +39,7 @@ namespace Core.Infrastructure.Repository
         public IGenericRepository<Income> IncomeRepository => _incomeRepository ??= new GenericRepository<Income>(_context);
         public IGenericRepository<Expense> ExpenseRepository => _expenseRepository ??= new GenericRepository<Expense>(_context);
         public IGenericRepository<Attachment> AttachmentRepository => _attachmentRepository ??= new GenericRepository<Attachment>(_context);
-        public IGenericRepository<ExpenseGroup> ExpenseGroupRepository => _expenseGroupRepository ??= new GenericRepository<ExpenseGroup>(_context);
+        public IGenericRepository<Category> CategoryRepository => _categoryRepository ??= new GenericRepository<Category>(_context);
         public IGenericRepository<Icon> IconRepository => _iconRepository ??= new GenericRepository<Icon>(_context);
 
         public IGenericRepository<Currency> CurrencyRepository => _currencyRepository ??= new GenericRepository<Currency>(_context);

@@ -8,25 +8,25 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Mediator.Categories
 {
-    public class DeleteExpenseGroupCommand : IRequest<bool>
+    public class DeleteCategoryCommand : IRequest<bool>
     {
         public Guid Id  { get; set; }
-        public DeleteExpenseGroupCommand(Guid id)
+        public DeleteCategoryCommand(Guid id)
         {
             Id = id;
         }
     }
 
-    public class DeleteExpenseGroupHandler : IRequestHandler<DeleteExpenseGroupCommand, bool>
+    public class DeleteCategoryHandler : IRequestHandler<DeleteCategoryCommand, bool>
     {
         public IUnitOfWork _unitOfWork;
-        public DeleteExpenseGroupHandler(IUnitOfWork unitOfWork)
+        public DeleteCategoryHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
-        public async Task<bool> Handle(DeleteExpenseGroupCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
         {
-            var repo = _unitOfWork.ExpenseGroupRepository;
+            var repo = _unitOfWork.CategoryRepository;
             var deleted = await repo.DeleteAsync(request.Id);
             if (deleted)
             {

@@ -61,10 +61,10 @@ namespace Core.Application.Mediator.Expenses
                     : orderBy = x => x.OrderByDescending(z => z.Amount);
                     break;
 
-                case "ExpenseGroup":
+                case "Category":
                     orderBy = request.Pagination.SortDirection == Pagination.Ascending
-                    ? orderBy = x => x.OrderBy(z => z.ExpenseGroup.Name)
-                    : orderBy = x => x.OrderByDescending(z => z.ExpenseGroup.Name);
+                    ? orderBy = x => x.OrderBy(z => z.Category.Name)
+                    : orderBy = x => x.OrderByDescending(z => z.Category.Name);
                     break;
             }
 
@@ -89,7 +89,7 @@ namespace Core.Application.Mediator.Expenses
 
             var count = await _unitOfWork.ExpenseRepository.CountAsync(expression);
             var data = await _unitOfWork.ExpenseRepository.GetPagedAsync(request.Pagination.Page, request.Pagination.PageSize,
-                expression, orderBy, new []{"BudgetJar", "ExpenseGroup" });
+                expression, orderBy, new []{"BudgetJar", "Category" });
             foreach (var item in data)
             {
                 item.PaidDate = DateTimeUtil.ToTimeZoneDateTime(item.PaidDate, request.TimeZoneId);
@@ -116,9 +116,9 @@ namespace Core.Application.Mediator.Expenses
                     }
                     break;
 
-                case "ExpenseGroupId":
-                    if (Value is Guid expenseGroupId && expenseGroupId != Guid.Empty) {
-                        return x => x.ExpenseGroupId == expenseGroupId;
+                case "CategoryId":
+                    if (Value is Guid categoryId && categoryId != Guid.Empty) {
+                        return x => x.CategoryId == categoryId;
                     }
                     break;
 

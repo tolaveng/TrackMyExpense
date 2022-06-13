@@ -28,6 +28,7 @@ using Core.Application.Providers.IProviders;
 using Core.Application.Providers;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using Core.Ioc;
 
 namespace Web.WebApp
 {
@@ -85,36 +86,14 @@ namespace Web.WebApp
             //        .Build();
             //});
 
-            //services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddAutoMapper(Assembly.GetAssembly(typeof(DataMapperProfile)));
-            services.AddAutoMapper(Assembly.GetAssembly(typeof(AppMapperProfile)));
-            services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddMediatR(Assembly.GetExecutingAssembly(), typeof(IUnitOfWork).Assembly);
-            //services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(UserDto)));
+            // Cor.Ioc
+            services.ConfigureServices(Configuration, Environment);
 
-            // Infrastructure
-            AddDatabase(services);
+            // Web App
             services.AddTransient<IReCaptchaService, ReCaptchaService>();
-
-            // .Net Identity
-            AddAppIdentity(services, Environment);
             services.AddHttpContextAccessor();
             services.AddScoped<IAuthUserService, AuthUserService>();
-
-            services.AddSingleton<IFileDirectoryProvider, FileDirectoryProvider>();
-            services.AddSingleton<IEmailService, EmailService>();
-            services.AddSingleton<ICurrencyProvider, CurrencyProvider>();
-
-            services.AddScoped<ISysAttributeService, SysAttributeService>();
-            services.AddScoped<IPageHtmlService, PageHtmlService > ();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUserService, UserService>();
-
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddTransient<IFileUploadFactory, FileUploadFactory>();
-            services.AddTransient<FileUploadLocalService>()
-                .AddTransient<IFileUploadService, FileUploadLocalService>(x => x.GetService<FileUploadLocalService>());
-            //services.AddTransient<IFileUploadService, FileUploadAzureService>(x => x.GetService<FileUploadAzureService>());
+            services.AddScoped<IPageHtmlService, PageHtmlService>();
 
             // Config Settings
             services.Configure<EmailSetting>(Configuration.GetSection("EmailSetting"));
@@ -219,54 +198,6 @@ namespace Web.WebApp
                 endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
-        }
-
-        private void AddDatabase(IServiceCollection services)
-        {
-            services.AddOptions();
-            var databaseSetting = Configuration.GetRequiredSection("DatabaseSetting");
-            services.Configure<DatabaseSetting>(databaseSetting);
-            
-            services.AddPooledDbContextFactory<AppDbContext>(opt => {
-                if (Environment.IsDevelopment()) opt.EnableSensitiveDataLogging();
-                opt.UseNpgsql(DatabaseConnection.GetConnectionString(databaseSetting.Get<DatabaseSetting>()));
-            });
-
-            //services.AddDbContext<AppDbContext>();
-            services.AddScoped<AppDbContext>(x =>
-                x.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext()
-            );
-        }
-
-        private void AddAppIdentity(IServiceCollection services, IWebHostEnvironment env)
-        {
-            services.AddIdentity<AppIdentityUser, AppIdentityRole>(opt => {
-                opt.Password.RequireDigit = false;
-                opt.Password.RequiredLength = 8;
-                opt.Password.RequireLowercase = false;
-                opt.Password.RequireUppercase = false;
-                opt.Password.RequireNonAlphanumeric = false;
-                opt.User.RequireUniqueEmail = true;
-                opt.SignIn.RequireConfirmedEmail = true;
-
-                if (env.IsDevelopment()) 
-                {
-                    opt.Password.RequiredLength = 4;
-                }
-                // custom reset password token
-                opt.Tokens.PasswordResetTokenProvider = "CustomPasswordResetProvider";
-            })
-            .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders()
-            .AddTokenProvider<PasswordResetTokenProvider<AppIdentityUser>>("CustomPasswordResetProvider");
-
-            // Set all identity token expiry to 2 days
-            services.Configure<DataProtectionTokenProviderOptions>(opt =>
-                opt.TokenLifespan = TimeSpan.FromDays(2));
-
-            // Set password reset token expiry to 24 hours
-            services.Configure<PasswordResetTokenProviderOptions>(opt =>
-                opt.TokenLifespan = TimeSpan.FromHours(24));
         }
     }
 }

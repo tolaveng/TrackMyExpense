@@ -47,7 +47,7 @@ namespace Core.Application.Mediator.Expenses
             // prevent recreation
             expense.Attachments = null;
             expense.BudgetJar = null;
-            expense.ExpenseGroup = null;
+            expense.Category = null;
 
             if (expense.Id != Guid.Empty)
             {

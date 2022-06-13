@@ -74,7 +74,7 @@ namespace Core.Tests.Expenses
             var attachmentsDto = _mapper.Map<List<AttachmentDto>>(attachments);
             
             var expenseDto = _mapper.Map<ExpenseDto>(expense);
-            expenseDto.ExpenseGroupId = Guid.Parse("12B8589B-6647-43C8-859C-0AD6BFD8F967");
+            expenseDto.CategoryId = Guid.Parse("12B8589B-6647-43C8-859C-0AD6BFD8F967");
 
             var request = new SaveExpenseRequest(expenseDto, attachmentsDto);
             var guid = await _handler.Handle(request, CancellationToken.None);
@@ -84,7 +84,7 @@ namespace Core.Tests.Expenses
 
             Assert.NotEqual(Guid.Empty, guid);
             Assert.NotNull(updatedExpense);
-            Assert.Equal(updatedExpense.ExpenseGroupId, Guid.Parse("12B8589B-6647-43C8-859C-0AD6BFD8F967"));
+            Assert.Equal(updatedExpense.CategoryId, Guid.Parse("12B8589B-6647-43C8-859C-0AD6BFD8F967"));
             Assert.Equal(140, budgetJar.TotalBalance);
         }
 

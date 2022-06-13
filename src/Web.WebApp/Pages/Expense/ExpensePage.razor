@@ -33,7 +33,7 @@
                 <MudTh><MudTableSortLabel SortLabel="PaidDate" T="ExpenseDto">Date</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="BudgetJar" T="ExpenseDto">Jar</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Amount" T="ExpenseDto">Amount</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="ExpenseGroup" T="ExpenseDto">Category</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="Category" T="ExpenseDto">Category</MudTableSortLabel></MudTh>
                 <MudTh>Description</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
@@ -45,8 +45,8 @@
                 </MudTd>
                 <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
                 <MudTd DataLabel="Category">
-                    <img src="@context.ExpenseGroup.Icon.IconUrl" height="24" width="24" class="mr-2" />
-                    @context.ExpenseGroup.Name
+                    <img src="@context.Category.Icon.IconUrl" height="24" width="24" class="mr-2" />
+                    @context.Category.Name
                 </MudTd>
                 <MudTd DataLabel="Description" HideSmall="@true">
                     @if(!string.IsNullOrWhiteSpace(context.Description) && context.Description.Length > 64)
@@ -124,7 +124,7 @@
 
         // resovle icons
         var iconIds = result.Data.Select(x => x.BudgetJar.IconId).ToList();
-        iconIds.AddRange(result.Data.Select(x => x.ExpenseGroup.IconId));
+        iconIds.AddRange(result.Data.Select(x => x.Category.IconId));
         var icons = await Mediator.Send(new GetIconsByIds(iconIds));
         var iconDictionary = icons.ToDictionary(x => x.Id);
         foreach(var data in result.Data)
@@ -132,7 +132,7 @@
             data.BudgetJar.Icon = iconDictionary.TryGetValue(data.BudgetJar.IconId, out var icon)
             ? icon : new IconDto();
 
-            data.ExpenseGroup.Icon = iconDictionary.TryGetValue(data.ExpenseGroup.IconId, out var aIcon)
+            data.Category.Icon = iconDictionary.TryGetValue(data.Category.IconId, out var aIcon)
             ? aIcon : new IconDto();
         }
 

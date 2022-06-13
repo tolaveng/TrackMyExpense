@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Domain.Entities
 {
-    public class ExpenseGroup : BaseEntity<Guid>
+    public class Category : BaseEntity<Guid>
     {
         public Guid UserId { get; set; }
 

@@ -10,32 +10,32 @@ using System.Threading.Tasks;
 
 namespace Core.Application.Mediator.Categories
 {
-    public class GetExpenseGroupsQuery : IRequest<List<ExpenseGroupDto>>
+    public class GetCategoriesQuery : IRequest<List<CategoryDto>>
     {
         public bool IsSystem { get; set; }
         public Guid? UserId { get; set; }
-        public GetExpenseGroupsQuery(bool isSystem, Guid? userId = null)
+        public GetCategoriesQuery(bool isSystem, Guid? userId = null)
         {
             IsSystem = isSystem;
             UserId = userId;
         }
     }
-    public class GetExpenseGroupsHandler : IRequestHandler<GetExpenseGroupsQuery, List<ExpenseGroupDto>>
+    public class GetCategoryHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDto>>
     {
         private readonly IMapper _mapper;
         public readonly IUnitOfWork _unitOfWork;
-        public GetExpenseGroupsHandler(IMapper mapper, IUnitOfWork unitOfWork)
+        public GetCategoryHandler(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
-        public async Task<List<ExpenseGroupDto>> Handle(GetExpenseGroupsQuery request, CancellationToken cancellationToken)
+        public async Task<List<CategoryDto>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
         {
-            var repo = _unitOfWork.ExpenseGroupRepository;
-            var expenseGroups = await repo.GetAllAsync(x => (x.IsSystem || !request.IsSystem) &&
+            var repo = _unitOfWork.CategoryRepository;
+            var categories = await repo.GetAllAsync(x => (x.IsSystem || !request.IsSystem) &&
             (!request.UserId.HasValue || x.UserId == request.UserId),
                 x => x.OrderBy(o => o.Name), new [] {"Icon"});
-            return _mapper.Map<List<ExpenseGroupDto>>(expenseGroups);
+            return _mapper.Map<List<CategoryDto>>(categories);
         }
     }
 }

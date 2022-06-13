@@ -63,10 +63,10 @@
                         </MudItem>
 
                         <MudItem xs="12" sm="12">
-                            <MudSelect Label="Category" @bind-Value="@expenseInputForm.ExpenseGroupId" For="@(() => expenseInputForm.ExpenseGroupId)"
+                            <MudSelect Label="Category" @bind-Value="@expenseInputForm.CategoryId" For="@(() => expenseInputForm.CategoryId)"
                                 Class="mb-3" AnchorOrigin="Origin.BottomCenter">
                                 <MudSelectItem Value="@(Guid.Empty)">Select a category</MudSelectItem>
-                                @foreach (var group in expenseGroups)
+                                @foreach (var group in categories)
                                 {
                                 <MudSelectItem Value="@(group.Id)">
                                     <img src="@group.Icon.IconUrl" height="24" width="24" class="mr-2" />
@@ -146,7 +146,7 @@
 
     private ExpenseInputModel expenseInputForm = new ExpenseInputModel();
     private List<BudgetJarDto> budgetJars =  new List<BudgetJarDto>();
-    private List<ExpenseGroupDto> expenseGroups =  new List<ExpenseGroupDto>();
+    private List<CategoryDto> categories =  new List<CategoryDto>();
 
     private bool isLoading;
     private FileUploader fileUploader;
@@ -174,17 +174,17 @@
         dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
 
         budgetJars = await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id));
-        expenseGroups = await Mediator.Send(new GetExpenseGroupsQuery(false, AuthUser.Id));
-        var systemExpenseGroups = await Mediator.Send(new GetExpenseGroupsQuery(true));
-        expenseGroups.AddRange(systemExpenseGroups);
-        expenseGroups = expenseGroups.DistinctBy(x => x.Name).ToList();
+        categories = await Mediator.Send(new GetCategoriesQuery(false, AuthUser.Id));
+        var systemCategories = await Mediator.Send(new GetCategoriesQuery(true));
+        categories.AddRange(systemCategories);
+        categories = categories.DistinctBy(x => x.Name).ToList();
 
         if (Id.Equals("new", StringComparison.InvariantCultureIgnoreCase))
         {
             isNew = true;
             expenseInputForm = new ExpenseInputModel(AuthUser);
             expenseInputForm.BudgetJarId = budgetJars.FirstOrDefault()?.Id ?? Guid.Empty;
-            expenseInputForm.ExpenseGroupId = expenseGroups.FirstOrDefault()?.Id ?? Guid.Empty;
+            expenseInputForm.CategoryId = categories.FirstOrDefault()?.Id ?? Guid.Empty;
 
         } else if (Guid.TryParse(Id, out incomeId))
         {
@@ -305,7 +305,7 @@
         public PaymentMethod PaymentMethod { get; set; }
 
         public Guid BudgetJarId { get; set; }
-        public Guid ExpenseGroupId { get; set; }
+        public Guid CategoryId { get; set; }
 
         public AttachmentDto[] Attachments { get; set; }
 
@@ -333,7 +333,7 @@
             IsTaxable = expense.IsTaxable;
             PaymentMethod = expense.PaymentMethod;
             BudgetJarId = expense.BudgetJarId;
-            ExpenseGroupId = expense.ExpenseGroupId;
+            CategoryId = expense.CategoryId;
 
             Attachments = expense.Attachments.ToArray();
         }
@@ -350,7 +350,7 @@
                 PaymentMethod = PaymentMethod,
                 IsTaxable = IsTaxable,
                 BudgetJarId = BudgetJarId,
-                ExpenseGroupId = ExpenseGroupId,
+                CategoryId = CategoryId,
                 Attachments = Attachments
             };
         }
@@ -370,7 +370,7 @@
             RuleFor(x => x.BudgetJarId).NotEmpty().WithMessage("Budget is requried")
             .NotEqual(Guid.Empty).WithMessage("Budget is requried");
 
-            RuleFor(x => x.ExpenseGroupId).NotEmpty().WithMessage("Category is requried")
+            RuleFor(x => x.CategoryId).NotEmpty().WithMessage("Category is requried")
             .NotEqual(Guid.Empty).WithMessage("Category is requried");
         }
     }

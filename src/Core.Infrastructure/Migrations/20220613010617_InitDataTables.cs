@@ -152,7 +152,7 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExpenseGroups",
+                name: "Categories",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -163,9 +163,9 @@ namespace Core.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ExpenseGroups", x => x.Id);
+                    table.PrimaryKey("PK_Categories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ExpenseGroups_Icons_IconId",
+                        name: "FK_Categories_Icons_IconId",
                         column: x => x.IconId,
                         principalTable: "Icons",
                         principalColumn: "Id");
@@ -346,7 +346,7 @@ namespace Core.Infrastructure.Migrations
                     IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
                     BudgetJarId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ExpenseGroupId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     RecurrentExpenseId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
@@ -363,9 +363,9 @@ namespace Core.Infrastructure.Migrations
                         principalTable: "BudgetJars",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Expenses_ExpenseGroups_ExpenseGroupId",
-                        column: x => x.ExpenseGroupId,
-                        principalTable: "ExpenseGroups",
+                        name: "FK_Expenses_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
                         principalColumn: "Id");
                 });
 
@@ -383,7 +383,7 @@ namespace Core.Infrastructure.Migrations
                     IsTaxable = table.Column<bool>(type: "boolean", nullable: false),
                     PaymentMethod = table.Column<int>(type: "integer", nullable: false),
                     BudgetJarId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ExpenseGroupId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
                     Repeat = table.Column<int>(type: "integer", nullable: false),
                     RepeatDay = table.Column<int>(type: "integer", nullable: false),
                     RepeatDaily = table.Column<string>(type: "text", nullable: true),
@@ -399,9 +399,9 @@ namespace Core.Infrastructure.Migrations
                         principalTable: "BudgetJars",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_RecurrentExpenses_ExpenseGroups_ExpenseGroupId",
-                        column: x => x.ExpenseGroupId,
-                        principalTable: "ExpenseGroups",
+                        name: "FK_RecurrentExpenses_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
                         principalColumn: "Id");
                 });
 
@@ -475,8 +475,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "4b37acea-085f-4792-abc0-3eedb571e4bd", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "234fec98-4428-402c-8c72-4867b4476348", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "1bfbfc27-bffe-4c84-8020-eadebe3ccb41", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "5629d745-6e8b-471a-b8fd-83758755e50f", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -493,7 +493,7 @@ namespace Core.Infrastructure.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "ExpenseGroups",
+                table: "Categories",
                 columns: new[] { "Id", "IconId", "IsSystem", "Name", "UserId" },
                 values: new object[,]
                 {
@@ -529,8 +529,8 @@ namespace Core.Infrastructure.Migrations
                 column: "IconId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseGroups_IconId",
-                table: "ExpenseGroups",
+                name: "IX_Categories_IconId",
+                table: "Categories",
                 column: "IconId");
 
             migrationBuilder.CreateIndex(
@@ -539,9 +539,9 @@ namespace Core.Infrastructure.Migrations
                 column: "BudgetJarId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Expenses_ExpenseGroupId",
+                name: "IX_Expenses_CategoryId",
                 table: "Expenses",
-                column: "ExpenseGroupId");
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expenses_PaidDate",
@@ -565,9 +565,9 @@ namespace Core.Infrastructure.Migrations
                 column: "BudgetJarId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecurrentExpenses_ExpenseGroupId",
+                name: "IX_RecurrentExpenses_CategoryId",
                 table: "RecurrentExpenses",
-                column: "ExpenseGroupId");
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
@@ -666,7 +666,7 @@ namespace Core.Infrastructure.Migrations
                 name: "BudgetJars");
 
             migrationBuilder.DropTable(
-                name: "ExpenseGroups");
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Icons");

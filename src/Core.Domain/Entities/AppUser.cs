@@ -1,11 +1,8 @@
 ﻿using Core.Domain.Enitities;
-using Core.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Core.Domain.Entities
 {
@@ -34,6 +31,12 @@ namespace Core.Domain.Entities
 
         public string ProfileImage { get; set; }
         public string TimeZone { get; set; }
-        public string CultureInfo{ get; set; }
+        public string CultureInfo { get; set; }
+
+        public string RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
+
+        public DateTime? LastSeen { get; set; }
+
     }
 }

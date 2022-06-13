@@ -27,9 +27,9 @@
                 }
             </MudSelect>
 
-            <MudSelect @bind-Value="@Filter.ExpenseGroupId" Label="Category" Variant="Variant.Text" Class="mb-3">
+            <MudSelect @bind-Value="@Filter.CategoryId" Label="Category" Variant="Variant.Text" Class="mb-3">
                 <MudSelectItem Value="@(Guid.Empty)">Select</MudSelectItem>
-                @foreach (var group in expenseGroups)
+                @foreach (var group in categories)
                 {
                     <MudSelectItem Value="@group.Id">@group.Name</MudSelectItem>
                 }
@@ -70,7 +70,7 @@
     private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
     private string cultureInfo = DefaultConstants.DefaultCultureInfo;
     private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
-    private ExpenseGroupDto[] expenseGroups = Array.Empty<ExpenseGroupDto>();
+    private CategoryDto[] categories = Array.Empty<CategoryDto>();
 
     private void toggleFilter()
     {
@@ -110,7 +110,7 @@
         budgetJars = (await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id)))
             .OrderBy(x => x.Name).ToArray();
         
-        expenseGroups = (await Mediator.Send(new GetExpenseGroupsQuery(false, AuthUser.Id)))
+        categories = (await Mediator.Send(new GetCategoriesQuery(false, AuthUser.Id)))
             .OrderBy(x => x.Name).ToArray();
     }
 }

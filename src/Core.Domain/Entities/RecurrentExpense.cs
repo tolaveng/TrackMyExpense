@@ -19,8 +19,8 @@ namespace Core.Domain.Entities
 
         public Guid BudgetJarId { get; set; }
         public virtual BudgetJar BudgetJar { get; set; }
-        public Guid ExpenseGroupId { get; set; }
-        public virtual ExpenseGroup ExpenseGroup { get; set; }
+        public Guid CategoryId { get; set; }
+        public virtual Category Category { get; set; }
 
         public RepeatType Repeat { get; set; }
         public int RepeatDay { get; set; }
