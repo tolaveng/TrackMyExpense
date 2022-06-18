@@ -15,6 +15,7 @@ using System.Security.Claims;
 using Core.Infrastructure.Extensions;
 using Core.Domain.Constants;
 using Microsoft.EntityFrameworkCore;
+using MediatR;
 
 namespace Core.Infrastructure.Repository
 {
@@ -25,6 +26,7 @@ namespace Core.Infrastructure.Repository
         private readonly SignInManager<AppIdentityUser> _signInManager;
         private readonly IMapper _mapper;
         private readonly ILogger<UserRepository> _logger;
+        
 
         public UserRepository(IDbContextFactory<AppDbContext> dbContextFactory,
             UserManager<AppIdentityUser> userManager,
@@ -282,8 +284,7 @@ namespace Core.Infrastructure.Repository
                     EmailConfirmed = true
                 };
                 var createResult = await _userManager.CreateAsync(appUser);
-                if (!createResult.Succeeded)
-                {
+                if (!createResult.Succeeded) {
                     return GenericResponse<Guid>.Failure("Unexpected error occured. Please try again later");
                 }
             }

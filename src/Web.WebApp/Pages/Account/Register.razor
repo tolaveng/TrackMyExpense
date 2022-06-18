@@ -3,6 +3,7 @@
 @layout EmptyLayout
 
 @using Core.Application.Mediator.BudgetJars
+@using Core.Application.Mediator.Categories
 @using Core.Application.Services.IServices
 @using Core.Domain.Constants
 @using Core.Domain.Entities
@@ -136,8 +137,9 @@
             return;
         }
 
-        // Create budget jar
+        // Create default budget jar and category from system
         await Mediator.Send(new CreateBudgetJarsFromDefault(user.Id));
+        await Mediator.Send(new CreateCategoryFromDefault(user.Id));
 
         // Confirm email
         var token = await UserService.GenerateEmailConfirmationTokenAsync(result.Data);

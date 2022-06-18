@@ -1,4 +1,4 @@
-﻿@page "/admin/expense-groups"
+﻿@page "/admin/categories"
 @using Core.Application.Mediator.Categories
 @using Core.Application.Mediator.Icons
 @using Core.Application.Models
@@ -9,7 +9,7 @@
 
 <MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
     <Breadcrumbs IsAdmin="true">
-        <BreadcrumbsItem Title="Expense Groups"  Icon="@Icons.Filled.Category" />
+        <BreadcrumbsItem Title="Categories"  Icon="@Icons.Filled.Category" />
     </Breadcrumbs>
 
     <MudCard>
@@ -187,7 +187,7 @@
         {
             try
             {
-                var deleted = await Mediator.Send(new DeleteCategoryCommand(id));
+                var deleted = await Mediator.Send(new DeleteCategoryCommand(id, false));
                 if (deleted)
                 {
                     categories.Remove(categories.Single(x => x.Id == id));

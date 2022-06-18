@@ -159,7 +159,8 @@ namespace Core.Infrastructure.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     IsSystem = table.Column<bool>(type: "boolean", nullable: false),
-                    IconId = table.Column<Guid>(type: "uuid", nullable: false)
+                    IconId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Archived = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -475,8 +476,8 @@ namespace Core.Infrastructure.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "1bfbfc27-bffe-4c84-8020-eadebe3ccb41", "user", "USER" },
-                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "5629d745-6e8b-471a-b8fd-83758755e50f", "admin", "ADMIN" }
+                    { new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"), "40247087-c02e-47b4-aaf5-969af116dac3", "user", "USER" },
+                    { new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"), "57fc82e7-fa85-4e69-a666-4a7000b8b186", "admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
@@ -494,28 +495,28 @@ namespace Core.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Categories",
-                columns: new[] { "Id", "IconId", "IsSystem", "Name", "UserId" },
+                columns: new[] { "Id", "Archived", "IconId", "IsSystem", "Name", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), true, "Donate", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), true, "Gardens", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), true, "Utilities", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), true, "Eat Out", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), new Guid("6550b905-6763-4e97-9038-50ec50d68853"), true, "Medicines", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), true, "Petro", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), true, "Sports", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), true, "Investment", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), true, "Grocery", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), true, "Furniture", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), true, "Toys", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), true, "Clothes", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), true, "Car", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), true, "Households", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), true, "Transport", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), true, "Insurance", new Guid("00000000-0000-0000-0000-000000000000") },
-                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), true, "Family", new Guid("00000000-0000-0000-0000-000000000000") }
+                    { new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), false, new Guid("1137ee8a-9a4e-4625-be8e-0612b6a20bc4"), true, "Donate", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), false, new Guid("2613db64-38d8-421c-9e73-c4fc2eb2c6df"), true, "Education", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), false, new Guid("44a67dfd-6a7d-4dbe-b8cf-82d25db8dbbc"), true, "Gardens", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), false, new Guid("5b311b51-d25d-459e-9d1c-b4e1b199edab"), true, "Utilities", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), false, new Guid("6370331d-d544-41b8-ad67-a0cfc0756975"), true, "Eat Out", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6550b905-6763-4e97-9038-50ec50d68853"), false, new Guid("6550b905-6763-4e97-9038-50ec50d68853"), true, "Medicines", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), false, new Guid("68dc6416-6d0b-4e63-b9ff-42c68d3b96f4"), true, "Petro", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), false, new Guid("6b7c5ad3-82c5-4afc-ad66-a2a895a4bf7b"), true, "Others", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), false, new Guid("70d3e625-cf3b-4eca-a773-f1fb5e340c64"), true, "Sports", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), false, new Guid("84478ca2-0873-4dac-a279-6cc2bd20b22c"), true, "Investment", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), false, new Guid("8d5d29e8-dd5a-4971-b1b0-a50a4bf4c73c"), true, "Grocery", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), false, new Guid("8ec17bda-749c-4089-8511-bce5cea403aa"), true, "Furniture", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), false, new Guid("bc0a7db7-2eed-415f-9076-08dab2e93933"), true, "Toys", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), false, new Guid("d6552f54-0c69-431e-9907-34147dd2c029"), true, "Clothes", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), false, new Guid("e54521ec-1d1c-41f0-8353-bc3b62485f25"), true, "Car", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), false, new Guid("ea2978ef-f900-4b01-b0f0-90afe13e0a55"), true, "Households", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), false, new Guid("ee676e1c-6a69-41ae-8b3b-b2dac73b9751"), true, "Transport", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), false, new Guid("f348aa99-c779-4b7c-a8bd-d96502ee2692"), true, "Insurance", new Guid("00000000-0000-0000-0000-000000000000") },
+                    { new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), false, new Guid("f58fb384-e35e-4b15-bbfd-428642178fbc"), true, "Family", new Guid("00000000-0000-0000-0000-000000000000") }
                 });
 
             migrationBuilder.CreateIndex(

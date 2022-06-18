@@ -1,19 +1,18 @@
 ﻿using Core.Application.IRepositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Application.Mediator.Categories
 {
     public class DeleteCategoryCommand : IRequest<bool>
     {
         public Guid Id  { get; set; }
-        public DeleteCategoryCommand(Guid id)
+
+        public bool IsArchived { get; set; }
+
+        public DeleteCategoryCommand(Guid id, bool isArchived)
         {
             Id = id;
+            IsArchived = isArchived;
         }
     }
 
@@ -27,12 +26,31 @@ namespace Core.Application.Mediator.Categories
         public async Task<bool> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
         {
             var repo = _unitOfWork.CategoryRepository;
-            var deleted = await repo.DeleteAsync(request.Id);
-            if (deleted)
+            var category = await repo.GetAsync(x => x.Id == request.Id);
+            if (category == null)
+            {
+                throw new ArgumentException("Category is not found");
+            }
+
+            if (request.IsArchived)
+            {
+                category.Archived = true;
+                repo.Update(category);
+            } else
+            {
+                await repo.DeleteAsync(request.Id);
+            }
+
+            try
             {
                 await _unitOfWork.SaveAsync();
                 return true;
+
+            } catch (Exception)
+            {
+                // ignored
             }
+            
             return false;
         }
     }

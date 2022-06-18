@@ -14,6 +14,8 @@ namespace Core.Application.Models
         public Guid IconId { get; set; }
         public IconDto? Icon { get; set; }
 
+        public bool Archived { get; set; }
+
         public static CategoryDto Clone(CategoryDto categoryDto)
         {
             return new CategoryDto() {

@@ -94,7 +94,6 @@
 
     private MudTable<ExpenseDto> table;
     private int TotalItems;
-    private string searchString = null;
     private bool loading = true;
 
     private ExpenseFilter filter = new ExpenseFilter();
@@ -122,7 +121,7 @@
         var result = await Mediator.Send(new GetExpensesPaged(AuthUser.Id, timeZoneId, pagination, filter));
         TotalItems = result.TotalCount;
 
-        // resovle icons
+        // resovle icons, cannot use include
         var iconIds = result.Data.Select(x => x.BudgetJar.IconId).ToList();
         iconIds.AddRange(result.Data.Select(x => x.Category.IconId));
         var icons = await Mediator.Send(new GetIconsByIds(iconIds));

@@ -1,0 +1,117 @@
+﻿@using Core.Application.Mediator.Categories
+@using Core.Application.Mediator.Icons
+@using Core.Application.Models
+@using MediatR
+@using Web.WebApp.Components
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="@editContext">
+            <DataAnnotationsValidator/>
+            <FluentValidationValidator T="CategoryDto" TValidator="CategoryValidator" />
+            <MudGrid>
+                <MudItem xs="12" sm="2" Class="d-flex justify-center align-center">
+                    @if (inputModel.Icon != null) {
+                        <MudImage Src="@inputModel.Icon.IconUrl" @onclick="@ShowIconSelector"
+                            Alt="@inputModel.Name" Elevation="1" Style="width: 48px; height: 48px;" Class="rounded-4"/>
+                    } else
+                    {
+                        <MudImage Src="/assets/icons/others.png" @onclick="@ShowIconSelector"
+                            Alt="@inputModel.Name" Elevation="1" Style="width: 48px; height: 48px;" Class="rounded-4"/>
+                    }
+                    @if (IconSet != null && IconSet.Length > 0)
+                    {
+                        <MudPopover Open="@isShowIconSelector" OverflowBehavior="OverflowBehavior.FlipAlways"
+                        AnchorOrigin="Origin.BottomLeft" TransformOrigin="Origin.TopLeft" >
+                        <div class="d-flex flex-column">
+                            <MudIconButton OnClick="@hideIconSelector" Class="ml-auto mb-1 p-0" Color="Color.Error" Icon="@Icons.Material.Filled.Close" />
+                            <MudPaper Class="budgetjar-card-icon-set">
+                                @foreach(IconDto icon in IconSet)
+                                {
+                                    <MudImage Class="icon" Src="@icon.IconUrl" Atl="@icon.Name" title="@icon.Name"
+                                        @onclick="@(() => SetIcon(icon))" />
+                                }
+                            </MudPaper>
+                        </div>
+                        </MudPopover>
+                    }
+                </MudItem>
+                <MudItem xs="12" sm="10">
+                    <MudTextField Label="Name" @bind-Value="@inputModel.Name" For="@(() => inputModel.Name)"/>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="OnCloseClicked">Close</MudButton>
+        <MudButton Color="@Color.Primary" Variant="Variant.Filled" OnClick="OnSaveClicked" Disabled="@isSubmitting" >Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] IDialogService Dialog { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public CategoryDto category { get; set; }
+
+    [Parameter]
+    public IconDto[] IconSet { get; set; }
+
+    [Parameter]
+    public Guid UserId { get; set; }
+
+    private EditContext editContext;
+    private CategoryDto inputModel;
+    private bool isShowIconSelector;
+    private bool isSubmitting;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(UserId == Guid.Empty)
+        {
+            throw new ArgumentNullException("User Id is required");
+        }
+
+        if (category != null)
+        {
+            inputModel = category;
+        }
+        else
+        {
+            inputModel = new CategoryDto();
+            inputModel.Id = Guid.Empty;
+            inputModel.Icon = null;
+            inputModel.IconId = Guid.Empty;
+            inputModel.UserId = UserId;
+        }
+        editContext = new EditContext(inputModel);
+    }
+
+    private void OnCloseClicked() => MudDialog.Cancel();
+    private async Task OnSaveClicked() {
+        if (!editContext.Validate() || inputModel.IconId == Guid.Empty) return;
+        isSubmitting = true;
+        var id = await Mediator.Send(new SaveCategoryCommand(inputModel));
+        MudDialog.Close(DialogResult.Ok(id));
+    }
+
+    private void SetIcon(IconDto icon)
+    {
+        inputModel.Icon = icon;
+        inputModel.IconId = icon.Id;
+        isShowIconSelector = false;
+    }
+
+    private void hideIconSelector()
+    {
+        isShowIconSelector = false;
+    }
+
+    private void ShowIconSelector()
+    {
+        isShowIconSelector = true;
+    }
+
+}

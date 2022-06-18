@@ -1,0 +1,191 @@
+﻿@page "/categories"
+@using AutoMapper
+@using Core.Application.Common
+@using Core.Application.Mediator.Categories
+@using Core.Application.Mediator.Icons
+@using Core.Application.Models
+@using Core.Application.Utils
+@using MediatR
+@using System.Security.Authentication
+@using Web.WebApp.Components.Dialogs
+
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Categories")" />
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumbs>
+        <BreadcrumbsItem Icon="@Icons.Filled.Category" Title="Categories"/>
+    </Breadcrumbs>
+    <MudCard>
+        <MudCardContent>
+            <MudTable @ref="table" ServerData="@(new Func<TableState, Task<TableData<CategoryDto>>>(ServerReload))"
+        Dense="true" FixedHeader="true" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true"
+        Loading="@loading" LoadingProgressColor="Color.Info"
+        T= "CategoryDto">
+            <ToolBarContent>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
+                    Add Category
+                </MudButton>
+                <MudSpacer />
+                <MudTextField T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortLabel="Name" T="CategoryDto">Category Name</MudTableSortLabel></MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    <img src="@context.Icon.IconUrl" height="24" width="24" class="mr-2" /> &nbsp;
+                    @context.Name
+                </MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
+                        Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context))" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
+                        Title="Delete" Color="Color.Error" OnClick="@(() => DeleteRow(context.Id))" />
+                </MudTd>
+            </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No record found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading...</MudText>
+            </LoadingContent>
+            <PagerContent>
+                <MudTablePager HorizontalAlignment="HorizontalAlignment.Left" HideRowsPerPage="false" HidePageNumber="false"
+                    InfoFormat="@($"{TotalItems} records")"/>
+            </PagerContent>
+            </MudTable>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+    [Inject] ISnackbar Snackbar { get; set; }
+    [Inject] IMapper Mapper { get; set; }
+    [Inject] IDialogService Dialog { get; set; }
+
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
+
+    private string timeZoneId = DefaultConstants.DefaultTimeZone;
+    private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
+    private string cultureInfo = DefaultConstants.DefaultCultureInfo;
+
+    private MudTable<CategoryDto> table;
+    private int TotalItems;
+    private bool loading = true;
+    private string filter;
+
+    private IconDto[] iconSet = Array.Empty<IconDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        timeZoneId = AuthUser.TimeZone;
+        cultureInfo = AuthUser.CultureInfo;
+        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
+        iconSet = (await Mediator.Send(new GetIconsQuery())).ToArray();
+        base.OnInitialized();
+    }
+
+    private async Task<TableData<CategoryDto>> ServerReload(TableState state)
+    {
+        if (AuthUser == null)
+        {
+            throw new AuthenticationException();
+        }
+
+        loading = true;
+        var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel,
+            state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending);
+
+        var result = await Mediator.Send(new GetCategoryPaged(AuthUser.Id, pagination, filter));
+        TotalItems = result.TotalCount;
+
+        loading = false;
+        return new TableData<CategoryDto>() {TotalItems = result.TotalCount, Items = result.Data};
+    }
+
+    private async Task AddNew()
+    {
+        var dialogParams = new DialogParameters
+        {
+            ["UserId"] = AuthUser.Id,
+            ["IconSet"] = iconSet
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = Dialog.Show<CategoryEditDialog>("New Category", dialogParams, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            await table.ReloadServerData();
+        }
+    }
+
+    private async Task EditRow(CategoryDto category)
+    {
+        var parameters = new DialogParameters
+        {
+            ["UserId"] = AuthUser.Id,
+            ["IconSet"] = iconSet,
+            ["Category"] = category,
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = Dialog.Show<CategoryEditDialog>("Edit Category", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Cancelled && result.Data != null)
+        {
+            await table.ReloadServerData();
+        }
+    }
+
+    private async Task DeleteRow(Guid id)
+    {
+        if (loading) return;
+
+        Snackbar.Clear();
+        loading = true;
+
+        // prevent delete in used category
+        var isUsed = await Mediator.Send(new IsCategoryInUsed(id));
+        if (isUsed)
+        {
+            Snackbar.Add("Cannot delete this category. It's using in the expenses.", Severity.Info);
+            loading = false;
+            return;
+        }
+
+        var dialogParams = new DialogParameters() {
+            ["Message"] = "Are you sure you want to delete this category?",
+            ["Color"] = Color.Error,
+            ["PrimaryButtonText"] = "Delete"
+        };
+        var dialog = Dialog.Show<ConfirmDialog>("Delete Category", dialogParams);
+        var result = await dialog.Result;
+        if (result.Cancelled) {
+            loading = false;
+            return;
+        }
+        try
+        {
+            var deleted = await Mediator.Send(new DeleteCategoryCommand(id, true));
+            if (deleted)
+            {
+                await table.ReloadServerData();
+                Snackbar.Add("Category has been deleted.", Severity.Success);
+                loading = false;
+            }
+        } catch (Exception)
+        {
+            Snackbar.Add("Sorry, cannot delete the category. Please try again later", Severity.Error);
+            loading = false;
+        }
+    }
+
+    private async Task OnSearch(string search)
+    {
+        filter = search;
+        await table.ReloadServerData();
+    }
+}

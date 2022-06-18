@@ -30,8 +30,11 @@ namespace Core.Ioc
             //services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddAutoMapper(Assembly.GetAssembly(typeof(DataMapperProfile)));
             services.AddAutoMapper(Assembly.GetAssembly(typeof(AppMapperProfile)));
-            services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddMediatR(Assembly.GetExecutingAssembly(), typeof(IUnitOfWork).Assembly);
+
+            services.AddMediatR(Assembly.GetExecutingAssembly(),
+                typeof(IUnitOfWork).Assembly,
+                typeof(UnitOfWork).Assembly);
+
             //services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(UserDto)));
 
             // Infrastructure

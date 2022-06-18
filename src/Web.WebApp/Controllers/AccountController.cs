@@ -1,4 +1,5 @@
 ﻿using Core.Application.Mediator.BudgetJars;
+using Core.Application.Mediator.Categories;
 using Core.Application.Models;
 using Core.Application.Services.IServices;
 using MediatR;
@@ -14,9 +15,9 @@ namespace Web.WebApp.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly Mediator _mediator;
+        private readonly IMediator _mediator;
 
-        public AccountController(IUserService userService, Mediator mediator)
+        public AccountController(IUserService userService, IMediator mediator)
         {
             _userService = userService;
             _mediator = mediator;
@@ -40,8 +41,9 @@ namespace Web.WebApp.Controllers
             var response = await _userService.ExternalLoginSignInAsync(loginInfo);
             if (response.Succeeded)
             {
-                // Create budget jar
+                // Create default budget jar and category from system
                 await _mediator.Send(new CreateBudgetJarsFromDefault(response.Data));
+                await _mediator.Send(new CreateCategoryFromDefault(response.Data));
 
                 return LocalRedirect(returnUrl);
             }

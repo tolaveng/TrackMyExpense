@@ -175,9 +175,6 @@
 
         budgetJars = await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id));
         categories = await Mediator.Send(new GetCategoriesQuery(false, AuthUser.Id));
-        var systemCategories = await Mediator.Send(new GetCategoriesQuery(true));
-        categories.AddRange(systemCategories);
-        categories = categories.DistinctBy(x => x.Name).ToList();
 
         if (Id.Equals("new", StringComparison.InvariantCultureIgnoreCase))
         {

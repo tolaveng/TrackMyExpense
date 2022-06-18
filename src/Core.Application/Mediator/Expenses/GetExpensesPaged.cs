@@ -90,6 +90,7 @@ namespace Core.Application.Mediator.Expenses
             var count = await _unitOfWork.ExpenseRepository.CountAsync(expression);
             var data = await _unitOfWork.ExpenseRepository.GetPagedAsync(request.Pagination.Page, request.Pagination.PageSize,
                 expression, orderBy, new []{"BudgetJar", "Category" });
+            // resolve date
             foreach (var item in data)
             {
                 item.PaidDate = DateTimeUtil.ToTimeZoneDateTime(item.PaidDate, request.TimeZoneId);

@@ -1,8 +1,6 @@
 ﻿using Core.Domain.Enitities;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Domain.Entities
 {
@@ -16,5 +14,6 @@ namespace Core.Domain.Entities
         
         public Guid IconId { get; set; }
         public virtual Icon Icon { get; set; }
+        public bool Archived { get; set; }
     }
 }
