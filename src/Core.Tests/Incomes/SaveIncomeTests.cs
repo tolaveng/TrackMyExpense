@@ -9,12 +9,10 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
-namespace Core.Tests.Expenses
+namespace Core.Tests.Incomes
 {
     public class SaveIncomeTests
     {
