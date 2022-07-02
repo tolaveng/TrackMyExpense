@@ -44,13 +44,13 @@ namespace Core.Application.Mediator.Incomes
         {
             var repo = _unitOfWork.IncomeRepository;
 
-            Func<IQueryable<Income>, IOrderedQueryable<Income>> orderBy = x => x.OrderByDescending(z => z.Begin);
+            Func<IQueryable<Income>, IOrderedQueryable<Income>> orderBy = x => x.OrderByDescending(z => z.FromDate);
             switch (request.Pagination.SortBy)
             {
                 case "IncomePeriod":
                     orderBy = request.Pagination.SortDirection == Pagination.Ascending
-                    ? orderBy = x => x.OrderBy(z => z.Begin)
-                    : orderBy = x => x.OrderByDescending(z => z.Begin);
+                    ? orderBy = x => x.OrderBy(z => z.FromDate)
+                    : orderBy = x => x.OrderByDescending(z => z.FromDate);
                     break;
 
                 case "Amount":
@@ -103,8 +103,8 @@ namespace Core.Application.Mediator.Incomes
             var data = await repo.GetPagedAsync(request.Pagination.Page, request.Pagination.PageSize, expression, orderBy, new[] { "IncomeBudgetJars" });
             foreach(var item in data)
             {
-                item.Begin = DateTimeUtil.ToTimeZoneDateTime(item.Begin, request.TimeZoneId);
-                item.End = DateTimeUtil.ToTimeZoneDateTime(item.End, request.TimeZoneId);
+                item.FromDate = DateTimeUtil.ToTimeZoneDateTime(item.FromDate, request.TimeZoneId);
+                item.ToDate = DateTimeUtil.ToTimeZoneDateTime(item.ToDate, request.TimeZoneId);
             }
             return new PagedResponse<IncomeDto>(_mapper.Map<IEnumerable<IncomeDto>>(data), count);
         }

@@ -40,13 +40,17 @@
             <RowTemplate>
                 <MudTd DataLabel="Date">@context.PaidDate.ToString(dateTimeFormat)</MudTd>
                 <MudTd DataLabel="Jar">
-                    <img src="@context.BudgetJar.Icon.IconUrl" height="24" width="24" class="mr-2" />
-                    @context.BudgetJar.Name
+                    <div class="d-flex flex-row">
+                        <img src="@context.BudgetJar.Icon.IconUrl" height="24" width="24" class="mr-2" />
+                        @context.BudgetJar.Name
+                    </div>
                 </MudTd>
                 <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
                 <MudTd DataLabel="Category">
-                    <img src="@context.Category.Icon.IconUrl" height="24" width="24" class="mr-2" />
-                    @context.Category.Name
+                    <div class="d-flex flex-row">
+                        <img src="@context.Category.Icon.IconUrl" height="24" width="24" class="mr-2" />
+                        @context.Category.Name
+                    </div>
                 </MudTd>
                 <MudTd DataLabel="Description" HideSmall="@true">
                     @if(!string.IsNullOrWhiteSpace(context.Description) && context.Description.Length > 64)
@@ -57,10 +61,12 @@
                     }
                 </MudTd>
                 <MudTd DataLabel="Actions">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
+                    <div class="d-flex flex-row">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
                         Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
                         Title="Delete" Color="Color.Error" OnClick="@(() => DeleteRow(context.Id))" />
+                    </div>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>

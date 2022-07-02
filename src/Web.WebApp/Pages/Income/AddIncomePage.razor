@@ -41,14 +41,14 @@
                     
                     <MudItem xs="12" sm="6">
                         <MudText Typo="Typo.caption">Income Period:</MudText>
-                        <MudDatePicker Label="From date" @bind-Date="@incomeInputForm.Begin"
-                            For="@(() => incomeInputForm.Begin)" Placeholder="@dateTimeFormat"
+                        <MudDatePicker Label="From date" @bind-Date="@incomeInputForm.FromDate"
+                            For="@(() => incomeInputForm.FromDate)" Placeholder="@dateTimeFormat"
                             DateFormat="@dateTimeFormat" DisableToolbar="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudText Typo="Typo.caption" Class="d-none d-sm-block">@((MarkupString)"&nbsp;")</MudText>
-                        <MudDatePicker Label="To date" @bind-Date="@incomeInputForm.End"
-                            For="@(() => incomeInputForm.End)" Placeholder="@dateTimeFormat"
+                        <MudDatePicker Label="To date" @bind-Date="@incomeInputForm.ToDate"
+                            For="@(() => incomeInputForm.ToDate)" Placeholder="@dateTimeFormat"
                             DateFormat="@dateTimeFormat" DisableToolbar="true"/>
                     </MudItem>
 
@@ -247,8 +247,8 @@
         public Guid UserId { get; set; }
         public decimal Amount { get; set; }
         public string Note { get; set; }
-        public DateTime? Begin { get; set; }
-        public DateTime? End { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
 
         public IncomeInputModel(){}
 
@@ -258,8 +258,8 @@
             UserId = user.Id;
             Amount = 0;
             var now = DateTimeUtil.TimeZoneNow(user.TimeZone);
-            Begin = new DateTime(now.Year, now.Month, 1);
-            End = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+            FromDate = new DateTime(now.Year, now.Month, 1);
+            ToDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
         }
 
         public IncomeInputModel(IncomeDto income)
@@ -268,8 +268,8 @@
             UserId = income.UserId;
             Amount = income.Amount;
             Note = income.Note;
-            Begin = income.Begin;
-            End = income.End;
+            FromDate = income.FromDate;
+            ToDate = income.ToDate;
         }
 
         public IncomeDto ToIncomeDto(string timeZone)
@@ -280,8 +280,8 @@
                 UserId = UserId,
                 Amount = Amount,
                 Note = Note,
-                Begin = DateTimeUtil.ToUtcDateTime(Begin.Value.Date, timeZone),
-                End = DateTimeUtil.ToUtcDateTime(End.Value.Date, timeZone)
+                FromDate = DateTimeUtil.ToUtcDateTime(FromDate.Value.Date, timeZone),
+                ToDate = DateTimeUtil.ToUtcDateTime(ToDate.Value.Date, timeZone)
             };
         }
     }
@@ -294,11 +294,11 @@
             .GreaterThanOrEqualTo(1).WithMessage("Amount must be greater than or equal to 1")
             .LessThan(1000000).WithMessage("Amount must be less than 1000000");
 
-            RuleFor(x => x.Begin).NotEmpty().WithMessage("Begin date is required")
-            .LessThan(x => x.End).When(x => x.End != null).WithMessage("Begin date must be before the end date");
+            RuleFor(x => x.FromDate).NotEmpty().WithMessage("Begin date is required")
+            .LessThan(x => x.ToDate).When(x => x.ToDate != null).WithMessage("Begin date must be before the end date");
 
-            RuleFor(x => x.End).NotEmpty().WithMessage("End date is required")
-            .GreaterThan(x => x.Begin).When(x => x.Begin != null).WithMessage("End date must be after the start date");
+            RuleFor(x => x.ToDate).NotEmpty().WithMessage("End date is required")
+            .GreaterThan(x => x.FromDate).When(x => x.FromDate != null).WithMessage("End date must be after the start date");
         }
     }
 }

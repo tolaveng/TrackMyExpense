@@ -14,8 +14,8 @@ namespace Core.Domain.Entities
         public Guid UserId  { get; set; }
         public decimal Amount { get; set; }
         public string Note { get; set; }
-        public DateTime Begin { get; set; }
-        public DateTime End { get; set; }
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
         public virtual ICollection<IncomeBudgetJar> IncomeBudgetJars { get; set; }
 
         public bool Archived { get; set; }

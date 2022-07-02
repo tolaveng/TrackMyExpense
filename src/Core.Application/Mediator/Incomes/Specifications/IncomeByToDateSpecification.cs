@@ -8,7 +8,7 @@ namespace Core.Application.Mediator.Incomes.Specifications
         public IncomeByToDateSpecification(DateTime toDate)
             : base()
         {
-            FilterExpression = x => x.End <= toDate;
+            FilterExpression = x => x.ToDate <= toDate;
         }
     }
 }

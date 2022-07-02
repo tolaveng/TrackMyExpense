@@ -37,8 +37,8 @@ namespace Core.Application.Mediator.Incomes
             {
                 return null;
             }
-            income.Begin = DateTimeUtil.ToTimeZoneDateTime(income.Begin, request.TimeZoneId);
-            income.End = DateTimeUtil.ToTimeZoneDateTime(income.End, request.TimeZoneId);
+            income.FromDate = DateTimeUtil.ToTimeZoneDateTime(income.FromDate, request.TimeZoneId);
+            income.ToDate = DateTimeUtil.ToTimeZoneDateTime(income.ToDate, request.TimeZoneId);
             return _mapper.Map<IncomeDto>(income);
         }
     }

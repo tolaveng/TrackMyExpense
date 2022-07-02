@@ -121,6 +121,8 @@ namespace Core.Application.Services
         public UserDto GetById(Guid userId)
         {
             var appUser = _userRepository.GetById(userId);
+            if (appUser == null) throw new ApplicationException("User not found.");
+
             var userDto = _mapper.Map<UserDto>(appUser);
             userDto.Password = string.Empty;
             userDto.TimeZone = !string.IsNullOrWhiteSpace(userDto.TimeZone) ? userDto.TimeZone : DefaultConstants.DefaultTimeZone;

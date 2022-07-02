@@ -35,7 +35,7 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Income Period">
-                    @context.Begin.ToString(dateTimeFormat) - @context.End.ToString(dateTimeFormat)
+                    @context.FromDate.ToString(dateTimeFormat) - @context.ToDate.ToString(dateTimeFormat)
                 </MudTd>
                 <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
                 <MudTd DataLabel="Note" HideSmall="@true">
@@ -47,10 +47,12 @@
                     }
                 </MudTd>
                 <MudTd DataLabel="Actions">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
+                    <div class="d-flex flex-row">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
                         Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
                         Title="Delete" Color="Color.Error" OnClick="@(() => DeleteRow(context.Id))" />
+                    </div>
                 </MudTd>
             </RowTemplate>
             <NoRecordsContent>
@@ -84,7 +86,6 @@
 
     private MudTable<IncomeDto> table;
     private int TotalItems;
-    private string searchString = null;
     private bool loading = true;
 
     private IncomeFilter filter = new IncomeFilter();

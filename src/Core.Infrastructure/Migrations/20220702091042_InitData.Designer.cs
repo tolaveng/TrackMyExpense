@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220613021747_InitDataTables")]
-    partial class InitDataTables
+    [Migration("20220702091042_InitData")]
+    partial class InitData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -809,14 +809,14 @@ namespace Core.Infrastructure.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("Begin")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("End")
+                    b.Property<DateTime>("FromDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Note")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("ToDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -1040,14 +1040,14 @@ namespace Core.Infrastructure.Migrations
                         new
                         {
                             Id = new Guid("9b78ce40-633a-48b5-99e3-d1cc5c753fbe"),
-                            ConcurrencyStamp = "57fc82e7-fa85-4e69-a666-4a7000b8b186",
+                            ConcurrencyStamp = "171638f1-534b-4e70-bddd-e975af32de8d",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("6a9ae0f3-285d-450b-96e5-413362fae4a6"),
-                            ConcurrencyStamp = "40247087-c02e-47b4-aaf5-969af116dac3",
+                            ConcurrencyStamp = "77df938f-9c25-437b-a4a8-52d745140423",
                             Name = "user",
                             NormalizedName = "USER"
                         });
