@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
 using Core.Application.Common;
 using Core.Application.IRepositories;
+using Core.Application.Mediator.Incomes.Specifications;
 using Core.Application.Models;
+using Core.Application.Specifications.Base;
 using Core.Application.Utils;
 using Core.Domain.Entities;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Core.Application.Mediator.Incomes
 {
@@ -20,11 +18,14 @@ namespace Core.Application.Mediator.Incomes
         public Guid UserId { get; set; }
         public Pagination Pagination { get; set; } = new Pagination();
 
-        public GetIncomesPaged(Guid userId, string timeZoneId, Pagination pagination)
+        public IncomeFilter? Filter { get; set; }
+
+        public GetIncomesPaged(Guid userId, string timeZoneId, Pagination pagination, IncomeFilter? filter = null)
         {
             TimeZoneId = timeZoneId;
             UserId = userId;
             Pagination = pagination;
+            Filter = filter;
         }
     }
 
@@ -46,16 +47,10 @@ namespace Core.Application.Mediator.Incomes
             Func<IQueryable<Income>, IOrderedQueryable<Income>> orderBy = x => x.OrderByDescending(z => z.Begin);
             switch (request.Pagination.SortBy)
             {
-                case "Begin":
+                case "IncomePeriod":
                     orderBy = request.Pagination.SortDirection == Pagination.Ascending
                     ? orderBy = x => x.OrderBy(z => z.Begin)
                     : orderBy = x => x.OrderByDescending(z => z.Begin);
-                    break;
-
-                case "End":
-                    orderBy = request.Pagination.SortDirection == Pagination.Ascending
-                    ? orderBy = x => x.OrderBy(z => z.End)
-                    : orderBy = x => x.OrderByDescending(z => z.End);
                     break;
 
                 case "Amount":
@@ -65,9 +60,47 @@ namespace Core.Application.Mediator.Incomes
                     break;
             }
 
-            Expression<Func<Income, bool>> expression = (z) => z.UserId == request.UserId && !z.Archived;
+            var userIdSpecification = new IncomeByUserIdSpecification(request.UserId);
+            var filterSpecification = new BaseSpecification<Income>(userIdSpecification.FilterExpression);
+
+            if (request.Filter != null)
+            {
+                var filter = request.Filter;
+                if (!string.IsNullOrWhiteSpace(filter.Note))
+                {
+                    filterSpecification = filterSpecification.And(new IncomeByDescriptionSpecification(filter.Note));
+                }
+
+                if (filter.MinAmount.HasValue && filter.MinAmount.Value > -1)
+                {
+                    filterSpecification = filterSpecification.And(new IncomeByMinAmountSpecification(filter.MinAmount.Value));
+                }
+
+                if (filter.MaxAmount.HasValue && filter.MaxAmount.Value > 0)
+                {
+                    filterSpecification = filterSpecification.And(new IncomeByMaxAmountSpecification(filter.MaxAmount.Value));
+                }
+
+                if (filter.BudgetJarId != Guid.Empty)
+                {
+                    filterSpecification = filterSpecification.And(new IncomeByBudgetJarIdSpecification(filter.BudgetJarId));
+                }
+
+                if (filter.FromDate.HasValue)
+                {
+                    filterSpecification = filterSpecification.And(new IncomeByFromDateSpecification(filter.FromDate.Value));
+                }
+
+                if (filter.ToDate.HasValue)
+                {
+                    filterSpecification = filterSpecification.And(new IncomeByToDateSpecification(filter.ToDate.Value));
+                }
+
+            }
+            Expression<Func<Income, bool>> expression = filterSpecification.FilterExpression;
+
             var count = await repo.CountAsync(expression);
-            var data = await repo.GetPagedAsync(request.Pagination.Page, request.Pagination.PageSize, expression, orderBy);
+            var data = await repo.GetPagedAsync(request.Pagination.Page, request.Pagination.PageSize, expression, orderBy, new[] { "IncomeBudgetJars" });
             foreach(var item in data)
             {
                 item.Begin = DateTimeUtil.ToTimeZoneDateTime(item.Begin, request.TimeZoneId);

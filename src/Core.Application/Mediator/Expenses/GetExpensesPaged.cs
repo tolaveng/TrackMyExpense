@@ -6,7 +6,6 @@ using Core.Application.Utils;
 using Core.Domain.Entities;
 using MediatR;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Core.Application.Mediator.Expenses
 {
@@ -138,9 +137,16 @@ namespace Core.Application.Mediator.Expenses
                     break;
 
                 case "MaxAmount":
-                    if (Value is decimal maxAmount && maxAmount > -1)
+                    if (Value is decimal maxAmount && maxAmount > 0)
                     {
                         return x => x.Amount <= maxAmount;
+                    }
+                    break;
+
+                case "IsTaxable":
+                    if (Value is bool isTaxable && isTaxable)
+                    {
+                        return x => x.IsTaxable;
                     }
                     break;
             }
