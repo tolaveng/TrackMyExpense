@@ -1,9 +1,9 @@
 ﻿@using Core.Application.Mediator.BudgetJars
-@using Core.Application.Mediator.Categories
-@using Core.Application.Mediator.Expenses
+@using Core.Application.Mediator.Incomes
 @using Core.Application.Models
 @using Core.Application.Utils
 @using MediatR
+
 <div>
     <MudButton Variant="Variant.Filled" 
         StartIcon="@Icons.Filled.FilterList" Color="Color.Default" OnClick="@toggleFilter">
@@ -16,9 +16,18 @@
         Elevation="3"
         Paper="true">
         <MudPaper Outlined="true" Class="px-4 py-8">
-            <MudDatePicker Label="Date" @bind-Date="@paidDate" Placeholder="@dateTimeFormat"
-                DateFormat="@dateTimeFormat" DisableToolbar="true" Class="mb-3" />
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                <MudDatePicker Label="From date" @bind-Date="@fromDate" Placeholder="@dateTimeFormat"
+                    DateFormat="@dateTimeFormat" DisableToolbar="true" Class="mb-3" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                 <MudDatePicker Label="To date" @bind-Date="@toDate" Placeholder="@dateTimeFormat"
+                    DateFormat="@dateTimeFormat" DisableToolbar="true" Class="mb-3" />
+                </MudItem>
+            </MudGrid>
 
+            @*
             <MudSelect @bind-Value="@Filter.BudgetJarId" Label="Budget Jar" Variant="Variant.Text" Class="mb-3">
                 <MudSelectItem Value="@(Guid.Empty)">Select</MudSelectItem>
                 @foreach (var jar in budgetJars)
@@ -26,14 +35,8 @@
                     <MudSelectItem Value="@jar.Id">@jar.Name</MudSelectItem>
                 }
             </MudSelect>
+            *@
 
-            <MudSelect @bind-Value="@Filter.CategoryId" Label="Category" Variant="Variant.Text" Class="mb-3">
-                <MudSelectItem Value="@(Guid.Empty)">Select</MudSelectItem>
-                @foreach (var group in categories)
-                {
-                    <MudSelectItem Value="@group.Id">@group.Name</MudSelectItem>
-                }
-            </MudSelect>
             <MudGrid>
                 <MudItem xs="12" sm="6">
                     <MudTextField @bind-Value="@Filter.MinAmount" Label="Min Amount" MaxLength="10" Class="mb-3" />
@@ -42,9 +45,8 @@
                     <MudTextField @bind-Value="@Filter.MaxAmount" Label="Max Amount" MaxLength="10" Class="mb-3" />
                 </MudItem>
             </MudGrid>
-            <MudTextField @bind-Value="@Filter.Description" Label="Description" Class="mb-3" />
-            <MudCheckBox @bind-Checked="@Filter.IsTaxable" Label="Is Taxable" Class="mb-3" />
-
+            <MudTextField @bind-Value="@Filter.Note" Label="Description" Class="mb-3" />
+            
             <div class="d-flex flex-row justify-space-between mt-3 ml-3 mr-3" >
                 <MudButton OnClick="@applyFilter" Class="mr-auto ml-n2" Color="Color.Primary" StartIcon="@Icons.Filled.Check" >Apply</MudButton>
                 <MudButton OnClick="@clearFilter" Class="ml-auto mr-n2" Color="Color.Default" StartIcon="@Icons.Filled.Clear">Clear</MudButton>
@@ -57,21 +59,21 @@
     [Inject] IMediator Mediator { get; set; }
 
     [Parameter]
-    public ExpenseFilter Filter { get; set; } = new ExpenseFilter();
+    public IncomeFilter Filter { get; set; } = new IncomeFilter();
 
     [Parameter]
-    public EventCallback<ExpenseFilter> OnFilterChanged { get; set; }
+    public EventCallback<IncomeFilter> OnFilterChanged { get; set; }
 
 
     [CascadingParameter]
     public UserDto AuthUser { get; set; } = default;
 
     private bool isShow;
-    private DateTime? paidDate;
+    private DateTime? fromDate;
+    private DateTime? toDate;
     private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
     private string cultureInfo = DefaultConstants.DefaultCultureInfo;
-    private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
-    private CategoryDto[] categories = Array.Empty<CategoryDto>();
+    // private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
 
     private void toggleFilter()
     {
@@ -81,9 +83,15 @@
     private async void applyFilter()
     {
         isShow = false;
-        if (paidDate.HasValue)
+
+        if (fromDate.HasValue)
         {
-            Filter.PaidDate = DateTimeUtil.ToUtcDateTime(paidDate.Value.Date, AuthUser.TimeZone);
+            Filter.FromDate = DateTimeUtil.ToUtcDateTime(fromDate.Value.Date, AuthUser.TimeZone);
+        }
+
+        if (toDate.HasValue)
+        {
+            Filter.ToDate = DateTimeUtil.ToUtcDateTime(toDate.Value.Date, AuthUser.TimeZone);
         }
 
         if (OnFilterChanged.HasDelegate)
@@ -95,23 +103,21 @@
     private async void clearFilter()
     {
         isShow = false;
-        Filter = new ExpenseFilter();
-
+        Filter = new IncomeFilter();
+        fromDate = null;
+        toDate = null;
         if (OnFilterChanged.HasDelegate)
         {
             await OnFilterChanged.InvokeAsync(Filter);
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         cultureInfo = AuthUser.CultureInfo;
         dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
 
-        budgetJars = (await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id)))
-            .OrderBy(x => x.Name).ToArray();
-        
-        categories = (await Mediator.Send(new GetCategoriesQuery(false, AuthUser.Id)))
-            .OrderBy(x => x.Name).ToArray();
+        //budgetJars = (await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id)))
+        //    .OrderBy(x => x.Name).ToArray();
     }
 }

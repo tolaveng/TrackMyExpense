@@ -30,20 +30,30 @@
                     <FluentValidationValidator T="IncomeInputModel" TValidator="IncomeInputValidator"/>
                     <MudGrid>
                     <MudItem xs="12" sm="12">
-                        <MudText>Add an income into your budget jars.</MudText>
+                        @if (isNew)
+                        {
+                            <MudText>Add income to budget jars.</MudText>
+                        } else
+                        {
+                            <MudText>Update income and budget jars.</MudText>
+                        }
                     </MudItem>
+                    
                     <MudItem xs="12" sm="6">
-                        <MudDatePicker Label="Begin date" @bind-Date="@incomeInputForm.Begin"
+                        <MudText Typo="Typo.caption">Income Period:</MudText>
+                        <MudDatePicker Label="From date" @bind-Date="@incomeInputForm.Begin"
                             For="@(() => incomeInputForm.Begin)" Placeholder="@dateTimeFormat"
                             DateFormat="@dateTimeFormat" DisableToolbar="true" />
                     </MudItem>
                     <MudItem xs="12" sm="6">
-                        <MudDatePicker Label="End date" @bind-Date="@incomeInputForm.End"
+                        <MudText Typo="Typo.caption" Class="d-none d-sm-block">@((MarkupString)"&nbsp;")</MudText>
+                        <MudDatePicker Label="To date" @bind-Date="@incomeInputForm.End"
                             For="@(() => incomeInputForm.End)" Placeholder="@dateTimeFormat"
                             DateFormat="@dateTimeFormat" DisableToolbar="true"/>
                     </MudItem>
+
                     <MudItem xs="12" sm="12">
-                        <MudTextField Label="Amount" @bind-Value="@incomeInputForm.Amount"
+                        <MudTextField Label="Amount:" @bind-Value="@incomeInputForm.Amount"
                             For="@(() => incomeInputForm.Amount)" MaxLength="10" Class="mb-3"
                             Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.AttachMoney"
                             Immediate="true" TextChanged="@(x => CalculateBudgetJar(x))"/>

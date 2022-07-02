@@ -21,21 +21,22 @@
         Loading="@loading" LoadingProgressColor="Color.Info"
         T= "IncomeDto">
             <ToolBarContent>
-                <MudSpacer />
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@AddNew">
                     Add Income
                 </MudButton>
+                <MudSpacer />
+                <IncomeFilterSelector Filter="@filter" OnFilterChanged="@OnFilterChanged" />
             </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortLabel="Begin" T="IncomeDto">Begin</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortLabel="End" T="IncomeDto">End</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="IncomePeriod" T="IncomeDto">Income Period</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="Amount" T="IncomeDto">Amount</MudTableSortLabel></MudTh>
                 <MudTh>Note</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Begin">@context.Begin.ToString(dateTimeFormat)</MudTd>
-                <MudTd DataLabel="End" HideSmall="@true">@context.End.ToString(dateTimeFormat)</MudTd>
+                <MudTd DataLabel="Income Period">
+                    @context.Begin.ToString(dateTimeFormat) - @context.End.ToString(dateTimeFormat)
+                </MudTd>
                 <MudTd DataLabel="Amount">@CurrencyUtil.Formatted(context.Amount, cultureInfo)</MudTd>
                 <MudTd DataLabel="Note" HideSmall="@true">
                     @if(!string.IsNullOrWhiteSpace(context.Note) && context.Note.Length > 64)
@@ -86,6 +87,8 @@
     private string searchString = null;
     private bool loading = true;
 
+    private IncomeFilter filter = new IncomeFilter();
+
     protected override void OnInitialized()
     {
         timeZoneId = AuthUser.TimeZone;
@@ -106,7 +109,7 @@
         var pagination = new Pagination(state.Page, state.PageSize, state.SortLabel,
             state.SortDirection == SortDirection.Descending ? Pagination.Descending : Pagination.Ascending);
 
-        var result = await Mediator.Send(new GetIncomesPaged(AuthUser.Id, timeZoneId, pagination));
+        var result = await Mediator.Send(new GetIncomesPaged(AuthUser.Id, timeZoneId, pagination, filter));
         TotalItems = result.TotalCount;
         loading = false;
         return new TableData<IncomeDto>() {TotalItems = result.TotalCount, Items = result.Data};
@@ -144,5 +147,11 @@
         {
             Snackbar.Add("Sorry, cannot delete the income. Please try again later", Severity.Error);
         }
+    }
+
+    private async Task OnFilterChanged(IncomeFilter aFilter)
+    {
+        filter = aFilter;
+        await table.ReloadServerData();
     }
 }
