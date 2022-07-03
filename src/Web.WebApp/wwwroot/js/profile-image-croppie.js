@@ -38,6 +38,7 @@ window.previewProfileImage = function (imageStream) {
                 url: imageUrl
             });
         }
+        // URL.revokeObjectURL(imageUrl);
     }).catch(function (ex) {
         console.error('PreviewProfileImage', ex);
     });

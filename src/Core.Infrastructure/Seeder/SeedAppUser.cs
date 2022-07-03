@@ -4,7 +4,6 @@ using Core.Infrastructure.Database;
 using Core.Infrastructure.Database.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -62,6 +61,17 @@ namespace Core.Infrastructure.Seeder
                         CreatedBy = adminUserId
                     };
                     context.Subscriptions.Add(subscription);
+
+                    // Create category
+                    var cat = new Category()
+                    {
+                        Id = Guid.Parse("6B7C5AD3-82C5-4AFC-AD66-A2A895A4BF7B"),
+                        Name = "Others",
+                        IsSystem = true,
+                        IconId = Guid.Parse("6B7C5AD3-82C5-4AFC-AD66-A2A895A4BF7B"),
+                    };
+                    context.Categories.Add(cat);
+
                     context.SaveChanges();
                 }
             }

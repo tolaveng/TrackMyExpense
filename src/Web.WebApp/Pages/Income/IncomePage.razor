@@ -48,10 +48,12 @@
                 </MudTd>
                 <MudTd DataLabel="Actions">
                     <div class="d-flex flex-row">
+                        <MudIconButton Icon="@Icons.Filled.RemoveRedEye" Size="Size.Small" aria-label="view"
+                            Title="View" Color="Color.Primary" OnClick="@(() => ViewRow(context.Id))" Class="mr-1" />
                         <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="edit"
-                        Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" />
+                            Title="Edit" Color="Color.Primary" OnClick="@(() => EditRow(context.Id))" Class="mr-1" />
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="delete"
-                        Title="Delete" Color="Color.Error" OnClick="@(() => DeleteRow(context.Id))" />
+                            Title="Delete" Color="Color.Error" OnClick="@(() => DeleteRow(context.Id))" Class="mr-1" />
                     </div>
                 </MudTd>
             </RowTemplate>
@@ -124,6 +126,20 @@
     private void EditRow(Guid incomeId)
     {
         NavigationManager.NavigateTo($"/income/{incomeId}");
+    }
+
+    private async Task ViewRow(Guid id)
+    {
+        var parameters = new DialogParameters {
+            ["IncomeId"] = id,
+            ["UserId"] = AuthUser.Id,
+            ["TimeZone"] = timeZoneId,
+            ["DateTimeFormat"] = dateTimeFormat,
+            ["CultureInfo"] = cultureInfo,
+        };
+        var options = new DialogOptions() { MaxWidth = MaxWidth.Large, FullWidth = true };
+        var dialog = Dialog.Show<IncomeViewDialog>("View Income", parameters, options);
+        await dialog.Result;
     }
 
     private async Task DeleteRow(Guid incomeId)

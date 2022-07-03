@@ -32,7 +32,7 @@ namespace Core.Application.Mediator.Expenses
         public async Task<ExpenseDto?> Handle(GetExpenseById request, CancellationToken cancellationToken)
         {
             var expense = await _unitOfWork.ExpenseRepository
-                .GetAsync(x => x.Id == request.ExpenseId && x.UserId == request.UserId);
+                .GetAsync(x => x.Id == request.ExpenseId && x.UserId == request.UserId, new[] { "BudgetJar", "Category" });
             if (expense == null)
             {
                 return null;

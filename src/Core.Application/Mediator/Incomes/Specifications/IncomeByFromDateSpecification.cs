@@ -1,4 +1,5 @@
 ﻿using Core.Application.Specifications.Base;
+using Core.Application.Utils;
 using Core.Domain.Entities;
 
 namespace Core.Application.Mediator.Incomes.Specifications
@@ -8,7 +9,7 @@ namespace Core.Application.Mediator.Incomes.Specifications
         public IncomeByFromDateSpecification(DateTime fromDate)
             : base()
         {
-            FilterExpression = x => x.FromDate >= fromDate;
+            FilterExpression = x => x.FromDate >= fromDate.StartOfDayUtc();
         }
     }
 }

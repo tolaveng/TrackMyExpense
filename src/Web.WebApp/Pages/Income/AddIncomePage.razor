@@ -83,7 +83,7 @@
                         <MudButton Type="button" Variant="Variant.Outlined" Color="@Color.Default" Class="mt-3 mr-3" OnClick="@OnCancel">
                             Cancel</MudButton>
                     }
-                    <AppButton Type="submit" Text="Save" Color="@Color.Primary" IsLoading="@isSubmitting"
+                    <AppButton Type="submit" Text="Save" Color="@Color.Primary" IsLoading="@isSubmitting" Icon="@Icons.Filled.Save"
                             IsDisabled="@(!((formContext.IsModified() || isModified) && formContext.Validate()))" Class="mt-3" />
                 </EditForm>
             </MudContainer>

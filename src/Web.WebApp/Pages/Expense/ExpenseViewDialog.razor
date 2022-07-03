@@ -1,0 +1,112 @@
+﻿@using Core.Application.Extensions
+@using Core.Application.Mediator.Expenses
+@using Core.Application.Mediator.Icons
+@using Core.Application.Models
+@using Core.Application.Utils
+@using MediatR
+@using Web.WebApp.Components.FileUploader
+<MudDialog>
+    <DialogContent>
+        @if (expense == null)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        } else
+        {
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <span>Date:</span> <b>@expense.PaidDate.ToString(DateTimeFormat)</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <span>Amount:</span> <b>@CurrencyUtil.Formatted(expense.Amount, CultureInfo)</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <span>Budget Jar:</span> &nbsp;
+                    @if (budgetJarIcon != null)
+                    {
+                        <img src="@budgetJarIcon.IconUrl" height="24" width="24" class="mr-2" />
+                    }
+                    <b>@expense.BudgetJar.Name</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <span>Categoy:</span> &nbsp;
+                    @if (categoryIcon != null) {
+                        <img src="@categoryIcon.IconUrl" height="24" width="24" class="mr-2" />
+                    }
+                     <b>@expense.Category.Name</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <span>Payment type:</span> <b>@expense.PaymentMethod.GetDisplayName()</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <span>Is Taxable:</span> <b>@(expense.IsTaxable ? "Yes" : "No")</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="12">
+                    <span>Description:</span>
+                    <div>
+                        @((MarkupString)expense.Description.GetHtmlText())
+                    </div>
+                </MudItem>
+                @if (expense.Attachments != null && expense.Attachments.Any())
+                {
+                    <MudItem xs="12" sm="12">
+                        <span>Attachments:</span> <div>
+                            @foreach(var attachment in expense.Attachments)
+                            {
+                                var file = new FileUploaderFile(attachment.Name, attachment.FileName);
+                                <FileUploaderItem @key="@file" File="@file" />
+                            }
+                        </div>
+                    </MudItem>   
+                }
+            </MudGrid>   
+        }
+    </DialogContent>
+    <DialogActions>
+        <AppButton OnClick="OnEditClicked" Icon="@Icons.Filled.Edit" Text="Edit" />
+        <AppButton OnClick="OnCloseClicked" IsOutline="true" Icon="@Icons.Filled.Close" Text="Close" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] IDialogService Dialog { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Guid ExpenseId { get; set; } = Guid.Empty;
+    [Parameter] public Guid UserId { get; set; } = Guid.Empty;
+    [Parameter] public string TimeZone { get; set; }
+    [Parameter] public string DateTimeFormat { get; set; }
+    [Parameter] public string CultureInfo { get; set; }
+
+    private ExpenseDto expense;
+    private IconDto budgetJarIcon;
+    private IconDto categoryIcon;
+
+    private void OnCloseClicked() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        expense = await Mediator.Send(new GetExpenseById(UserId, ExpenseId, TimeZone));
+        if (expense == null)
+        {
+            throw new InvalidOperationException("Expense is not found");
+        }
+
+        var icons = (await Mediator.Send(new GetIconsQuery())).ToArray();
+        budgetJarIcon = icons.SingleOrDefault(x => x.Id == expense.BudgetJar.IconId);
+        categoryIcon = icons.SingleOrDefault(x => x.Id == expense.Category.IconId);
+    }
+
+    private void OnEditClicked()
+    {
+        NavigationManager.NavigateTo($"/expense/{expense.Id}");
+    }
+}

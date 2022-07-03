@@ -16,10 +16,19 @@
             <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Cancel" aria-label="Cancel" title="Cancel" OnClick="@CancelClick" />
         } else if (!ReadOnly)
         {
-            <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Edit" aria-label="Edit" title="Edit" OnClick="@EditClick" />
+            @if (!HideEdit)
+            {
+                <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Edit" aria-label="Edit" title="Edit" OnClick="@EditClick" />    
+            }
+            
             @if (!HideDelete)
             {
                 <MudIconButton Class="icon" Icon="@Icons.Material.Filled.Delete" aria-label="Delete" Title="Delete" OnClick="@DeleteClick" />
+            }
+
+            if (HideEdit && HideDelete)
+            {
+                <div class="m-3"></div>
             }
         } else
         {
@@ -93,6 +102,9 @@
 
     [Parameter]
     public bool HideDelete { get; set; }
+
+    [Parameter]
+    public bool HideEdit { get; set; }
 
     [Parameter]
     public bool HideEditName { get; set; }

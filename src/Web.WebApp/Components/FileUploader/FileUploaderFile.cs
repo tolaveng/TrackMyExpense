@@ -2,5 +2,5 @@
 
 namespace Web.WebApp.Components.FileUploader
 {
-    public record FileUploaderFile( string Name, string FileName, IBrowserFile BowserFile = null);
+    public record FileUploaderFile( string Name, string FileName, IBrowserFile BrowserFile = null);
 }

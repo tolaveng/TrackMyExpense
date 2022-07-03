@@ -101,11 +101,19 @@ namespace Core.Application.Mediator.Expenses
         {
             switch (Name)
             {
-                case "PaidDate":
-                    if (Value is DateTime paidDate)
+                case "FromDate":
+                    if (Value is DateTime fromDate)
                     {
                         return x =>
-                            x.PaidDate >= paidDate.StartOfDayUtc() && x.PaidDate <= paidDate.EndOfDayUtc();
+                            x.PaidDate >= fromDate.StartOfDayUtc();
+                    }
+                    break;
+
+                case "ToDate":
+                    if (Value is DateTime toDate)
+                    {
+                        return x =>
+                            x.PaidDate <= toDate.EndOfDayUtc();
                     }
                     break;
 

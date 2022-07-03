@@ -189,7 +189,7 @@ a, .btn-link {
 }
 
 .mud-dialog-content {
-    max-height: 520px;
+    max-height: 480px;
     overflow-y: scroll;
 }
 

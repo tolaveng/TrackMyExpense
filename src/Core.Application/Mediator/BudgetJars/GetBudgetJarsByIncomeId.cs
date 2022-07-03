@@ -30,10 +30,12 @@ namespace Core.Application.Mediator.BudgetJars
             var jarIds = incomeJars.Select(x => x.BudgetJarId).ToList();
             var budgetJars = await _unitOfWork.BudgetJarRepository.GetAllAsync(x => jarIds.Contains(x.Id),
                 x => x.OrderByDescending(o => o.Percentage), new[] {"Icon"});
+            // replace by income jar
             foreach(var jar in budgetJars)
             {
-                jar.TotalBalance = 0;
-                jar.Percentage = incomeJars.Single(x => x.BudgetJarId == jar.Id).Percentage;
+                var incomeJar = incomeJars.Single(x => x.BudgetJarId == jar.Id);
+                jar.TotalBalance = incomeJar.Amount;
+                jar.Percentage = incomeJar.Percentage;
             }
             return _mapper.Map<List<BudgetJarDto>>(budgetJars);
         }

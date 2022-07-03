@@ -39,8 +39,17 @@
                     <DataAnnotationsValidator/>
                     <FluentValidationValidator T="ExpenseInputModel" TValidator="ExpenseInputModelValidator"/>
                     <MudGrid>
+                        <MudItem xs="12" sm="6">
+                            <MudDatePicker Label="Date" @bind-Date="@expenseInputForm.PaidDate" Placeholder="@dateTimeFormat"
+                            For="@(() => expenseInputForm.PaidDate)" DateFormat="@dateTimeFormat" DisableToolbar="true"/>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudTextField Label="Amount" @bind-Value="@expenseInputForm.Amount" For="@(() => expenseInputForm.Amount)" MaxLength="10" Class="mb-3"/>
+                        </MudItem>
+
                         <MudItem xs="12" sm="12">
-                        <MudSelect Label="Income Budget Jar" @bind-Value="@expenseInputForm.BudgetJarId" For="@(() => expenseInputForm.BudgetJarId)"
+                        <MudSelect Label="Budget Jar" @bind-Value="@expenseInputForm.BudgetJarId" For="@(() => expenseInputForm.BudgetJarId)"
                             Class="mb-3" AnchorOrigin="Origin.BottomCenter">
                             <MudSelectItem Value="@(Guid.Empty)">Select a jar</MudSelectItem>
                             @foreach (var budgetJar in budgetJars)
@@ -51,15 +60,6 @@
                             </MudSelectItem>
                             }
                         </MudSelect>
-                        </MudItem>
-
-                        <MudItem xs="12" sm="6">
-                            <MudTextField Label="Amount" @bind-Value="@expenseInputForm.Amount" For="@(() => expenseInputForm.Amount)" MaxLength="10" Class="mb-3"/>
-                        </MudItem>
-
-                        <MudItem xs="12" sm="6">
-                            <MudDatePicker Label="Date" @bind-Date="@expenseInputForm.PaidDate" Placeholder="@dateTimeFormat"
-                            For="@(() => expenseInputForm.PaidDate)" DateFormat="@dateTimeFormat" DisableToolbar="true"/>
                         </MudItem>
 
                         <MudItem xs="12" sm="12">
@@ -76,22 +76,26 @@
                             </MudSelect>
                         </MudItem>
 
-                        <MudItem xs="12" sm="12">
+                        <MudItem xs="12" sm="6">
                             <MudSelect Label="Payment Type" @bind-Value="@expenseInputForm.PaymentMethod" For="@(() => expenseInputForm.PaymentMethod)"
                                 Class="mb-3" AnchorOrigin="Origin.BottomCenter">
                                 @foreach (PaymentMethod payMethod in Enum.GetValues(typeof(PaymentMethod)))
                                 {
-                                <MudSelectItem Value="@(payMethod)">@payMethod</MudSelectItem>
+                                <MudSelectItem Value="@(payMethod)">@payMethod.GetDisplayName()</MudSelectItem>
                                 }
                             </MudSelect>
+                        </MudItem>
+
+                        <MudItem xs="12" sm="6">
+                            <MudCheckBox @bind-Checked="@expenseInputForm.IsTaxable" Label="As Taxable" For=@(() => expenseInputForm.IsTaxable) />
                         </MudItem>
 
                         <MudItem xs="12" sm="12">
                             <MudTextField Label="Description" Variant="Variant.Outlined" @bind-Value="@expenseInputForm.Description" For="@(() => expenseInputForm.Description)" Lines="3" />
                         </MudItem>
-
+                        
                         <MudItem xs="12" sm="12">
-                            <MudText>Upload receipts/invoices</MudText>
+                            <MudText>Attachments (upload image or pdf documents)</MudText>
                             @{
                                 var files = expenseInputForm.Attachments.Select(x => new FileUploaderFile(x.Name, x.FileName)).ToArray();
                                 <FileUploader @ref="@fileUploader" IsUploading="@isUploading" Files="@files" OnRemove="@FileRemoveHandler"
@@ -101,13 +105,12 @@
                             }
                         </MudItem>
 
-                        <MudCheckBox @bind-Checked="@expenseInputForm.IsTaxable" Label="Mark as Taxable" For=@(() => expenseInputForm.IsTaxable) />
                     </MudGrid>
                     @if(!isNew) {
                         <MudButton Type="button" Variant="Variant.Outlined" Color="@Color.Default" Class="mt-3 mr-3" OnClick="@OnCancel">
                         Cancel</MudButton>
                     }
-                    <AppButton Type="submit" Text="Save" Color="@Color.Primary" IsLoading="@isSubmitting"
+                    <AppButton Type="submit" Text="Save" Color="@Color.Primary" IsLoading="@isSubmitting" Icon="@Icons.Filled.Save"
                         IsDisabled="@(!((formContext.IsModified() || isModified) && formContext.Validate()))" Class="mt-3" />
                 </EditForm>
                 }
@@ -136,7 +139,7 @@
     public string Id { get; set; }
 
     private bool isNew;
-    private Guid incomeId;
+    private Guid expenseId;
     private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
     private string cultureInfo = DefaultConstants.DefaultCultureInfo;
     private bool isSubmitting;
@@ -181,10 +184,10 @@
             expenseInputForm.BudgetJarId = budgetJars.FirstOrDefault()?.Id ?? Guid.Empty;
             expenseInputForm.CategoryId = categories.FirstOrDefault()?.Id ?? Guid.Empty;
 
-        } else if (Guid.TryParse(Id, out incomeId))
+        } else if (Guid.TryParse(Id, out expenseId))
         {
             isNew = false;
-            var expense = await Mediator.Send(new GetExpenseById(AuthUser.Id, incomeId, AuthUser.TimeZone));
+            var expense = await Mediator.Send(new GetExpenseById(AuthUser.Id, expenseId, AuthUser.TimeZone));
             if (expense == null)
             {
                 throw new InvalidOperationException("Expense is not found");

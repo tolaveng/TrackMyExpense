@@ -2,7 +2,8 @@
 {
     public class ExpenseFilter
     {
-        public DateTime? PaidDate { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
         public Guid BudgetJarId { get; set; }
         public decimal? MinAmount { get; set; }
         public decimal? MaxAmount { get; set; }

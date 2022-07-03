@@ -1,0 +1,66 @@
+﻿.fileUploader-item {
+    border: 1px solid #000000;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+    font-size: 0.75rem;
+    height: 80px;
+    margin: 8px;
+    padding: 0;
+    white-space: normal;
+    width: 60px;
+    overflow: visible;
+    /* background for file type */
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-image: url("./assets/fileIcons/unknown.svg");
+}
+
+::deep .fileUploader-item-icon {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    top: -6px;
+    right: -6px;
+    background: rgba(0,0,0,.5);
+}
+
+.fileUploader-item .fileUploader-file-name {
+    background: rgba(255, 255, 255, 0.5);
+    height: 100%;
+    width: 100%;
+    overflow-wrap: anywhere;
+    overflow: hidden;
+}
+
+.fileUploader-item.fileUploader-jpg,
+.fileUploader-item.fileUploader-jpeg {
+    background-image: url("./assets/fileIcons/jpg.svg");
+}
+
+.fileUploader-item.fileUploader-png {
+    background-image: url("./assets/fileIcons/png.svg");
+}
+
+.fileUploader-item.fileUploader-doc,
+.fileUploader-item.fileUploader-docx {
+    background-image: url("./assets/fileIcons/doc.svg");
+}
+
+.fileUploader-item.fileUploader-xls,
+.fileUploader-item.fileUploader-xlsx {
+    background-image: url("./assets/fileIcons/xls.svg");
+}
+
+.fileUploader-item.fileUploader-txt {
+    background-image: url("./assets/fileIcons/txt.svg");
+}
+
+.fileUploader-item.fileUploader-pdf {
+    background-image: url("./assets/fileIcons/pdf.svg");
+}

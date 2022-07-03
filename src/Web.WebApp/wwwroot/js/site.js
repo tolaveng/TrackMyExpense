@@ -71,3 +71,15 @@ window.GetBrowserTimeZone = function () {
 	const currentTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 	return currentTimeZone ? currentTimeZone : '';
 }
+
+
+// https://docs.microsoft.com/en-us/aspnet/core/blazor/images?view=aspnetcore-6.0#stream-images
+// Test image steam
+window.addDocumentImage = async (imageStream) => {
+	const arrayBuffer = await imageStream.arrayBuffer();
+	const blob = new Blob([arrayBuffer]);
+	const url = URL.createObjectURL(blob);
+	var img = document.createElement("img");
+	img.src = url;
+	document.body.appendChild(img);
+}

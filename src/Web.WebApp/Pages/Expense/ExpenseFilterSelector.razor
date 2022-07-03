@@ -16,8 +16,16 @@
         Elevation="3"
         Paper="true">
         <MudPaper Outlined="true" Class="px-4 py-8">
-            <MudDatePicker Label="Date" @bind-Date="@paidDate" Placeholder="@dateTimeFormat"
-                DateFormat="@dateTimeFormat" DisableToolbar="true" Class="mb-3" />
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                <MudDatePicker Label="From date" @bind-Date="@fromDate" Placeholder="@dateTimeFormat"
+                    DateFormat="@dateTimeFormat" DisableToolbar="true" Class="mb-3" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                 <MudDatePicker Label="To date" @bind-Date="@toDate" Placeholder="@dateTimeFormat"
+                    DateFormat="@dateTimeFormat" DisableToolbar="true" Class="mb-3" />
+                </MudItem>
+            </MudGrid>
 
             <MudSelect @bind-Value="@Filter.BudgetJarId" Label="Budget Jar" Variant="Variant.Text" Class="mb-3">
                 <MudSelectItem Value="@(Guid.Empty)">Select</MudSelectItem>
@@ -67,7 +75,8 @@
     public UserDto AuthUser { get; set; } = default;
 
     private bool isShow;
-    private DateTime? paidDate;
+    private DateTime? fromDate;
+    private DateTime? toDate;
     private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
     private string cultureInfo = DefaultConstants.DefaultCultureInfo;
     private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
@@ -81,9 +90,14 @@
     private async void applyFilter()
     {
         isShow = false;
-        if (paidDate.HasValue)
+        if (fromDate.HasValue)
         {
-            Filter.PaidDate = DateTimeUtil.ToUtcDateTime(paidDate.Value.Date, AuthUser.TimeZone);
+            Filter.FromDate = DateTimeUtil.ToUtcDateTime(fromDate.Value.Date, AuthUser.TimeZone);
+        }
+
+        if (toDate.HasValue)
+        {
+            Filter.ToDate = DateTimeUtil.ToUtcDateTime(toDate.Value.Date, AuthUser.TimeZone);
         }
 
         if (OnFilterChanged.HasDelegate)
@@ -96,6 +110,8 @@
     {
         isShow = false;
         Filter = new ExpenseFilter();
+        fromDate = null;
+        toDate = null;
 
         if (OnFilterChanged.HasDelegate)
         {

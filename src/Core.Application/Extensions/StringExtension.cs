@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Core.Application.Extensions
 {
@@ -20,6 +21,14 @@ namespace Core.Application.Extensions
             }
 
             return fileName;
+        }
+
+        public static string GetHtmlText (this string stringValue)
+        {
+            if (string.IsNullOrWhiteSpace(stringValue)) return "";
+
+            return Regex.Replace(
+                HttpUtility.HtmlEncode(stringValue), "\r?\n|\r", "<br />");
         }
     }
 }

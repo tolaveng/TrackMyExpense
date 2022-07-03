@@ -2,7 +2,7 @@
     imageStream.arrayBuffer().then(function (arrayBuffer) {
         const blob = new Blob([arrayBuffer]);
         const objectUrl = URL.createObjectURL(blob);
-
+        
         if (fileUploderPreviewImage && isImage) {
             fileUploderPreviewImage.src = objectUrl;
         }

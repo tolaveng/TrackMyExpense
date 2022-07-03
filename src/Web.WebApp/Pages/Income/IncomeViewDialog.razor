@@ -1,0 +1,92 @@
+﻿@using Core.Application.Extensions
+@using Core.Application.Mediator.BudgetJars
+@using Core.Application.Mediator.Icons
+@using Core.Application.Mediator.Incomes
+@using Core.Application.Models
+@using Core.Application.Utils
+@using MediatR
+@using Web.WebApp.Components.FileUploader
+@using Web.WebApp.Pages.BudgetJar
+<MudDialog>
+    <DialogContent>
+        @if (income == null)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        } else
+        {
+            <MudGrid>
+                <MudItem xs="12" sm="12">
+                    <span>Income Period:</span>
+                    <b>@income.FromDate.ToString(DateTimeFormat) - @income.ToDate.ToString(DateTimeFormat)</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <span>Amount:</span> <b>@CurrencyUtil.Formatted(income.Amount, CultureInfo)</b>
+                </MudItem>
+
+                <MudItem xs="12" sm="12">
+                    <span>Note:</span>
+                    <div>
+                        @((MarkupString)income.Note.GetHtmlText())
+                    </div>
+                </MudItem>
+
+                @if (budgetJars.Any())
+                {
+                    <MudItem xs="12" sm="12">
+                        <span>Budget Jars:</span>
+                        <div class="budgetjar-cards">
+                            @foreach(var jar in budgetJars)
+                            {
+                               <BudgetJarCard BudgetJar="@jar"
+                                FormattedAmount="@(CurrencyUtil.Formatted(jar.TotalBalance, CultureInfo))"
+                                HideDelete="true" HideEdit="true" 
+                                />
+                            }
+                        </div>
+                    </MudItem>   
+                }
+                
+            </MudGrid>   
+        }
+    </DialogContent>
+    <DialogActions>
+        <AppButton OnClick="OnEditClicked" Icon="@Icons.Filled.Edit" Text="Edit" />
+        <AppButton OnClick="OnCloseClicked" IsOutline="true" Icon="@Icons.Filled.Close" Text="Close" />
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Inject] IDialogService Dialog { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+    [Inject] NavigationManager NavigationManager { get; set; }
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Guid IncomeId { get; set; } = Guid.Empty;
+    [Parameter] public Guid UserId { get; set; } = Guid.Empty;
+    [Parameter] public string TimeZone { get; set; }
+    [Parameter] public string DateTimeFormat { get; set; }
+    [Parameter] public string CultureInfo { get; set; }
+
+    private IncomeDto income;
+    private BudgetJarDto[] budgetJars = Array.Empty<BudgetJarDto>();
+
+    private void OnCloseClicked() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        income = await Mediator.Send(new GetIncomeById(UserId, IncomeId, TimeZone));
+        if (income == null)
+        {
+            throw new InvalidOperationException("Income is not found");
+        }
+
+        budgetJars = (await Mediator.Send(new GetBudgetJarsByIncomeId(income.Id))).ToArray();
+    }
+
+    private void OnEditClicked()
+    {
+        NavigationManager.NavigateTo($"/income/{income.Id}");
+    }
+}

@@ -1,7 +1,9 @@
 ﻿@using System.IO
 <div @key="@File.FileName" class=@($"fileUploader-item {GetClassName()}") @onclick="@OnImageClicked">
+    @if (OnRemove.HasDelegate) {
     <MudIconButton Class="fileUploader-item-icon" Icon="@Icons.Material.Filled.Close" Color="@Color.Error"
         Size="Size.Small" aria-label="Remove" Title="Remove" OnClick="@OnRemoveClicked" />
+    }
     <span class="fileUploader-file-name">@File.Name</span>
 </div>
 
@@ -34,6 +36,7 @@
     {
         var parameters = new DialogParameters {
             ["File"] = File,
+            ["OnRemove"] = OnRemove
         };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
         var dialog = Dialog.Show<FileUploaderPreviewDialog>(File.Name, parameters, options);
