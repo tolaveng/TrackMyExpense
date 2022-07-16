@@ -1,8 +1,223 @@
 ﻿@page "/"
+@using Core.Application.Common
+@using Core.Application.Mediator.BudgetJars
+@using Core.Application.Mediator.Categories
+@using Core.Application.Mediator.Expenses
+@using Core.Application.Mediator.IncomeBudgetJars
+@using Core.Application.Models
+@using Core.Application.Utils
+@using MediatR
 
-<MudContainer Class="mt-16" MaxWidth="MaxWidth.False">
-    <h1>Hello, world!</h1>
+<SetPageTitle Value="@($"{DefaultConstants.PageTitle} - Overview")" />
+<MudContainer Class="mt-8" MaxWidth="@MaxWidth.ExtraLarge">
+    <Breadcrumbs />
+    <MudCard Outlined="true" Class="p-3">
+        <MudCardContent>
+        <MudGrid>
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="1"  style="min-height: 550px;" Class="chart-summary p-3">
+                    <div class="chart-summary-title">Total budget jars balances: @CurrencyUtil.Formatted(totalBalance, cultureInfo)</div>
+                    <div @ref="@jarTotalChart" style="width: 400px;" class="chart-summary-chart">
+                        <MudProgressCircular class="loading" Size="Size.Small" Color="@Color.Default" Indeterminate />
+                        <canvas id="jarTotalChart" class="chart"></canvas>
+                    </div>
+                    <div class="chart-summary-text">Total balances of budget jars.</div>
+                </MudPaper>
+            </MudItem>
 
-    Welcome to your new app.
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="1" style="min-height: 550px;" Class="chart-summary p-3">
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <div class="chart-summary-title">Budget jars between period:</div>
+                        </MudItem>
+                        <MudItem xs="12" sm="8">
+                            <MudDateRangePicker PickerVariant="PickerVariant.Dialog" Label="" DisableToolbar="true"
+                            DateRange="@jarDateRange" DateFormat="@dateTimeFormat"  Class="mud-daterang-picker-top"
+                            DateRangeChanged="@OnJarDateRangeChanged"/>
+                        </MudItem>
+                    </MudGrid>
+                    <div @ref="@jarMonthlyChart" style="width: 400px;" class="chart-summary-chart">
+                        <MudProgressCircular class="loading" Size="Size.Small" Color="@Color.Default" Indeterminate />
+                        <canvas id="jarMonthlyChart" class="chart"></canvas>
+                    </div>
+                    <div class="chart-summary-text">Sum of income budget jars which substract expenses.</div>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="1" style="min-height: 500px;" Class="chart-summary p-3">
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <div class="chart-summary-title">Expense categories between period:</div>
+                        </MudItem>
+                        <MudItem xs="12" sm="8">
+                            <MudDateRangePicker PickerVariant="PickerVariant.Dialog" Label="" DisableToolbar="true"
+                            DateRange="@categoryDateRange" DateFormat="@dateTimeFormat"  Class="mud-daterang-picker-top"
+                            DateRangeChanged="@OnCategoryDateRangeChanged"/>
+                        </MudItem>
+                    </MudGrid>
+                    <div @ref="@categoryChart" style="width: 400px;" class="chart-summary-chart">
+                        <MudProgressCircular class="loading" Size="Size.Small" Color="@Color.Default" Indeterminate />
+                        <canvas id="categoryChart" class="chart"></canvas>
+                    </div>
+                    <div class="chart-summary-text">Sum of expense categories.</div>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="1" style="min-height: 500px;" Class="chart-summary p-3">
+                    <MudGrid>
+                        <MudItem xs="12" sm="4">
+                            <div class="chart-summary-title">Expenses</div>
+                        </MudItem>
+                        <MudItem xs="12" sm="8">
+                            <MudDateRangePicker PickerVariant="PickerVariant.Dialog" Label="" DisableToolbar="true"
+                            DateRange="@expenseDateRange" DateFormat="@dateTimeFormat"  Class="mud-daterang-picker-top"
+                            DateRangeChanged="@OnExpenseDateRangeChanged"/>
+                        </MudItem>
+                    </MudGrid>
+                    <div @ref="@expenseChart" style="width: 400px;" class="chart-summary-chart">
+                        <MudProgressCircular class="loading" Size="Size.Small" Color="@Color.Default" Indeterminate />
+                        <canvas id="expenseChart" class="chart"></canvas>
+                    </div>
+                    <div class="chart-summary-text">Sum of expense by date.</div>
+                </MudPaper>
+            </MudItem>
+
+        </MudGrid>
+        </MudCardContent>
+    </MudCard>
 </MudContainer>
+
+@code {
+    [Inject] IJSRuntime JS { get; set; }
+    [Inject] IMediator Mediator { get; set; }
+
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
+
+    private string dateTimeFormat = DefaultConstants.DefaultDateTimeFormat;
+    private string cultureInfo = DefaultConstants.DefaultCultureInfo;
+
+    private DateTime dateNow;
+    private DateRange jarDateRange;
+    private DateRange categoryDateRange;
+    private DateRange expenseDateRange;
+
+    private Dictionary<string, BudgetJarDto> totalBudgetJars;
+    private decimal totalBalance;
+    private ElementReference jarTotalChart;
+    private ElementReference jarMonthlyChart;
+    private ElementReference categoryChart;
+    private ElementReference expenseChart;
+
+    private IJSObjectReference renderChart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cultureInfo = AuthUser.CultureInfo;
+        dateTimeFormat = DateTimeUtil.GetDateTimeFormatFromCultureInfo(AuthUser.CultureInfo);
+
+        dateNow = DateTimeUtil.TimeZoneNow(AuthUser.TimeZone);
+        var fromDate = new DateTime(dateNow.Year, dateNow.Month, 1);
+        var toDate = new DateTime(dateNow.Year, dateNow.Month, DateTime.DaysInMonth(dateNow.Year, dateNow.Month));
+        jarDateRange = new DateRange(fromDate, toDate);
+        categoryDateRange = new DateRange(fromDate, toDate);
+        expenseDateRange = new DateRange(fromDate, toDate);
+
+        totalBudgetJars = (await Mediator.Send(new GetBudgetJarsByUserId(AuthUser.Id)))
+        .OrderByDescending(x => x.TotalBalance)
+        .ToDictionary(x => x.Name);
+
+        totalBalance = totalBudgetJars.Values.Sum(x => x.TotalBalance);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        renderChart = await JS.InvokeAsync<IJSObjectReference>("import", "./js/charts/RenderChart.js");
+
+        await RenderTotalJarChart();
+        await RenderMontlyJarChart();
+        await RenderCategoryChart();
+        await RenderExpenseChart();
+    }
+
+    protected async Task OnJarDateRangeChanged(DateRange dateRange)
+    {
+        jarDateRange = dateRange;
+        await RenderMontlyJarChart();
+    }
+
+    protected async Task OnCategoryDateRangeChanged(DateRange dateRange)
+    {
+        categoryDateRange = dateRange;
+        await RenderCategoryChart();
+    }
+
+    protected async Task OnExpenseDateRangeChanged(DateRange dateRange)
+    {
+        expenseDateRange = dateRange;
+        await RenderExpenseChart();
+    }
+
+
+    private async Task RenderTotalJarChart()
+    {
+        if (renderChart == null) return;
+        var dataSets = ChartDataSet.FromDataArray("", totalBudgetJars.Values.Select(x => x.TotalBalance).ToArray());
+        await renderChart.InvokeVoidAsync("renderChart", jarTotalChart, "pie", "",
+            totalBudgetJars.Keys.ToArray(), dataSets);
+    }
+
+    private async Task RenderMontlyJarChart()
+    {
+        if (renderChart == null || jarDateRange == null) return;
+        if (!jarDateRange.Start.HasValue || !jarDateRange.End.HasValue) return;
+
+        var startDate = DateTimeUtil.ToUtcDateTime(jarDateRange.Start.Value, AuthUser.TimeZone);
+        var toDate = DateTimeUtil.ToUtcDateTime(jarDateRange.End.Value, AuthUser.TimeZone);
+        var budgetJars = (await Mediator.Send(new GetCalculatedBudgetJarByDate(startDate, toDate)))
+        .OrderByDescending(x => x.TotalBalance)
+        .ToDictionary(x => x.Name);
+        var dataSets = ChartDataSet.FromDataArray("", budgetJars.Values.Select(x => x.TotalBalance).ToArray());
+        await renderChart.InvokeVoidAsync("renderChart", jarMonthlyChart, "doughnut", "",
+            budgetJars.Keys.ToArray(), dataSets);
+
+    }
+
+    private async Task RenderCategoryChart()
+    {
+        if (renderChart == null || categoryDateRange == null) return;
+        if (!categoryDateRange.Start.HasValue || !categoryDateRange.End.HasValue) return;
+
+        var startDate = DateTimeUtil.ToUtcDateTime(categoryDateRange.Start.Value, AuthUser.TimeZone);
+        var toDate = DateTimeUtil.ToUtcDateTime(categoryDateRange.End.Value, AuthUser.TimeZone);
+        var categories = (await Mediator.Send(new GetCalculatedCategories(startDate, toDate)))
+        .OrderByDescending(x => x.TotalAmount)
+        .ToDictionary(x => x.Name);
+
+        var dataSets = ChartDataSet.FromDataArray("", categories.Values.Select(x => x.TotalAmount).ToArray());
+        await renderChart.InvokeVoidAsync("renderChart", categoryChart, "bar", "",
+            categories.Keys.ToArray(), dataSets, true, "y");
+    }
+
+    private async Task RenderExpenseChart()
+    {
+        if (renderChart == null || expenseDateRange == null) return;
+        if (!expenseDateRange.Start.HasValue || !expenseDateRange.End.HasValue) return;
+
+        var startDate = DateTimeUtil.ToUtcDateTime(expenseDateRange.Start.Value, AuthUser.TimeZone);
+        var toDate = DateTimeUtil.ToUtcDateTime(expenseDateRange.End.Value, AuthUser.TimeZone);
+        var expenses = (await Mediator.Send(new GetCalculatedExpensesByDate(startDate, toDate)))
+        .OrderBy(x => x.PaidDate);
+        var dataSets = ChartDataSet.FromDataArray("Expenses", expenses.Select(x => x.Amount).ToArray(), "#1AC3B3");
+        await renderChart.InvokeVoidAsync("renderChart", expenseChart, "line", "",
+            expenses.Select(x => x.PaidDate.ToString(dateTimeFormat)).ToArray(), dataSets);
+        
+    }
+
+}
 

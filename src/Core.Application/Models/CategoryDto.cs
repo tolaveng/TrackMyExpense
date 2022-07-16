@@ -16,6 +16,9 @@ namespace Core.Application.Models
 
         public bool Archived { get; set; }
 
+        // Calculated
+        public decimal TotalAmount { get; set; }
+
         public static CategoryDto Clone(CategoryDto categoryDto)
         {
             return new CategoryDto() {

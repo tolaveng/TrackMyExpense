@@ -76,14 +76,19 @@
 
         if (category != null)
         {
+            // Edit
             inputModel = category;
         }
         else
         {
+            // New
+            var defaultIcon = IconSet.FirstOrDefault(x => x.Name == "Others");
+            if (defaultIcon == null) { defaultIcon = IconSet.First(); }
+
             inputModel = new CategoryDto();
             inputModel.Id = Guid.Empty;
-            inputModel.Icon = null;
-            inputModel.IconId = Guid.Empty;
+            inputModel.Icon = defaultIcon;
+            inputModel.IconId = defaultIcon.Id;
             inputModel.UserId = UserId;
         }
         editContext = new EditContext(inputModel);

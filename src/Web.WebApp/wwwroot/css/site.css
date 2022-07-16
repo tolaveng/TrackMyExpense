@@ -288,3 +288,30 @@ a, .btn-link {
     height: 100px;
     width: 100px;
 }
+
+/* hack align top empty label */
+.mud-daterang-picker-top {
+    top: -8px;
+}
+
+.chart-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-summary-title {
+    align-self: flex-start;
+}
+
+.chart-summary-chart {
+    margin: auto;
+    overflow: auto;
+}
+
+.chart-summary-text {
+    font-size: 11px;
+    margin-top: auto;
+    margin-bottom: 10px;
+}

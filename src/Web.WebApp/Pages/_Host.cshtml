@@ -40,12 +40,17 @@
     <script src="js/site.js" asp-append-version="true"></script>
     <script src="_framework/blazor.server.js"></script>
     <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/chartjs/chart.min.js"></script>
+    <script src="js/chartjs/chartjs-plugin-datalabels.min.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 
     <script>
         function SetPageTitle(title) {
             document.title = title;
         }
+
+        // Register the plugin to all charts:
+        Chart.register(ChartDataLabels);
     </script>
 </body>
 </html>
