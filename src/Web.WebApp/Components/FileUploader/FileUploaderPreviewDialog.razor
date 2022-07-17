@@ -42,6 +42,9 @@
     [Inject] IJSRuntime JSRuntime { get; set; }
 
     [Parameter]
+    public Guid UserId { get; set; }
+
+    [Parameter]
     public FileUploaderFile File  { get; set; }
 
     [Parameter]
@@ -67,7 +70,7 @@
         // display uploaded file
         if (File.BrowserFile == null)
         {
-            DownloadUrl = FileDirectoryProvider.GetAttachmentUrl(File.FileName, NavigationManager.BaseUri);
+            DownloadUrl = FileDirectoryProvider.GetAttachmentUrl(UserId, File.FileName, NavigationManager.BaseUri);
             if (isImage)
             {
                 showLoading = true;

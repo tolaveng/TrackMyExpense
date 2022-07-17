@@ -16,6 +16,11 @@ using MudBlazor;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Core.Ioc;
+using System.Net;
+using System.Linq;
+using System.Security.Claims;
+using Core.Application.Providers.IProviders;
+using System;
 
 namespace Web.WebApp
 {
@@ -31,6 +36,7 @@ namespace Web.WebApp
 
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Environment { get; }
+        public IAuthUserService AuthUserService { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -132,7 +138,7 @@ namespace Web.WebApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IFileDirectoryProvider fileDirectoryProvider)
         {
             if (env.IsDevelopment())
             {
@@ -149,20 +155,6 @@ namespace Web.WebApp
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            if (env.IsDevelopment()) {
-                // Serve local upload file
-                var fileUploadSetting = Configuration.GetSection("FileUploadSetting").Get<FileUploadSetting>();
-                if (!Directory.Exists(fileUploadSetting.UploadDir))
-                {
-                    Directory.CreateDirectory(fileUploadSetting.UploadDir);
-                }
-                app.UseStaticFiles(new StaticFileOptions()
-                {
-                    FileProvider = new PhysicalFileProvider(fileUploadSetting.UploadDir),
-                    RequestPath = new PathString(fileUploadSetting.UploadWebUrl)
-                });
-            }
-
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/static-files?view=aspnetcore-6.0
             var runDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             app.UseStaticFiles(new StaticFileOptions
@@ -178,6 +170,45 @@ namespace Web.WebApp
             app.UseAuthorization();
 
             app.UseSession();
+
+            // Server storage for file uploading in the expense attachment
+            if (env.IsDevelopment())
+            {
+                // Serve local upload file
+                var fileUploadSetting = Configuration.GetSection("FileUploadSetting").Get<FileUploadSetting>();
+                if (!Directory.Exists(fileUploadSetting.UploadDir))
+                {
+                    Directory.CreateDirectory(fileUploadSetting.UploadDir);
+                }
+                app.UseStaticFiles(new StaticFileOptions()
+                {
+                    FileProvider = new PhysicalFileProvider(fileUploadSetting.UploadDir),
+                    RequestPath = new PathString(fileUploadSetting.UploadWebUrl),
+                    // allow authenticated user only
+                    OnPrepareResponse = ctx =>
+                    {
+                        // if user access to his/her own directory
+                        if (ctx.Context.User != null && ctx.Context.User.Identity.IsAuthenticated)
+                        {
+                            var userIdClaim = ctx.Context.User.FindFirst(ClaimTypes.NameIdentifier);
+                            if (userIdClaim == null ||
+                                string.IsNullOrEmpty(userIdClaim.Value) ||
+                                !fileDirectoryProvider.CheckUserAttachmentUrl(userIdClaim.Value, ctx.Context.Request.Path))
+                            {
+                                    ctx.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                                    ctx.Context.Response.Headers.Add("Cache-Control", "no-store");
+                                    ctx.Context.Response.ContentLength = 0;
+                                    ctx.Context.Response.Body = Stream.Null;
+                            }
+                        } else {
+                            ctx.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                            ctx.Context.Response.Headers.Add("Cache-Control", "no-store");
+                            ctx.Context.Response.ContentLength = 0;
+                            ctx.Context.Response.Body = Stream.Null;
+                        }
+                    }
+                });
+            }
 
             app.UseEndpoints(endpoints =>
             {

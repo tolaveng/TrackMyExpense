@@ -1,4 +1,5 @@
 ﻿@using System.IO
+@using Core.Application.Models
 <div @key="@File.FileName" class=@($"fileUploader-item {GetClassName()}") @onclick="@OnImageClicked">
     @if (OnRemove.HasDelegate) {
     <MudIconButton Class="fileUploader-item-icon" Icon="@Icons.Material.Filled.Close" Color="@Color.Error"
@@ -9,6 +10,9 @@
 
 @code {
     [Inject] IDialogService Dialog { get; set; }
+
+    [CascadingParameter]
+    public UserDto AuthUser { get; set; } = default;
 
     [Parameter]
     public FileUploaderFile File  { get; set; }
@@ -36,7 +40,8 @@
     {
         var parameters = new DialogParameters {
             ["File"] = File,
-            ["OnRemove"] = OnRemove
+            ["OnRemove"] = OnRemove,
+            ["UserId"] = AuthUser.Id,
         };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
         var dialog = Dialog.Show<FileUploaderPreviewDialog>(File.Name, parameters, options);

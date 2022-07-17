@@ -74,13 +74,17 @@ namespace Core.Application.Mediator.Expenses
             if (deleteAttachments.Any())
             {
                 var fileUploadService = _fileUploadFactory.GetFileUploadService();
-                await fileUploadService.DeleteAttachmentsAsync(deleteAttachments.Select(x => x.FileName).ToArray());
+                await fileUploadService.DeleteAttachmentsAsync(expense.UserId, deleteAttachments.Select(x => x.FileName).ToArray());
                 _unitOfWork.AttachmentRepository.DeleteRange(deleteAttachments);
             }
 
             var insertAttachments = attachments.Where(x => dbAttachments.All(y => y.Id != x.Id));
             if (insertAttachments.Any())
             {
+                foreach(var att in insertAttachments)
+                {
+                    att.ExpenseId = expense.Id;
+                }
                 await _unitOfWork.AttachmentRepository.InsertRangeAsync(insertAttachments);
             }
             

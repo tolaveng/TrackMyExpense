@@ -16,7 +16,7 @@ namespace Core.Tests
 
             var fileUploadServiceMock = new Mock<IFileUploadService>();
 
-            fileUploadServiceMock.Setup(x => x.DeleteAttachmentsAsync(It.IsAny<string[]>()))
+            fileUploadServiceMock.Setup(x => x.DeleteAttachmentsAsync(ConstantMock.UserId, It.IsAny<string[]>()))
                 .Returns(Task.FromResult(true));
 
 

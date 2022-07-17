@@ -35,9 +35,9 @@ namespace Core.Application.Services
             return result;
         }
 
-        public async Task<FileUploadResponse> SaveAttachmentAsync(FileUploadRequest file, string saveFileName, CancellationToken ct)
+        public async Task<FileUploadResponse> SaveAttachmentAsync(Guid userId, FileUploadRequest file, string saveFileName, CancellationToken ct)
         {
-            var imageDir = FileDirectoryProvider.GetAttachmentDirectory();
+            var imageDir = FileDirectoryProvider.GetAttachmentDirectory(userId);
             var result = await SaveFileAsync(file, imageDir, saveFileName, ct);
             if (result.Succeeded && file.IsImage)
             {
@@ -168,11 +168,11 @@ namespace Core.Application.Services
             return await Task.FromResult(true);
         }
 
-        public async Task<bool> DeleteAttachmentsAsync(string[] fileNames)
+        public async Task<bool> DeleteAttachmentsAsync(Guid userId, string[] fileNames)
         {
             foreach(var fileName in fileNames)
             {
-                var deleteFile = Path.Combine(FileDirectoryProvider.GetAttachmentDirectory(), fileName);
+                var deleteFile = Path.Combine(FileDirectoryProvider.GetAttachmentDirectory(userId), fileName);
                 if (!File.Exists(deleteFile)) continue;
                 try
                 {

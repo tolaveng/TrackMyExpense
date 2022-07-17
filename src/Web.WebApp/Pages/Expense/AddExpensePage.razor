@@ -208,13 +208,13 @@
         var expense = expenseInputForm.ToExpenseDto(AuthUser.TimeZone);
         var attachments = expense.Attachments.ToList();
 
-        // new files
+        // upload new files
         var browserFiles = fileUploader.GetBrowserFiles();
         if (browserFiles.Any())
         {
             isUploading = true;
             StateHasChanged();
-            var newAttachments = await UploadAttachments(expense.Id, browserFiles);
+            var newAttachments = await UploadAttachments(AuthUser.Id, expense.Id, browserFiles);
             attachments.AddRange(newAttachments);
         }
 
@@ -229,7 +229,7 @@
         NavigationManager.NavigateTo("/expenses");
     }
 
-    private async Task<List<AttachmentDto>> UploadAttachments(Guid expenseId, List<IBrowserFile> browserFiles)
+    private async Task<List<AttachmentDto>> UploadAttachments(Guid userId, Guid expenseId, List<IBrowserFile> browserFiles)
     {
         var fileUploadService = FileUploadFactory.GetFileUploadService();
         fileUploadService.AllowExtensions = allowExtensions;
@@ -243,7 +243,7 @@
                     var fileName = browserFile.Name.SanitiseFileName();
                     var fileUpload = new FileUploadRequest(fileStream, fileName);
                     var saveFileName = Guid.NewGuid();
-                    var result = await fileUploadService.SaveAttachmentAsync(fileUpload, saveFileName.ToString(), cts.Token);
+                    var result = await fileUploadService.SaveAttachmentAsync(userId, fileUpload, saveFileName.ToString(), cts.Token);
                     if (result.Succeeded)
                     {
                         attachments.Add(new AttachmentDto()

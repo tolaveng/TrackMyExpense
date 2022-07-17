@@ -20,7 +20,7 @@ namespace Core.Application.Services.IServices
         Task<FileUploadResponse> SaveProfileImageAsync(FileUploadRequest fileUploadRequest,
             string saveFileName, CancellationToken ct);
 
-        Task<FileUploadResponse> SaveAttachmentAsync(FileUploadRequest fileUploadRequest,
+        Task<FileUploadResponse> SaveAttachmentAsync(Guid userId, FileUploadRequest fileUploadRequest,
             string saveFileName, CancellationToken ct);
 
         Task<FileUploadResponse> SaveProfileImageThumbnailAsync(FileUploadRequest fileUploadRequest,
@@ -30,6 +30,6 @@ namespace Core.Application.Services.IServices
         Task<bool> DeleteProfileImageAsync(string imageName);
         Task<bool> DeleteProfileImageThumbnailAsync(string imageName);
 
-        Task<bool> DeleteAttachmentsAsync(string[] fileNames);
+        Task<bool> DeleteAttachmentsAsync(Guid userId, string[] fileNames);
     }
 }

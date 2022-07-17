@@ -98,17 +98,23 @@ namespace Core.Application.Providers
             return $"{GetUploadDirectoryUrl(new[] { "profileimages", "thumbnails" }, baseUri)}{fileName}";
         }
 
-        public string GetAttachmentDirectory()
+        public string GetAttachmentDirectory(Guid userId)
         {
-            return GetUploadDirectory(new string[] { "Attachments" });
+            return GetUploadDirectory(new string[] { "Attachments", userId.ToString() });
         }
 
-        public string GetAttachmentUrl(string fileName, string baseUri)
+        public string GetAttachmentUrl(Guid userId, string fileName, string baseUri)
         {
             if (string.IsNullOrEmpty(fileName)) return string.Empty;
 
             fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
-            return $"{GetUploadDirectoryUrl(new[] { "attachments" }, baseUri)}{fileName}";
+            return $"{GetUploadDirectoryUrl(new[] { "attachments", userId.ToString() }, baseUri)}{fileName}";
+        }
+
+        public bool CheckUserAttachmentUrl(string userId, string url)
+        {
+            var testPath = GetUploadDirectoryUrl(new[] { "attachments", userId }, null);
+            return url.Contains(testPath, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
