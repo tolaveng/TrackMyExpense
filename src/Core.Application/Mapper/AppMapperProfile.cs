@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Application.Models;
 using Core.Application.Providers.IProviders;
+using Core.Application.Services.IServices;
 using Core.Domain.Entities;
 
 namespace Core.Application.Mapper
@@ -34,10 +35,10 @@ namespace Core.Application.Mapper
     // Resolve Icon image url
     public class SetIconWebUrl : IMappingAction<Icon, IconDto>
     {
-        private readonly IFileDirectoryProvider _fileDirectoryProvider;
-        public SetIconWebUrl(IFileDirectoryProvider fileDirectoryProvider)
+        private readonly IUriResolver _uriResolver;
+        public SetIconWebUrl(IUriResolver uriResolver)
         {
-            _fileDirectoryProvider = fileDirectoryProvider;
+            _uriResolver = uriResolver;
         }
         public void Process(Icon source, IconDto destination, ResolutionContext context)
         {
@@ -46,7 +47,7 @@ namespace Core.Application.Mapper
                 destination.IconUrl = string.Empty;
                 return;
             }
-            destination.IconUrl = _fileDirectoryProvider.GetIconUrl(source.IconType, source.Path);
+            destination.IconUrl = _uriResolver.IconUrl(source.IconType, source.Path);
         }
 
         public SetIconWebUrl()
@@ -58,15 +59,15 @@ namespace Core.Application.Mapper
     // Resove Profile Image
     public class SetProfileImageWebUrl : IMappingAction<AppUser, UserDto>
     {
-        private readonly IFileDirectoryProvider _fileDirectoryProvider;
-        public SetProfileImageWebUrl(IFileDirectoryProvider fileDirectoryProvider)
+        private readonly IUriResolver _uriResolver;
+        public SetProfileImageWebUrl(IUriResolver uriResolver)
         {
-            _fileDirectoryProvider = fileDirectoryProvider;
+            _uriResolver = uriResolver;
         }
         public void Process(AppUser source, UserDto destination, ResolutionContext context)
         {
-            destination.ProfileImageUrl = _fileDirectoryProvider.GetProfileImageUrl(source.ProfileImage, string.Empty);
-            destination.ProfileImageThumbnailUrl = _fileDirectoryProvider.GetProfileImageThumbnailUrl(source.ProfileImage, string.Empty);
+            destination.ProfileImageUrl = _uriResolver.ProfileImageUrl(source.ProfileImage, string.Empty);
+            destination.ProfileImageThumbnailUrl = _uriResolver.ProfileImageThumbnailUrl(source.ProfileImage, string.Empty);
         }
     }
 }

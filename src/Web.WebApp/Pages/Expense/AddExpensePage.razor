@@ -241,7 +241,7 @@
             {
                 using (var fileStream = browserFile.OpenReadStream(fileUploadService.MaxFileSize)) {
                     var fileName = browserFile.Name.SanitiseFileName();
-                    var fileUpload = new FileUploadRequest(fileStream, fileName);
+                    var fileUpload = new FileUploadRequest(fileStream, fileName, browserFile.ContentType);
                     var saveFileName = Guid.NewGuid();
                     var result = await fileUploadService.SaveAttachmentAsync(userId, fileUpload, saveFileName.ToString(), cts.Token);
                     if (result.Succeeded)

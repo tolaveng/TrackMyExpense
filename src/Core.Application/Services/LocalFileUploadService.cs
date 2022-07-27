@@ -5,7 +5,7 @@ using Core.Application.Services.IServices;
 
 namespace Core.Application.Services
 {
-    public class FileUploadLocalService : IFileUploadService
+    public class LocalFileUploadService : IFileUploadService
     {
         public string[] AllowExtensions { get; set; } = { ".png", ".jpg", ".jpeg"};
         public long MaxFileSize { get; set; } = 100 * 1024; // 100 K
@@ -14,7 +14,7 @@ namespace Core.Application.Services
 
         private readonly IFileDirectoryProvider FileDirectoryProvider;
 
-        public FileUploadLocalService(IFileDirectoryProvider fileDirectoryProvider)
+        public LocalFileUploadService(IFileDirectoryProvider fileDirectoryProvider)
         {
             FileDirectoryProvider = fileDirectoryProvider;
         }
@@ -110,7 +110,7 @@ namespace Core.Application.Services
                     OnUploadProgress(0);
                     return FileUploadResponse.Fail("Fild upload have been cancelled");
                 };
-                // remove uploding...
+                // rename the uploding...
                 File.Move(saveFilePath, saveFilePath.Replace(".uploading", ""), true);
                 OnUploadProgress(100);
 

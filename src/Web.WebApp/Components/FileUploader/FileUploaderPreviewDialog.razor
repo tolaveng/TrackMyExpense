@@ -1,5 +1,6 @@
 ﻿@using Core.Application.Providers.IProviders
 @using System.IO
+@using Core.Application.Services.IServices
 <MudDialog>
     <DialogContent>
         <div class="fileuploader-preview">
@@ -37,7 +38,7 @@
 </MudDialog>
 
 @code {
-    [Inject] public IFileDirectoryProvider  FileDirectoryProvider { get; set; }
+    [Inject] public IUriResolver UriResolver { get; set; }
     [Inject] public NavigationManager NavigationManager { get; set; }
     [Inject] IJSRuntime JSRuntime { get; set; }
 
@@ -70,7 +71,7 @@
         // display uploaded file
         if (File.BrowserFile == null)
         {
-            DownloadUrl = FileDirectoryProvider.GetAttachmentUrl(UserId, File.FileName, NavigationManager.BaseUri);
+            DownloadUrl = UriResolver.AttachmentUrl(File.FileName, UserId.ToString(), NavigationManager.BaseUri);
             if (isImage)
             {
                 showLoading = true;
@@ -80,7 +81,7 @@
         // new upload, display after render
         else
         {
-            ImageSrc = FileDirectoryProvider.GetAssetFileUrl("image-placeholder-small.png", NavigationManager.BaseUri);
+            ImageSrc = UriResolver.AssetUrl("image-placeholder-small.png", NavigationManager.BaseUri);
             DownloadUrl = string.Empty;
         }
     }

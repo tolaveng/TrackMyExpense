@@ -204,7 +204,7 @@
         try
         {
             using var fileStream = browserFile.OpenReadStream(fileUploadService.MaxFileSize);
-            var fileUpload = new FileUploadRequest(fileStream, browserFile.Name);
+            var fileUpload = new FileUploadRequest(fileStream, browserFile.Name, browserFile.ContentType);
 
             var result = await fileUploadService.SaveIconFileAsync(fileUpload, fileName, cts.Token);
             if (result.Succeeded)

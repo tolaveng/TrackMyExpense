@@ -3,6 +3,7 @@
 @using Core.Application.Mediator.Users
 @using Core.Application.Models
 @using Core.Application.Providers.IProviders
+@using Core.Application.Services.IServices
 @using Core.Application.Utils
 @using FluentValidation
 @using MediatR
@@ -115,7 +116,7 @@
     [Inject] IMediator Mediator { get; set; }
     [Inject] IDialogService Dialog { get; set; }
     [Inject] IJSRuntime JSRuntime { get; set; }
-    [Inject] IFileDirectoryProvider FileDirectoryProvider { get; set; }
+    [Inject] IUriResolver UriResolver { get; set; }
     [Inject] NavigationManager NavigationManager { get; set; }
     [Inject] ISnackbar Snackbar { get; set; }
 
@@ -145,8 +146,8 @@
             imageName = AuthUser.ProfileImage;
 
             var baseUri = NavigationManager.BaseUri;
-            imageUrl = FileDirectoryProvider.GetProfileImageUrl(AuthUser.ProfileImage, baseUri);
-            imageThumbnailUrl = FileDirectoryProvider.GetProfileImageThumbnailUrl(AuthUser.ProfileImage, baseUri);
+            imageUrl = UriResolver.ProfileImageUrl(AuthUser.ProfileImage, baseUri);
+            imageThumbnailUrl = UriResolver.ProfileImageThumbnailUrl(AuthUser.ProfileImage, baseUri);
         }
 
         if (AuthUser.Subscriptions != null)
@@ -261,8 +262,8 @@
                 // preview
                 profileInputForm.ProfileImage = imageName;
                 var baseUri = NavigationManager.BaseUri;
-                imageUrl = FileDirectoryProvider.GetProfileImageUrl(imageName, baseUri);
-                imageThumbnailUrl = FileDirectoryProvider.GetProfileImageThumbnailUrl(imageName, baseUri);
+                imageUrl = UriResolver.ProfileImageUrl(imageName, baseUri);
+                imageThumbnailUrl = UriResolver.ProfileImageThumbnailUrl(imageName, baseUri);
             }
         }
     }

@@ -1,6 +1,5 @@
 ﻿using Core.Application.Providers.IProviders;
 using Core.Application.Settings;
-using Core.Domain.Enums;
 using Microsoft.Extensions.Options;
 
 
@@ -13,11 +12,6 @@ namespace Core.Application.Providers
         public FileDirectoryProvider(IOptions<FileUploadSetting> options)
         {
             FileUploadSetting = options.Value;
-        }
-
-        public string GetAssetFileUrl(string fileName, string baseUri)
-        {
-            return $"{baseUri}/assets/{fileName}";
         }
 
         public string GetUploadDirectory(string[] subDirectories)
@@ -55,66 +49,9 @@ namespace Core.Application.Providers
             return GetUploadDirectory(new string[] { "ProfileImages", "Thumbnails" });
         }
 
-        public string GetUploadDirectoryUrl(string[] subDirectories, string baseUri)
-        {
-            var url = FileUploadSetting.UploadWebUrl;
-            if (!string.IsNullOrEmpty(baseUri))
-            {
-                url = $"{baseUri.TrimEnd('/')}{url}";
-            }
-            foreach (var subDirectory in subDirectories)
-            {
-                if (string.IsNullOrEmpty(subDirectory)) continue;
-                url = $"{url}/{subDirectory}";
-            }
-
-            return $"{url}/";
-        }
-
-        public string GetIconUrl(IconType iconType, string path)
-        {
-            if (string.IsNullOrEmpty(path)) return "";
-
-            return iconType switch
-            {
-                IconType.Upload => $"{GetUploadDirectoryUrl(new[] { "icons" }, string.Empty)}{path}",
-                _ => path,
-            };
-        }
-
-        public string GetProfileImageUrl(string fileName, string baseUri)
-        {
-            if (string.IsNullOrEmpty(fileName)) return string.Empty;
-
-            fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
-            return $"{GetUploadDirectoryUrl(new[] { "profileimages" }, baseUri)}{fileName}";
-        }
-
-        public string GetProfileImageThumbnailUrl(string fileName, string baseUri)
-        {
-            if (string.IsNullOrEmpty(fileName)) return string.Empty;
-
-            fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
-            return $"{GetUploadDirectoryUrl(new[] { "profileimages", "thumbnails" }, baseUri)}{fileName}";
-        }
-
         public string GetAttachmentDirectory(Guid userId)
         {
             return GetUploadDirectory(new string[] { "Attachments", userId.ToString() });
-        }
-
-        public string GetAttachmentUrl(Guid userId, string fileName, string baseUri)
-        {
-            if (string.IsNullOrEmpty(fileName)) return string.Empty;
-
-            fileName = $"{fileName}?v={DateTime.Now.ToFileTime()}";
-            return $"{GetUploadDirectoryUrl(new[] { "attachments", userId.ToString() }, baseUri)}{fileName}";
-        }
-
-        public bool CheckUserAttachmentUrl(string userId, string url)
-        {
-            var testPath = GetUploadDirectoryUrl(new[] { "attachments", userId }, null);
-            return url.Contains(testPath, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
