@@ -1,4 +1,5 @@
 ﻿@using Core.Application.Common.Files
+@using Core.Application.Extensions
 @using Core.Application.Services.IServices
 @using MediatR
 @using System.IO
@@ -25,6 +26,7 @@
         <AppButton Color="Color.Error"  OnClick="OnDeleteClicked" IsOutline="true"
             IsDisabled="@(string.IsNullOrEmpty(ImageName))" Icon="@Icons.Filled.DeleteForever" Text="Delete" />
         <MudSpacer />
+        <span style="font-size: small; color:red;">*** The profile image is accessible over the internet.</span>
         <AppButton OnClick="OnCloseClicked" IsOutline="true" Icon="@Icons.Filled.Close" Text="Close" />
         <AppButton OnClick="OnSaveClicked" Text="Save" IsLoading="@isLoading" Color="Color.Primary" IsDisabled="@(!isSaveEnabled)" Icon="@Icons.Filled.Save"/>
     </DialogActions>
@@ -113,7 +115,7 @@
                 }
 
                 using (var fileStream = browserFile.OpenReadStream(fileUploadService.MaxFileSize)) {
-                    var fileUpload = new FileUploadRequest(fileStream, browserFile.Name);
+                    var fileUpload = new FileUploadRequest(fileStream, browserFile.Name, browserFile.ContentType);
                     await fileUploadService.SaveProfileImageAsync(fileUpload, fileName, cts.Token);    
                 }
             }
@@ -141,7 +143,8 @@
             }
 
             using var dataReferenceStream = await dataReference.OpenReadStreamAsync(maxAllowedSize: maxFileSize);
-            var fileUploadCropped = new FileUploadRequest(dataReferenceStream, thumbFileName);
+            var contentType = browserFile != null ? browserFile.ContentType : thumbFileName.GetContentType();
+            var fileUploadCropped = new FileUploadRequest(dataReferenceStream, thumbFileName, contentType);
             var result = await fileUploadService.SaveProfileImageThumbnailAsync(fileUploadCropped, thumbFileName, cts.Token);
 
             if (!result.Succeeded)

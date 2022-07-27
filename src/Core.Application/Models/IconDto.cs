@@ -15,19 +15,6 @@ namespace Core.Application.Models
         public string IconUrl { get; set; } = string.Empty;
 
         public bool Archived { get; set; }
-
-        public static IconDto FromDomain(Icon icon, IFileDirectoryProvider fileDirectoryProvider)
-        {
-            return new IconDto()
-            {
-                Id = icon.Id,
-                Name = icon.Name,
-                Path = icon.Path,
-                IconType = icon.IconType,
-                IsHidden = icon.IsHidden,
-                IconUrl = fileDirectoryProvider.GetIconUrl(icon.IconType, icon.Path)
-            };
-        }
     }
 
     public class IconValidator : AbstractValidator<IconDto>

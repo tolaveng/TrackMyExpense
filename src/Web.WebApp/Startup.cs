@@ -92,6 +92,7 @@ namespace Web.WebApp
             services.Configure<EmailSetting>(Configuration.GetSection("EmailSetting"));
             services.Configure<FileUploadSetting>(Configuration.GetSection("FileUploadSetting"));
             services.Configure<ReCaptchaSetting>(Configuration.GetSection("ReCaptcha"));
+            services.Configure<AzureStorageSetting>(Configuration.GetSection("AzureStorage"));
 
             // Config route option
             services.Configure<RouteOptions>(opt =>
@@ -138,7 +139,7 @@ namespace Web.WebApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IFileDirectoryProvider fileDirectoryProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -171,7 +172,7 @@ namespace Web.WebApp
 
             app.UseSession();
 
-            // Server storage for file uploading in the expense attachment
+            // Server local file storage, otherwise using cloud
             if (env.IsDevelopment())
             {
                 // Serve local upload file
@@ -187,13 +188,15 @@ namespace Web.WebApp
                     // allow authenticated user only
                     OnPrepareResponse = ctx =>
                     {
-                        // if user access to his/her own directory
+                        if (!ctx.Context.Request.Path.ToString().ToLower().Contains("attachments")) return;
+
+                        // if user access to his/her own attachment directory
                         if (ctx.Context.User != null && ctx.Context.User.Identity.IsAuthenticated)
                         {
                             var userIdClaim = ctx.Context.User.FindFirst(ClaimTypes.NameIdentifier);
                             if (userIdClaim == null ||
                                 string.IsNullOrEmpty(userIdClaim.Value) ||
-                                !fileDirectoryProvider.CheckUserAttachmentUrl(userIdClaim.Value, ctx.Context.Request.Path))
+                                !ctx.Context.Request.Path.ToString().Contains(userIdClaim.Value))
                             {
                                     ctx.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                                     ctx.Context.Response.Headers.Add("Cache-Control", "no-store");

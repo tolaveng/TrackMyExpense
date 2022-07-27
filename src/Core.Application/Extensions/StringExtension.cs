@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.StaticFiles;
+using System;
 using System.Text.RegularExpressions;
 using System.Web;
 
@@ -29,6 +30,32 @@ namespace Core.Application.Extensions
 
             return Regex.Replace(
                 HttpUtility.HtmlEncode(stringValue), "\r?\n|\r", "<br />");
+        }
+
+        public static string GetContentType (this string fileName)
+        {
+            const string DefaultContentType = "application/octet-stream";
+
+            var provider = new FileExtensionContentTypeProvider();
+
+
+            // add a custome csv
+            if (!provider.Mappings.TryGetValue(".csv", out var _))
+            {
+                provider.Mappings.Add(".csv", "text/csv");
+            }
+            else
+            {
+                provider.Mappings[".csv"] = "text/csv";
+            }
+
+            // try to get the content type
+            if (!provider.TryGetContentType(fileName, out string contentType))
+            {
+                contentType = DefaultContentType;
+            }
+
+            return contentType;
         }
     }
 }

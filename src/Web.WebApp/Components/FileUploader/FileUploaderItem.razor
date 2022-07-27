@@ -45,5 +45,6 @@
         };
         var options = new DialogOptions() { MaxWidth = MaxWidth.Medium, FullWidth = true };
         var dialog = Dialog.Show<FileUploaderPreviewDialog>(File.Name, parameters, options);
+        await dialog.Result;
     }
 }

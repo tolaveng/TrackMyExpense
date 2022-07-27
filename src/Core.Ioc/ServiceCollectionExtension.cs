@@ -44,18 +44,22 @@ namespace Core.Ioc
             AddAppIdentity(services, env);
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<ISysAttributeService, SysAttributeService>();
+            services.AddSingleton<ISysAttributeService, SysAttributeService>();
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
 
             services.AddSingleton<IFileDirectoryProvider, FileDirectoryProvider>();
+            services.AddSingleton<IUriResolver, UriResolver>();
             services.AddSingleton<IEmailService, EmailService>();
             services.AddSingleton<ICurrencyProvider, CurrencyProvider>();
-            services.AddTransient<IFileUploadFactory, FileUploadFactory>();
-            services.AddTransient<FileUploadLocalService>()
-                .AddTransient<IFileUploadService, FileUploadLocalService>(x => x.GetService<FileUploadLocalService>());
-            //services.AddTransient<IFileUploadService, FileUploadAzureService>(x => x.GetService<FileUploadAzureService>());
+
+            // Factory and Ioc
+            services.AddSingleton<IFileUploadFactory, FileUploadFactory>();
+            services.AddSingleton<LocalFileUploadService>()
+            .AddSingleton<IFileUploadService, LocalFileUploadService>(x => x.GetService<LocalFileUploadService>());
+            services.AddSingleton<AzureFileUploadService>()
+            .AddSingleton<IFileUploadService, AzureFileUploadService>(x => x.GetService<AzureFileUploadService>());
 
         }
 
