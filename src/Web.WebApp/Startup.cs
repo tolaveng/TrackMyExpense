@@ -17,9 +17,7 @@ using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Core.Ioc;
 using System.Net;
-using System.Linq;
 using System.Security.Claims;
-using Core.Application.Providers.IProviders;
 using System;
 
 namespace Web.WebApp
