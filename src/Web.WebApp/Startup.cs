@@ -19,6 +19,12 @@ using Core.Ioc;
 using System.Net;
 using System.Security.Claims;
 using System;
+using Core.Infrastructure.Database;
+using OpenIddict.Validation;
+using System.Diagnostics;
+using Microsoft.AspNetCore;
+using static OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Web.WebApp
 {
@@ -65,7 +71,7 @@ namespace Web.WebApp
             services.Configure<CookiePolicyOptions>(opt =>
             {
                 opt.CheckConsentNeeded = context => true;
-                //opt.MinimumSameSitePolicy = SameSiteMode.None;
+                opt.MinimumSameSitePolicy = SameSiteMode.Lax; //for OAuth
             });
 
             // Requires all users to be authenticated - NOT WORK with Blazor razor component
@@ -79,6 +85,77 @@ namespace Web.WebApp
 
             // Cor.Ioc
             services.ConfigureServices(Configuration, Environment);
+
+            // OpendIddict
+            // https://documentation.openiddict.com/guides/getting-started.html
+            services.AddOpenIddict()
+                // Register the OpenIddict core components.
+                .AddCore(options =>
+                {
+                    // Configure OpenIddict to use the Entity Framework Core stores and models.
+                    // Note: call ReplaceDefaultEntities() to replace the default entities.
+                    options.UseEntityFrameworkCore()
+                           .UseDbContext<AppDbContext>();
+                })
+                // Register the OpenIddict server components.
+                .AddServer(options =>
+                {
+                    // Enable the token endpoint.
+                    options.SetTokenEndpointUris("/connect/token")
+                        .SetAuthorizationEndpointUris("/connect/authorize")
+                        .SetUserinfoEndpointUris("/connect/userinfo")
+                        .SetIntrospectionEndpointUris("/connect/introspect")
+                        ;
+
+                    // Flow
+                    //options.AllowClientCredentialsFlow();
+                    options.AllowAuthorizationCodeFlow().RequireProofKeyForCodeExchange();
+                    options.AllowRefreshTokenFlow();
+
+                    // Using reference tokens means the actual access and refresh tokens
+                    // are stored in the database and different tokens, referencing the actual
+                    // tokens (in the db), are used in request headers. The actual tokens are not
+                    // made public.
+                    //options.UseReferenceAccessTokens();
+                    //options.UseReferenceRefreshTokens();
+
+                    //options.AddEncryptionKey(new SymmetricSecurityKey(
+                    //    Convert.FromBase64String("DRjd/GnduI3Efzen9V9BvbNUfc/VKgXltV7Kbk9sMkY=")));
+
+                    // Register scopes (permissions)
+                    options.RegisterScopes("api");
+
+                    // Set the lifetime of your tokens
+                    options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30));
+                    options.SetRefreshTokenLifetime(TimeSpan.FromDays(7));
+
+                    // Register the signing and encryption credentials.
+                    options.AddDevelopmentEncryptionCertificate()
+                           .AddDevelopmentSigningCertificate();
+
+                    // Encryption and signing of tokens
+                    options.AddEphemeralEncryptionKey()
+                        .AddEphemeralSigningKey()
+                        .DisableAccessTokenEncryption();
+
+                    // Register the ASP.NET Core host and configure the ASP.NET Core options.
+                    options.UseAspNetCore()
+                           .EnableTokenEndpointPassthrough()
+                           .EnableAuthorizationEndpointPassthrough();
+                })
+                // Register the OpenIddict validation handler.
+                // Note: the OpenIddict validation handler is only compatible with the
+                // default token format or with reference tokens and cannot be used with
+                // JWT tokens. For JWT tokens, use the Microsoft JWT bearer handler.
+                // Register the OpenIddict validation components.
+                .AddValidation(options =>
+                 {
+                     // Import the configuration from the local OpenIddict server instance.
+                     options.UseLocalServer();
+
+                     // Register the ASP.NET Core host.
+                     options.UseAspNetCore();
+                 });
 
             // Web App
             services.AddTransient<IReCaptchaService, ReCaptchaService>();
@@ -149,7 +226,12 @@ namespace Web.WebApp
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
             }
+
+
+            // Cread OpenIdConnect client
+            SeedApiClient.CreateApiClient(app);
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -165,6 +247,7 @@ namespace Web.WebApp
 
             app.UseRouting();
             app.UseCookiePolicy();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
 

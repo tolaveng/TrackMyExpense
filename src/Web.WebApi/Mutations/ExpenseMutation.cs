@@ -5,6 +5,7 @@ using MediatR;
 
 namespace Web.WebApi.Mutations
 {
+    [ExtendObjectType("Mutation")]
     public class ExpenseMutation
     {
         public async Task<ExpenseDto> SaveExpense([Service] IMediator mediator,
