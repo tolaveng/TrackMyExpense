@@ -1,12 +1,11 @@
-﻿using Core.Infrastructure.Database;
+﻿using Core.Infrastructure.Configurations;
+using Core.Infrastructure.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Infrastructure.Seeder
 {
@@ -19,17 +18,30 @@ namespace Core.Infrastructure.Seeder
                 var context = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
                 context.Database.EnsureCreated();
 
+                var oidcSetting = serviceScope.ServiceProvider.GetRequiredService<IOptions<OidcSetting>>().Value;
+
+                if (string.IsNullOrWhiteSpace(oidcSetting.ClientId) ||
+                    string.IsNullOrWhiteSpace(oidcSetting.ClientSecret))
+                {
+                    throw new InvalidOperationException("Client id and secret must be set");
+                }
+
                 var manager = serviceScope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
-                var existingClientApp = manager.FindByClientIdAsync("api-client").GetAwaiter().GetResult();
+                var existingClientApp = manager.FindByClientIdAsync(oidcSetting.ClientId).GetAwaiter().GetResult();
                 if (existingClientApp == null)
                 {
+                    // Studpid, RedirectUris is readonly,
+                    var redirectUris = oidcSetting.RedirectUris.Split(',')
+                        .Select(x => new Uri(x.Trim())).ToArray();
+                    var redirectUri1 = redirectUris[0];
+                    var redirectUri2 = redirectUris.Length > 1 ? redirectUris[1] : null;
+
                     manager.CreateAsync(new OpenIddictApplicationDescriptor
                     {
-                        ClientId = "api-client",
-                        ClientSecret = "499D56FA-B47B-5199-BA61-B298D431C318",
-                        RedirectUris = { new Uri("https://oauth.pstmn.io/v1/callback") },
-                        PostLogoutRedirectUris = { new Uri("http://localhost:53507/signout-callback-oidc") },
-                        //AQAAAAEAACcQAAAAEPO7vne7va67W61jDZwOZSTF1FfLAcKKK40zf0n3yHSmIDmvMToZjs0cXlqhyOXwuQ==
+                        ClientId = oidcSetting.ClientId,
+                        ClientSecret = oidcSetting.ClientSecret,
+                        RedirectUris = { redirectUri1, redirectUri2 },
+                        PostLogoutRedirectUris = { new Uri(oidcSetting.PostLogoutRedirectUri) },
                         DisplayName = "Api Client",
                         Permissions = {
                             OpenIddictConstants.Permissions.Endpoints.Token,

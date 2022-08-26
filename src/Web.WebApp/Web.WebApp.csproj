@@ -31,4 +31,8 @@
     <ProjectReference Include="..\Core.Ioc\Core.Ioc.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+		<None Include="$(ProjectDir)certificates\\**" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" LinkBase="certificates\" />
+	</ItemGroup>
+
 </Project>

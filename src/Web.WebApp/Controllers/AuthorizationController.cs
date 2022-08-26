@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using System;
@@ -41,7 +41,7 @@ namespace Web.WebApp.Controllers
                 throw new NotImplementedException("The specified grant is not implemented.");
             }
 
-            if (request.IsAuthorizationCodeGrantType())
+            if (request.IsAuthorizationCodeGrantType() || request.IsRefreshTokenGrantType())
             {
                 // Retrieve the claims principal stored in the authorization code
                 var claimsPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
@@ -49,6 +49,7 @@ namespace Web.WebApp.Controllers
                 // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
                 return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
+
 
             return BadRequest(new OpenIddictResponse
             {
@@ -80,19 +81,14 @@ namespace Web.WebApp.Controllers
                     });
             }
 
-            // Create a new claims principal
-            //var identity = new ClaimsIdentity(
-            //    authenticationType: TokenValidationParameters.DefaultAuthenticationType,
-            //    nameType: Claims.Name,
-            //    roleType: Claims.Role);
-
             var claims = new List<Claim>
             {
                 // 'subject' claim which is required
                 new Claim(Claims.Subject, user.Id.ToString()),
                 new Claim(Claims.Audience, "api-client", OpenIddictConstants.Destinations.AccessToken),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email).SetDestinations(Destinations.AccessToken, Destinations.IdentityToken)
+
+                new Claim(Claims.Email, user.Email).SetDestinations(Destinations.IdentityToken)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -105,10 +101,27 @@ namespace Web.WebApp.Controllers
                 Scopes.OpenId,
                 Scopes.Email,
                 Scopes.Profile,
+                Scopes.OfflineAccess,
             }.Intersect(request.GetScopes()));
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
             return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
+
+
+        [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
+        [HttpGet("~/connect/userinfo")]
+        public async Task<IActionResult> Userinfo()
+        {
+            var claimsPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme))
+                .Principal;
+
+            return Ok(new
+            {
+                Name = "Not implement",
+                Sub = claimsPrincipal.GetClaim(OpenIddictConstants.Claims.Subject),
+                
+            });
         }
 
     }

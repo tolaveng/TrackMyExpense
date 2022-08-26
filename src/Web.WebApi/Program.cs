@@ -4,23 +4,13 @@
 
 
 using Core.Infrastructure.Configurations;
-using Core.Infrastructure.Database;
 using Core.Ioc;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OpenIddict.Abstractions;
-using OpenIddict.Validation;
 using OpenIddict.Validation.AspNetCore;
-using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using Web.WebApi.Mutations;
 using Web.WebApi.Queries;
-using static OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,88 +53,40 @@ builder.Services.ConfigureServices(builder.Configuration, builder.Environment);
 // Turn off, JWT claim type mapping to allow well-known claims(sub, idp)
 //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+var oidcSetting = builder.Configuration.GetSection("OidcSetting").Get<OidcSetting>();
+//builder.Services.AddSingleton(oidcSetting);
+builder.Services.Configure<OidcSetting>(builder.Configuration.GetSection("OidcSetting"));
+
 // OpenIdConnect
 builder.Services.AddOpenIddict()
     .AddValidation(options =>
     {
-        // Test if the authorization handler can be extracted from the HttpRequest
-        options.AddEventHandler<OpenIddictValidationEvents.ProcessAuthenticationContext>(builder =>
-        {
-            builder.UseInlineHandler(context =>
-            {
-                var request = context.Transaction.GetHttpRequest();
-                Debug.WriteLine("Authorization header: " + request.Headers.Authorization.ToString());
-
-                return default;
-            });
-
-            builder.SetOrder(ExtractAccessTokenFromAuthorizationHeader.Descriptor.Order + 1);
+        if (string.IsNullOrEmpty(oidcSetting.SecurityKey)) throw new InvalidOperationException("Security Key is not configued");
+        var secretKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(oidcSetting.SecurityKey));
+        options.Configure(conf => {
+            conf.TokenValidationParameters.ValidateIssuer = true;
+            conf.TokenValidationParameters.IssuerSigningKey = secretKey;
+            conf.TokenValidationParameters.ValidateIssuerSigningKey = true;
         });
-        // End Test
-
-        //options.SetConfiguration(new OpenIdConnectConfiguration
-        //{
-        //    Issuer = "https://localhost:44365/",
-        //    SigningKeys = { new X509SecurityKey(AuthenticationExtensionMethods.TokenSigningCertificate()) }
-        //});
-
-        //options.AddEncryptionCertificate(AuthenticationExtensionMethods.TokenEncryptionCertificate());
 
         // uses OpenID Connect discovery
-        options.SetIssuer("https://localhost:8081/");
-        options.AddAudiences("api-client");
+        options.SetIssuer(oidcSetting.Issuer);
+        options.AddAudiences(oidcSetting.ClientId);
         // credentials used when communicating with the remote introspection endpoint.
         options.UseIntrospection()
-            .SetClientId("api-client")
-            .SetClientSecret("499D56FA-B47B-5199-BA61-B298D431C318");
+            .SetClientId(oidcSetting.ClientId)
+            .SetClientSecret(oidcSetting.ClientSecret);
 
         // Register the System.Net.Http integration.
         options.UseSystemNetHttp();
 
         // Register the ASP.NET Core host.
         options.UseAspNetCore();
-
-        // Register the Owin host.
-        //options.UseOwin().UseActiveAuthentication();
     });
 builder.Services.AddAuthentication(options => {
     options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
     options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });
-
-
-
-// Authentication
-// - JWT
-//var jwtConfig = builder.Configuration.GetSection("JwtSetting").Get<JwtSetting>();
-// builder.Services.AddSingleton(jwtConfig);
-
-// JWT
-//builder.Services.AddAuthentication(opt =>
-//{
-//    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddJwtBearer(opt =>
-//    {
-//        opt.Authority = "https://localhost:8081/";
-//        opt.Audience = "api-client";
-//        opt.TokenValidationParameters.ValidTypes = new[] { "at+jwt" };
-//        //opt.RequireHttpsMetadata = false;
-//        //opt.SaveToken = true; // save to HttpContext
-//        opt.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuerSigningKey = true,
-
-//            NameClaimType = ClaimTypes.NameIdentifier,
-//            ValidateIssuer = false,
-//            //ValidIssuer = jwtTokenConfig.Issuer,
-//            ValidateAudience = false,
-//            ValidAudience = "api-client", //jwtTokenConfig.Audience,
-//            ValidateLifetime = true,
-//            ClockSkew = TimeSpan.Zero // remove 5 minute window after the token expired,
-//        };
-//    });
 
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
@@ -179,7 +121,7 @@ if (builder.Environment.IsDevelopment())
 }
 
 
-//-----------APP--------------
+//----------- APP --------------
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

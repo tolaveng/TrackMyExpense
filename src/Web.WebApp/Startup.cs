@@ -20,11 +20,10 @@ using System.Net;
 using System.Security.Claims;
 using System;
 using Core.Infrastructure.Database;
-using OpenIddict.Validation;
-using System.Diagnostics;
-using Microsoft.AspNetCore;
-using static OpenIddict.Validation.AspNetCore.OpenIddictValidationAspNetCoreHandlers;
+using Core.Infrastructure.Configurations;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Web.WebApp
 {
@@ -86,6 +85,15 @@ namespace Web.WebApp
             // Cor.Ioc
             services.ConfigureServices(Configuration, Environment);
 
+
+            var oidcSetting = Configuration.GetSection("OidcSetting").Get<OidcSetting>();
+            if (string.IsNullOrEmpty(oidcSetting.SecurityKey)) throw new InvalidOperationException("Security Key is not configued");
+            var secretKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(oidcSetting.SecurityKey));
+            
+            var signingCertPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "certificates", "SigningCert.pfx");
+            var signingCert = new X509Certificate2(signingCertPath, "");
+            //var signingKey = new X509SecurityKey(signingCert);
+
             // OpendIddict
             // https://documentation.openiddict.com/guides/getting-started.html
             services.AddOpenIddict()
@@ -99,7 +107,7 @@ namespace Web.WebApp
                 })
                 // Register the OpenIddict server components.
                 .AddServer(options =>
-                {
+                {   
                     // Enable the token endpoint.
                     options.SetTokenEndpointUris("/connect/token")
                         .SetAuthorizationEndpointUris("/connect/authorize")
@@ -112,36 +120,31 @@ namespace Web.WebApp
                     options.AllowAuthorizationCodeFlow().RequireProofKeyForCodeExchange();
                     options.AllowRefreshTokenFlow();
 
-                    // Using reference tokens means the actual access and refresh tokens
-                    // are stored in the database and different tokens, referencing the actual
-                    // tokens (in the db), are used in request headers. The actual tokens are not
-                    // made public.
-                    //options.UseReferenceAccessTokens();
-                    //options.UseReferenceRefreshTokens();
-
-                    //options.AddEncryptionKey(new SymmetricSecurityKey(
-                    //    Convert.FromBase64String("DRjd/GnduI3Efzen9V9BvbNUfc/VKgXltV7Kbk9sMkY=")));
-
                     // Register scopes (permissions)
                     options.RegisterScopes("api");
 
                     // Set the lifetime of your tokens
-                    options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30));
-                    options.SetRefreshTokenLifetime(TimeSpan.FromDays(7));
+                    options.SetAccessTokenLifetime(TimeSpan.FromMinutes(oidcSetting.AccessTokenLifetimeMinutes));
+                    options.SetRefreshTokenLifetime(TimeSpan.FromDays(oidcSetting.RefreshTokenLifetimeDays));
+
+                    options.AddSigningCertificate(signingCert);
+                    options.AddEncryptionKey(secretKey);
+                    options.AddSigningKey(secretKey);
 
                     // Register the signing and encryption credentials.
-                    options.AddDevelopmentEncryptionCertificate()
-                           .AddDevelopmentSigningCertificate();
+                    //options.AddDevelopmentEncryptionCertificate()
+                    //       .AddDevelopmentSigningCertificate();
 
                     // Encryption and signing of tokens
-                    options.AddEphemeralEncryptionKey()
-                        .AddEphemeralSigningKey()
-                        .DisableAccessTokenEncryption();
+                    //options.AddEphemeralEncryptionKey()
+                    //    .AddEphemeralSigningKey();
+                    //    .DisableAccessTokenEncryption();
 
                     // Register the ASP.NET Core host and configure the ASP.NET Core options.
                     options.UseAspNetCore()
                            .EnableTokenEndpointPassthrough()
-                           .EnableAuthorizationEndpointPassthrough();
+                           .EnableAuthorizationEndpointPassthrough()
+                           .EnableUserinfoEndpointPassthrough();
                 })
                 // Register the OpenIddict validation handler.
                 // Note: the OpenIddict validation handler is only compatible with the
@@ -168,7 +171,8 @@ namespace Web.WebApp
             services.Configure<FileUploadSetting>(Configuration.GetSection("FileUploadSetting"));
             services.Configure<ReCaptchaSetting>(Configuration.GetSection("ReCaptcha"));
             services.Configure<AzureStorageSetting>(Configuration.GetSection("AzureStorage"));
-
+            services.Configure<OidcSetting>(Configuration.GetSection("OidcSetting"));
+            
             // Config route option
             services.Configure<RouteOptions>(opt =>
             {
