@@ -17,10 +17,13 @@ using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Core.Ioc;
 using System.Net;
-using System.Linq;
 using System.Security.Claims;
-using Core.Application.Providers.IProviders;
 using System;
+using Core.Infrastructure.Database;
+using Core.Infrastructure.Configurations;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Web.WebApp
 {
@@ -67,7 +70,7 @@ namespace Web.WebApp
             services.Configure<CookiePolicyOptions>(opt =>
             {
                 opt.CheckConsentNeeded = context => true;
-                //opt.MinimumSameSitePolicy = SameSiteMode.None;
+                opt.MinimumSameSitePolicy = SameSiteMode.Lax; //for OAuth
             });
 
             // Requires all users to be authenticated - NOT WORK with Blazor razor component
@@ -82,6 +85,81 @@ namespace Web.WebApp
             // Cor.Ioc
             services.ConfigureServices(Configuration, Environment);
 
+
+            var oidcSetting = Configuration.GetSection("OidcSetting").Get<OidcSetting>();
+            if (string.IsNullOrEmpty(oidcSetting.SecurityKey)) throw new InvalidOperationException("Security Key is not configued");
+            var secretKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(oidcSetting.SecurityKey));
+            
+            var signingCertPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "certificates", "SigningCert.pfx");
+            var signingCert = new X509Certificate2(signingCertPath, "");
+            //var signingKey = new X509SecurityKey(signingCert);
+
+            // OpendIddict
+            // https://documentation.openiddict.com/guides/getting-started.html
+            services.AddOpenIddict()
+                // Register the OpenIddict core components.
+                .AddCore(options =>
+                {
+                    // Configure OpenIddict to use the Entity Framework Core stores and models.
+                    // Note: call ReplaceDefaultEntities() to replace the default entities.
+                    options.UseEntityFrameworkCore()
+                           .UseDbContext<AppDbContext>();
+                })
+                // Register the OpenIddict server components.
+                .AddServer(options =>
+                {   
+                    // Enable the token endpoint.
+                    options.SetTokenEndpointUris("/connect/token")
+                        .SetAuthorizationEndpointUris("/connect/authorize")
+                        .SetUserinfoEndpointUris("/connect/userinfo")
+                        .SetIntrospectionEndpointUris("/connect/introspect")
+                        ;
+
+                    // Flow
+                    //options.AllowClientCredentialsFlow();
+                    options.AllowAuthorizationCodeFlow().RequireProofKeyForCodeExchange();
+                    options.AllowRefreshTokenFlow();
+
+                    // Register scopes (permissions)
+                    options.RegisterScopes("api");
+
+                    // Set the lifetime of your tokens
+                    options.SetAccessTokenLifetime(TimeSpan.FromMinutes(oidcSetting.AccessTokenLifetimeMinutes));
+                    options.SetRefreshTokenLifetime(TimeSpan.FromDays(oidcSetting.RefreshTokenLifetimeDays));
+
+                    options.AddSigningCertificate(signingCert);
+                    options.AddEncryptionKey(secretKey);
+                    options.AddSigningKey(secretKey);
+
+                    // Register the signing and encryption credentials.
+                    //options.AddDevelopmentEncryptionCertificate()
+                    //       .AddDevelopmentSigningCertificate();
+
+                    // Encryption and signing of tokens
+                    //options.AddEphemeralEncryptionKey()
+                    //    .AddEphemeralSigningKey();
+                    //    .DisableAccessTokenEncryption();
+
+                    // Register the ASP.NET Core host and configure the ASP.NET Core options.
+                    options.UseAspNetCore()
+                           .EnableTokenEndpointPassthrough()
+                           .EnableAuthorizationEndpointPassthrough()
+                           .EnableUserinfoEndpointPassthrough();
+                })
+                // Register the OpenIddict validation handler.
+                // Note: the OpenIddict validation handler is only compatible with the
+                // default token format or with reference tokens and cannot be used with
+                // JWT tokens. For JWT tokens, use the Microsoft JWT bearer handler.
+                // Register the OpenIddict validation components.
+                .AddValidation(options =>
+                 {
+                     // Import the configuration from the local OpenIddict server instance.
+                     options.UseLocalServer();
+
+                     // Register the ASP.NET Core host.
+                     options.UseAspNetCore();
+                 });
+
             // Web App
             services.AddTransient<IReCaptchaService, ReCaptchaService>();
             services.AddHttpContextAccessor();
@@ -93,7 +171,8 @@ namespace Web.WebApp
             services.Configure<FileUploadSetting>(Configuration.GetSection("FileUploadSetting"));
             services.Configure<ReCaptchaSetting>(Configuration.GetSection("ReCaptcha"));
             services.Configure<AzureStorageSetting>(Configuration.GetSection("AzureStorage"));
-
+            services.Configure<OidcSetting>(Configuration.GetSection("OidcSetting"));
+            
             // Config route option
             services.Configure<RouteOptions>(opt =>
             {
@@ -151,7 +230,12 @@ namespace Web.WebApp
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
             }
+
+
+            // Cread OpenIdConnect client
+            SeedApiClient.CreateApiClient(app);
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -167,6 +251,7 @@ namespace Web.WebApp
 
             app.UseRouting();
             app.UseCookiePolicy();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
 

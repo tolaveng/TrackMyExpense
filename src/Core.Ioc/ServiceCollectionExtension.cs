@@ -73,6 +73,9 @@ namespace Core.Ioc
             services.AddPooledDbContextFactory<AppDbContext>(opt => {
                 if (env.IsDevelopment()) opt.EnableSensitiveDataLogging();
                 opt.UseNpgsql(DatabaseConnection.GetConnectionString(databaseSetting.Get<DatabaseSetting>()));
+
+                // Register the entity sets needed by OpenIddict.
+                opt.UseOpenIddict();
             });
 
             //services.AddDbContext<AppDbContext>();
